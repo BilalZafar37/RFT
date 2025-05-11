@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+
+{% block page_heading_1 %}Home{% endblock %} 
+{% block page_heading_2 %}Create Shipments{% endblock %} 
+{% block page_heading_3 %}Create New Shipment{% endblock %} 
+
+{% block styles %}
+/* red glow around the offending input */
+.highlight-error {
+  outline: 2px solid #e3342f;
+  animation: blink 0.5s ease-in-out 4;
+}
+@keyframes blink {
+  0%,100% { box-shadow: 0 0 0 red; }
+  50%   { box-shadow: 0 0 8px red; }
+}
+{% endblock %} 
+
+{% block button_submit %}
+<button id="submit" type="submit" style="width: 600px;" form="main_form" class="btn bg-gradient-success">Create Shipment</button>
+{% endblock %} 
+
+{% block content %}  
+<form id="main_form" action="{{ url_for('main.createShipments') }}" method="POST">
+  <!-- PO UPDATE TABLE -->
+  <table id="myTable" style="color: black;" class="table table-responsive table-hover">
+    <thead>
+      <tr>
+        <th>Sr.<input style="width: 30% !important;" type="checkbox" id="select-all"></th>
+
+        <th data-col="PONumber">PO Number</th>
+        <th data-col="Supplier">Supplier</th>
+        <th data-col="Brand">Brand</th>
+        <th data-col="CatName">Category</th>
+        <th data-col="Article">Article</th>
+        <th>Qty to ship</th>       {# your <input> column #}
+        <th data-col="BalanceQty">Total Qty</th>
+        <th>Balance Qty</th> 
+        <th data-col="TotalValue">Total Value</th>
+        <th>Balance Value </th> {# js‐computed #}
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in rows %}
+      <tr>
+        <td class="text-center">
+          <!-- <input type="hidden" name="poline_id" value="{{ r.POLineID }}"> -->
+          {{ loop.index }}.
+        </td>
+          
+        <td class="col-PONumber">{{ r.PONumber }}</td>
+        <td class="col-Supplier">{{ r.Supplier }}</td>
+        <td class="col-Brand">{{ r.Brand }}</td>
+        <td class="col-CatName">{{ r.CatName }}</td>
+        <td class="col-Article">{{ r.Article }}</td>
+
+        {#  Qty‐to‐ship input  #}
+        <td>
+          <input
+            type="checkbox" name="POID" class="item-checkbox form-check-inline" style="accent-color: red !important;" value="{{ r.POLineID }}"/>
+          <input
+            type="number" name="selected_qty_{{ r.POLineID }}"
+            class="selected-qty form-control-sm rounded w-70"
+            value="0" min="0" max="{{ r.BalanceQty }}" step="1"/>
+        </td>
+
+        <td class="orig-balance col-BalanceQty">{{ r.BalanceQty }}</td>
+        <td class="new-balance">0</td>
+
+        <td class="total-value col-TotalValue">{{ "{:,.2f}".format(r.TotalValue) }} USD</td>
+        <td class="value-balance">0</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</form>
+{% endblock %}   
+
+{% block script_extra %}
+<!-- Blink on empty submit -->
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const form = document.querySelector("form");              // or #main_form
+    const checkboxes = form.querySelectorAll(".item-checkbox");
+  
+    form.addEventListener("submit", e => {
+      let firstBad = null;
+  
+      checkboxes.forEach(cb => {
+        if (!cb.checked) return;
+        const pid = cb.value;
+        const qtyInput = form.querySelector(`input[name="selected_qty_${pid}"]`);
+        if (!qtyInput) return;
+  
+        // clear any old highlight
+        qtyInput.classList.remove("highlight-error");
+  
+        if (parseInt(qtyInput.value, 10) === 0) {
+          firstBad = firstBad || qtyInput;
+        }
+      });
+  
+      if (firstBad) {
+        e.preventDefault();
+        alert("You checked an item but left its quantity at 0. Please enter a positive number.");
+        // highlight + scroll
+        firstBad.classList.add("highlight-error");
+        firstBad.scrollIntoView({ behavior: "smooth", block: "center" });
+        firstBad.focus();
+      }
+    });
+  });
+  </script>
+  
+
+<!-- QTY management calculations -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.selected-qty').forEach(function (input) {
+      input.addEventListener('input', function () {
+        const row = input.closest('tr');
+  
+        const origBalance = parseFloat(row.querySelector('.orig-balance').textContent) || 0;
+        const totalValue = parseFloat(row.querySelector('.total-value').textContent) || 0;
+        const selectedQty = parseFloat(input.value) || 0;
+  
+        // Calculate new balance
+        const newBalance = origBalance - selectedQty;
+        row.querySelector('.new-balance').textContent = newBalance < 0 ? 0 : newBalance;
+  
+        // Calculate unit value and new value
+        const unitValue = origBalance > 0 ? totalValue / origBalance : 0;
+        const valueBalance = newBalance > 0 ? (unitValue * newBalance).toFixed(2) : '0.00';
+        row.querySelector('.value-balance').textContent = valueBalance;
+      });
+  
+      // Trigger once on load to populate correctly
+      input.dispatchEvent(new Event('input'));
+    });
+  });
+</script>
+
+<!-- Checkbox checked -->
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const selectAll = document.getElementById("select-all");
+  
+    selectAll.addEventListener("change", () => {
+      const checked = selectAll.checked;
+  
+      document.querySelectorAll(".item-checkbox").forEach(cb => {
+        const row = cb.closest("tr");
+        // row.offsetParent === null for display:none rows
+        if (row && row.offsetParent !== null) {
+          cb.checked = checked;
+        }
+      });
+    });
+  });
+</script> 
+
+{% endblock %}

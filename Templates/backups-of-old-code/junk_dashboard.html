@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="apple-touch-icon" sizes="76x76" href="/static/img/apple-icon.png">
+  
+  <link rel="icon" type="image/png" href="/static/img/favicon.png">
+  <title>
+    RFT
+  </title>
+  <!--     Fonts and icons     -->
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900|Roboto+Slab:400,700" />
+  <!-- Nucleo Icons -->
+  <link href="/static/css/nucleo-icons.css" rel="stylesheet" />
+  <link href="/static/css/nucleo-svg.css" rel="stylesheet" />
+  <!-- Font Awesome Icons -->
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+
+  <!-- CSS Files -->
+  <link id="pagestyle" href="/static/css/material-dashboard.css?v=3.1.0" rel="stylesheet" />
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+</head>
+
+<style>
+  /* For WebKit browsers (Chrome, Safari, Edge) */
+  .scroll-container::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  .scroll-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+
+  .scroll-container::-webkit-scrollbar-thumb {
+    background-color: #c1c1c1;
+    border-radius: 5px;
+    border: 2px solid #f1f1f1;
+  }
+
+  .scroll-container::-webkit-scrollbar-thumb:hover {
+    background-color: #a8a8a8;
+  }
+
+  /* For Firefox */
+  .scroll-container {
+    scrollbar-width: thin;
+    scrollbar-color: #c1c1c1 #f1f1f1;
+  }
+
+  .fixed-height-card {
+    height: 350px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .scrollable-card-body {
+    flex: 1 1 auto;
+    overflow: auto !important;;
+  }
+
+  .bg-gradient-primary {
+    background-image: linear-gradient(195deg, #4054ec 0%, #D81B60 100%);
+  }
+  .dropdown-container {
+  display: none;
+  /* background-color: #262626; */
+  padding-left: 8px;
+  }
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  .dropdown-btn {
+  padding: 6px 8px 6px 16px;
+  text-decoration: none;
+  font-size: 20px;
+  color: #818181;
+  display: block;
+  border: none;
+  background: none;
+  width:100%;
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+  }
+  .hov:hover{
+    
+    display: flex;
+    width: 169px;
+    border: none;
+    border-radius: 5px;
+    background-image: linear-gradient(195deg, #4054ec 0%, #D81B60 100%);
+  }
+  .numbadge {
+  --bs-badge-padding-x: 0.5em;
+  --bs-badge-padding-y: 0.5em;
+  --bs-badge-font-size: 0.75em;
+  --bs-badge-font-weight: 700;
+  --bs-badge-color: #fff;
+  --bs-badge-border-radius: 10rem;
+  display: inline-block;
+  padding: var(--bs-badge-padding-y) var(--bs-badge-padding-x);
+  font-size: var(--bs-badge-font-size);
+  font-weight: var(--bs-badge-font-weight);
+  line-height: 1;
+  color: var(--bs-badge-color);
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: var(--bs-badge-border-radius);
+  }
+  /* Target the select2 container */
+.select2-container {
+    max-width: 607.321px !important;
+    min-width: 190px !important;
+    width: auto !important;
+}
+
+/* Ensure the dropdown itself also follows the same width */
+.select2-dropdown {
+    max-width: 607.321px !important;
+    min-width: 190px !important;
+    width: auto !important;
+}
+
+/* Style the inner text field where the selection appears */
+.select2-selection {
+    max-width: 607.321px !important;
+    min-width: 190px !important;
+    width: auto !important;
+}
+
+</style>
+
+<body class="g-sidenav-show " style="background: radial-gradient(#000000, #325fff)">
+  <!-- SERCHABLE DROPDOWNS -->
+  <!-- Include jQuery and Select2 JS -->
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+  <script>
+      $(document).ready(function () {
+          $("#brand_ytd , #brand_ytd_sellIN , #brand_graph, #brandSelect, #brand_deliverstatuses , #brand_credit_check, #brand_ytd_return").select2({
+              multiple: true,
+              allow_clear:true,
+          });
+      });
+  </script>
+  {% include 'sidebar2.html' %} 
+  <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
+
+    <!-- Navbar contains username -->
+    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur" data-scroll="true">
+      <div class="container-fluid py-1 px-3">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
+            <li style="color: white;" class="breadcrumb-item text-sm active" aria-current="page">Home</li>
+          </ol>
+          <h6 style="color: white;" class="font-weight-bolder mb-0">Dashboard</h6>
+        </nav>
+        <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
+          <div class="ms-md-auto pe-md-3 d-flex align-items-center">
+            <div class="input-group input-group-outline">
+              <label aria-placeholder="Type here" class="form-label"></label>
+              <input style="color: white;" placeholder="Type here" type="text" class="form-control">
+            </div>
+          </div>
+          <ul class="navbar-nav  justify-content-end">
+            <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
+              <a href="javascript:;" class="nav-link text-body p-0" id="iconNavbarSidenav">
+                <div class="sidenav-toggler-inner">
+                  <i class="sidenav-toggler-line"></i>
+                  <i class="sidenav-toggler-line"></i>
+                  <i class="sidenav-toggler-line"></i>
+                </div>
+              </a>
+            </li>
+            <li class="nav-item px-3 d-flex align-items-center">
+              <a href="#" class="nav-link text-body p-0">
+                <i style="color: white;" class="fa fa-cog fixed-plugin-button-nav cursor-pointer"></i>
+              </a>
+            </li>
+            <li class="nav-item d-flex align-items-center">
+              <a href="/login" class="nav-link text-body font-weight-bold px-0">
+                <i style="color: white;" class="fa fa-user me-sm-1"></i>
+                <span class="d-sm-inline d-none" style="color: white;">{{session['username']}}</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <!-- End Navbar -->
+
+    <form class="filter-form" method="post" action="{{ url_for('dashboard') }}">
+      <div class="container-fluid py-4">
+        <div class="row">
+          <!-- T1 -->
+          <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+            <div class="card fixed-height-card">
+              <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                <div class="bg-gradient-dark shadow-primary border-radius-lg pt-4 pb-3">
+                  <h6 class="bg-gradient-primary text-white text-capitalize text-center ps-3" style="border-top-right-radius: 5px; border-bottom-right-radius: 5px;">Monthly</h6>
+                </div>
+              </div>
+              <div class="card-header p-3 pt-2">
+                <h5 class="text-center"><i class="material-icons opacity-10" style="color: gold;">paid</i>B2B Orders status</h5>
+              </div>
+              <div class="card-body scrollable-card-body" style="padding-top: 0px;">
+                <div class="pt-1">
+                    <input type="hidden" value="t1" name="t1"> 
+                    <select style="width: 190px;" id="brand_ytd" name="brand_ytd[]" multiple>
+                      <option value="" selected disabled>All</option>
+                      <option value="ALL HAP">ALL HAP</option>
+                      {% for brand in brands_list %}
+                        {% if brand in session['user_brand_access'] or session['role'] == 'admin' %}
+                          <option value="{{ brand }}" {% if brand in selected_brand_t1  %}selected{% endif %}>{{ brand }}</option>
+                        {% endif %}
+                      {% endfor %}
+                    </select>
+                    <button class="badge badge-sm bg-gradient-info" style=" border: 1px solid black; width: 66px;" type="submit">Brand</button>
+                    
+                    <select style="width: 190px;" name="created_month_ytd" id="month1"> 
+                      <option value="All">All months</option>
+                      {% for month in all_created_months %}
+                        <option value="{{ month }}" {% if selected_created_month == month %}selected{% endif %}>{{ month|datetimeformat }}</option>
+                      {% endfor %}
+                    </select>
+                    <button class="badge badge-sm bg-gradient-info" style=" border: 1px solid black;" type="submit">Month</button>
+                  <hr class="dark horizontal">
+                  <table>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <p class=" mb-0 text-capitalize" style="color: black;">No. of Sales Orders :</p>
+                        </td>
+                        <td>
+                          <h6 class="mb-0" style="color: blue;"> {{ result.SalesDocumentCount }}</h6>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p class=" mb-0 text-capitalize" style="color: black;">No of Delivery Notes :</p>
+                        </td>
+                        <td>
+                          <h6 class="mb-0" style="color: blue;"> {{ result.DeliveryCount }}</h6>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p class="mb-0 text-capitalize" style="color: black;">Under Logistics:</p>
+                        </td>
+                        <td class="d-flex flex-row">
+                          <h6 class="mb-0" style="color: green;">{{ "{:,.0f}".format(result.TotalOpen)  if result.TotalOpen is not none else "0" }}</h6> <p class="text-xs" style="color: green;">SAR</p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p class="mb-0 text-capitalize" style="color: black;">value of Invoiced orders :</p>
+                        </td>
+                        <td class="d-flex flex-row">
+                          <h6 class="mb-0" style="color: green;"> {{ "{:,.0f}".format(result.TotalNet) if result.TotalNet is not none else "0" }}</h6> <p class="text-xs" style="color: green;">SAR</p>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tables combined -->
+          <div class="col-xl-9 col-sm-6 mb-xl-0 mb-4">
+            <div class="card fixed-height-card">
+              <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                <div class="bg-gradient-dark shadow-primary border-radius-lg pt-4 pb-3">
+                  <h6 class="bg-gradient-primary text-white text-capitalize text-center ps-3" style="border-top-right-radius: 5px; border-bottom-right-radius: 5px;">B2B Orders status</h6>
+                </div>
+              </div>
+              <div class="col text-center">
+                <input type="hidden" value="t2" name="t2">
+                <div class="d-inline-block mt-2">
+                  <!-- Combine table BRAND FILTER -->
+                  <select name="brand_deliverstatuses[]" id="brand_deliverstatuses" class="form-select d-inline-block w-auto" multiple>
+                    <option value="" selected disabled>All</option>
+                    <option value="ALL HAP">ALL HAP</option>
+                    {% for brand in brands_list %}
+                      {% if brand in session['user_brand_access'] or session['role'] == 'admin' %}
+                        <option value="{{ brand }}" {% if brand in selected_brand_t2 %}selected{% endif %}>{{ brand }}</option>
+                      {% endif %}
+                    {% endfor %}
+                  </select>
+                  <button class="badge badge-sm bg-gradient-info" type="submit">Brand</button>
+
+                  <!-- Combined table month filter -->
+                  <select name="month_t2_t3_t4" id="month_t2_t3_t4"  class="form-select d-inline-block w-auto"> 
+                    <option value="All">All months</option>
+                    {% for month in all_created_months %}
+                      <option value="{{ month }}" {% if selected_t2_t3_t4 == month %}selected{% endif %}>{{ month|datetimeformat }}</option>
+                    {% endfor %}
+                  </select>
+                </div>    
+              </div>
+        
+              <div class="row" style="overflow: scroll; max-height: 220px; padding-top: 0px;">
+                <!-- Credit-Check Column -->
+                <div class="col-md-4 ">
+                  <div class="pt-2 text-center">
+                    <h5><i class="material-icons opacity-10" style="color: orange;">paid</i> Credit-Check</h5>
+                  </div>
+                  <div class="card-body" style="overflow: auto; max-height: 220px; padding-top: 0;">
+                    <hr class="dark horizontal">
+                    <table class="table">
+                      <tbody>
+                        {% for key, item in credit_status_data.items() %}
+                          {% if item.total_net_value != 0 %}
+                            <tr>
+                              <td>
+                                <p class="mb-0 text-capitalize" style="color: black;">
+                                  {{ key }}: 
+                                  {% if 'block' in key %}
+                                  <i class="material-icons opacity-10" style="color: gray;" data-toggle="tooltip" data-placement="Top" title="Credit-Check blocked, to be released by finance">info</i>
+                                  {% endif %}
+                                  {% if 'done' in key %}
+                                  <i class="material-icons opacity-10" style="color: gray;" data-toggle="tooltip" data-placement="Top" title="Credit-Check completed orders are under logistics">info</i>
+                                  {% endif %}
+                                </p>
+                              </td>
+                              <td class="text-end" style="display: inline-block;">
+                                {% if 'block' in key %}
+                                <a href="/credit_check_blocked">
+                                  <h6 class="mb-0 text-sm" style="color: blue;">
+                                    {{ "{:,.0f}".format(item.total_net_value | default(0)) }} SAR
+                                  </h6>
+                                </a>
+                                {% endif %}
+                                {% if 'done' in key %}
+                                <h6 class="mb-0 text-sm" style="color: blue;">
+                                  {{ "{:,.0f}".format(item.total_net_value | default(0)) }} SAR
+                                </h6>
+                                {% endif %}
+                              </td>
+                            </tr>
+                          {% endif %}
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <!-- Order Fulfillment Column -->
+                <div class="col-md-4">
+                  <div class="pt-2 text-center">
+                    <h5><i class="material-icons opacity-10" style="color: gray;">warehouse</i> Order Fulfillment</h5>
+                  </div>
+                  <div class="card-body" style="max-height: 220px; padding-top: 0;">
+                    <hr class="dark horizontal">
+                    <table class="table">
+                      <tbody>
+                        {% for result in group1_results %}
+                          {% if result.TotalOpen is not none %}
+                            <tr>
+                              <!-- <td>
+                                <p class="mb-0 text-capitalize" style="color: black;">{{ result.Status }}:</p>
+                              </td> -->
+                              <td>
+                                <p class="mb-0 text-capitalize" style="color: {{ 'red' if 'cancelled' in result.Status else 'black' }};">
+                                  {{ result.Status }}: 
+                                  {% if result.Status == 'New Order' %}
+                                  <i class="material-icons opacity-10" style="color: gray;" data-toggle="tooltip" data-placement="Top" title="Order after release waiting to to processed">info</i>
+                                  {% endif %}
+                                  {% if result.Status == 'Aging New Orders' %}
+                                  <i class="material-icons opacity-10" style="color: gray;" data-toggle="tooltip" data-placement="Top" title="Order release more then 3 days ago">info</i>
+                                  {% endif %}
+                                </p>
+                              </td>
+                              <td>
+                                <a href="/sales_order_status/status/{{ result.Status | urlencode }}">
+                                  <h6 class="mb-0" style="color: blue;">{{ result.DeliveryCount }}</h6>
+                                </a>
+                              </td>
+                              <td class="text-end {{ 'd-none' if 'DN-Order cancelled' in result.Status else '' }}">
+                                <h6 class="mb-0" style="color: {{ 'red' if 'cancelled' in result.Status else 'green' }}; font-size: 12px;">{{ "{:,.0f}".format(result.TotalOpen | default(0)) }} SAR</h6>
+                              </td>
+                            </tr>
+                          {% endif %}
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <!-- Order Delivery Column -->
+                <div class="col-md-4">
+                  <div class="pt-2 text-center">
+                    <h5><i class="material-icons opacity-10" style="color: green;">local_shipping</i> Order Delivery</h5>
+                  </div>
+                  <div class="card-body" style="max-height: 220px; padding-top: 0;">
+                    <hr class="dark horizontal">
+                    <table class="table">
+                      <tbody>
+                        {% for result in group2_results %}
+                          <tr>
+                            <td>
+                              <p class="mb-0 text-capitalize" style="color: black;">
+                                {{ result.Status }}: 
+                                {% if 'In-transit' in result.Status %}
+                                <i class="material-icons opacity-10" style="color: gray;" data-toggle="tooltip" data-placement="Top" title="Order Out-For delivery">info</i>
+                                {% endif %}
+                              </p>
+                            </td>
+                            <td>
+                              <a href="/sales_order_status/status/{{ result.Status | urlencode }}">
+                                <h6 class="mb-0" style="color: blue;">{{ result.DeliveryCount }}</h6>
+                              </a>
+                            </td>
+                            <td class="text-end">
+                              <h6 class="mb-0" style="color: green;  font-size: 12px;">{{ "{:,.0f}".format(result.TotalNet | default(0)) }} SAR</h6>
+                            </td>
+                          </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row mt-4">
+          <!-- CHART 2 -->
+          <div class=" col-md-12 mt-4 mb-4">
+            <div class="card z-index-2 ">
+              <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                <div class="bg-gradient-primary shadow-primary border-radius-lg py-3 pe-1">
+                  <div class="chart">
+                    <!-- <canvas id="chart-bars" class="chart-canvas" height="300" width="700"></canvas> -->
+                    <canvas id="multiBrandChart" style="height: 400px;" ></canvas>
+                  </div>
+                </div>
+              </div>
+              <div class="card-body">
+                <label for="yearSelect">Year:</label>
+                <select id="yearSelect"></select>
+
+                <label for="brandSelect">Brands:</label>
+                <select id="brandSelect" name="brand" style="width:200px;height:100px;" multiple>
+                  <!-- <option value="All" selected>All</option> -->
+                  <option value="All" selected>All</option>
+                </select>
+
+                <button class="badge badge-sm bg-gradient-info" style=" border: 1px solid black;" type="button" id="applyFilters">Apply Filters</button>
+                
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- CHART 1 -->
+        <div class=" col-md-12 mt-4 mb-4">
+          <div class="card z-index-2 ">
+            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+              <div class="bg-gradient-primary shadow-primary border-radius-lg py-3 pe-1">
+                <div class="chart">
+                  <canvas id="chart-bars" class="chart-canvas" height="300" width="700"></canvas>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              <input type="hidden" value="g1" name="g1"> 
+              <select name="brand_graph[]" id="brand_graph" multiple>
+                  <option value="" selected disabled>All</option>
+                  <option value="ALL HAP">ALL HAP</option>
+                  {% for brand in brands_list %}
+                    {% if brand in session['user_brand_access'] or session['role'] == 'admin'%}
+                      <option value="{{ brand }}" {% if brand in selected_brand %}selected{% endif %}>{{ brand }}</option>
+                    {% endif %}
+                  {% endfor %}
+              </select>
+              <button class="badge badge-sm bg-gradient-info" style=" border: 1px solid black;"  type="submit">Brand</button>
+
+              <select style="width: 190px;" name="created_month_g1" id="month1"> 
+                <option value="All">All months</option>
+                {% for month in all_created_months %}
+                  <option value="{{ month }}" {% if selected_created_month_g1 == month %}selected{% endif %}>{{ month|datetimeformat }}</option>
+                {% endfor %}
+              </select>
+              <button class="badge badge-sm bg-gradient-info" style=" border: 1px solid black;" type="submit">Month</button>
+              <!-- <hr class="dark horizontal">
+              <div class="d-flex ">
+                <i class="material-icons text-sm my-auto me-1">schedule</i>
+                <p class="mb-0 text-sm"> Last update Just now </p>
+              </div> -->
+            </div>
+          </div>
+        </div>
+        <div class="row mt-4">
+          <!-- T5 RETURNS YTD TABLE -->
+          <div class="col-lg-6 mt-4 mb-3">
+            <div class="card z-index-2 ">
+                <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                    <div class="bg-gradient-faded-dark shadow-dark border-radius-lg py-3 pe-1">
+                        <div class="chart" height="300" width="700">
+                        <!-- Monthly Net Sales Table for t4 -->
+                        <table class="table align-items-center mb-0 table-responsive" style="color: white;">
+                            <thead>
+                                <tr>
+                                <th colspan="6" style="text-align: center;">
+                                    <h3 style="width: 100%; text-align: center; color: white;"><i class="material-icons opacity-10" style="color: rgb(255, 30, 0);">paid</i> YTD Total Company Sales Return Report </h3>
+                                </th>
+                                </tr>
+                                <tr>
+                                    <th>Month</th>
+                                    <th>Total Returns Value</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for entry in monthly_net_returns_t5 %}
+                                <tr>
+                                    <td>{{ entry.month|format_month }}</td>
+                                    <td>{{ entry.TotalReturn }}</td>
+                                    <td>
+                                        <a class="hov" href="/general_MCSI/{{ selected_brand_t5|default(All) | join(',') }}/{{ entry.month }}" style="color: white;">Detailed Breakdown</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <!-- --- End of Sell-In Report Summary (t4) --- -->
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Filter Form for t4 -->
+                    <input type="hidden" name="t5" value="1">
+                    <label for="brand_ytd_return">Brand:</label>
+                    <select name="brand_ytd_return[]" id="brand_ytd_return" multiple>
+                        <option value="" selected disabled>All</option>
+                        <option value="ALL HAP">ALL HAP</option>
+                        {% for brand in brands_list %}
+                        {% if brand in session['user_brand_access'] or session['role'] == 'admin'%}
+                            <option value="{{ brand }}" {% if brand in selected_brand_t5 %}selected{% endif %}>{{ brand }}</option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                    <button class="badge badge-sm bg-gradient-info" style=" border: 1px solid black;"  type="submit">Brand</button>
+                    <div class="d-flex ">
+                        <i class="material-icons text-sm my-auto me-1">schedule</i>
+                        <p class="mb-0 text-sm">just updated</p>
+                    </div>
+                </div>
+            </div>
+          </div>
+          <!-- T4 -->
+          <div class="col-lg-6 mt-4 mb-3">
+            <div class="card z-index-2 ">
+              <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                <div class="bg-gradient-dark shadow-dark border-radius-lg py-3 pe-1">
+                  <div class="chart" height="300" width="700">
+
+                    <!-- Monthly Net Sales Table Sell-In Report called t4 -->
+                    <table class="table align-items-center mb-0 table-responsive" style="color: white;">
+                        <thead>
+                          <tr>
+                            <th colspan="6" style="text-align: center;">
+                              <h3 style="width: 100%; text-align: center; color: white;"><i class="material-icons opacity-10" style="color: gold;">paid</i> YTD Total Company Sell-IN Report </h3>
+                            </th>
+                          </tr>
+                          <tr>
+                              <th>Month</th>
+                              <th>Total Net Sales</th>
+                              <th>Details</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                            {% for entry in monthly_net_sales_t4 %}
+                            <tr>
+                                <td>{{ entry.month|format_month }}</td>
+                                <td>{{ entry.TotalNet }}</td>
+                                <td>
+                                    <a class="hov" href="/YTD_report_sell_in_summary?brand=All&created_month={{ entry.month}}" style="color: white; ">Detailed Breakdown</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <!-- --- End of Sell-In Report Summary (t4) --- -->
+                  </div>
+                </div>
+              </div>
+              <div class="card-body">
+                <!-- Filter Form for t4 -->
+                <input type="hidden" name="t4" value="1">
+                <label for="brand_ytd_sellIN">Brand:</label>
+                <select name="brand_ytd_sellIN[]" id="brand_ytd_sellIN" multiple>
+                  <option value="" selected disabled>All</option>
+                  <option value="ALL HAP">ALL HAP</option>
+                  {% for brand in brands_list %}
+                    {% if brand in session['user_brand_access'] or session['role'] == 'admin'%}
+                      <option value="{{ brand }}" {% if brand in selected_brand_t4 %}selected{% endif %}>{{ brand }}</option>
+                    {% endif %}
+                  {% endfor %}
+                </select>
+                <button class="badge badge-sm bg-gradient-info" style=" border: 1px solid black;"  type="submit">Brand</button>
+                <div class="d-flex ">
+                  <i class="material-icons text-sm my-auto me-1">schedule</i>
+                  <p class="mb-0 text-sm">just updated</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {%include 'footer_credits.html'%} 
+      </div>
+    </form>
+  </main>
+
+  <!--   Core JS Files   -->
+  <script src="/static/js/core/popper.min.js"></script>
+  <script src="/static/js/core/bootstrap.min.js"></script>
+  <script src="/static/js/plugins/perfect-scrollbar.min.js"></script>
+  <script src="/static/js/plugins/smooth-scrollbar.min.js"></script>
+  <script src="/static/js/generalScripts.js"></script>
+  <script src="/static/js/plugins/chartjs.min.js"></script>
+
+  <script>
+    const watermarkPlugin = {
+      id: 'watermark',
+      beforeDraw: (chart) => {
+        const ctx = chart.ctx;
+        const width = chart.width;
+        const height = chart.height;
+
+        // Configure watermark style
+        ctx.save();
+        ctx.globalAlpha = 0.3; // Transparency
+        ctx.font = "bold 50px Arial"; // Font style
+        ctx.fillStyle = "white"; // Color
+
+        // Add watermark text
+        const text = "TOTAL COMPANY NET SALES";
+        const textWidth = ctx.measureText(text).width;
+
+        // Rotate and position text in the center
+        ctx.translate(width / 2, height / 2);
+        // ctx.rotate(-Math.PI / 4); // Diagonal
+        ctx.fillText(text, -textWidth / 2, 0);
+
+        ctx.restore();
+      },
+    };
+    Chart.register(watermarkPlugin);
+
+    var ctx = document.getElementById("chart-bars").getContext("2d");
+    // Use chart_data from backend
+    
+    // var dates = {{ dates | safe }};
+    // var totals = {{ totals | safe }};
+    var dates = JSON.parse('{{ dates | tojson | safe }}');
+    var total_count = JSON.parse('{{ totals | tojson | safe }}');
+    var total_val = JSON.parse('{{ total_val | tojson | safe }}');
+
+    // CHART 1 FOR SALES ORDER COUNT
+    new Chart(ctx, {
+      type: "bar", // Base chart type
+      data: {
+        labels: dates,
+        datasets: [
+          {
+            label: "Sales Order Count",
+            type: "bar", // Keep as bar chart
+            data: total_count,
+            backgroundColor: "rgba(255, 255, 255, .8)",
+            borderRadius: 4,
+            maxBarThickness: 10,
+            yAxisID: 'y', // Assign to left y-axis
+          },
+          {
+            label: "Booked Amount (SAR)",
+            type: "line", // Change to line chart
+            data: total_val,
+            borderColor: "rgba(0, 255, 255, .8)",
+            backgroundColor: "rgba(0, 255, 255, .5)",
+            tension: 0.4,
+            fill: true,
+            yAxisID: 'y1', // Assign to right y-axis
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          watermark: false,
+          legend: {
+            display: true,
+            labels: {
+              color: '#ffffff',
+              font: {
+                size: 16,
+              },
+            },
+          },
+          tooltip: {
+            mode: 'index',
+            intersect: false,
+          },
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
+        scales: {
+          y: {
+            type: 'linear',
+            position: 'left',
+            grid: {
+              drawBorder: false,
+              color: 'rgba(255, 255, 255, .2)',
+            },
+            ticks: {
+              color: "#fff",
+              font: {
+                size: 16,
+                weight: 300,
+                family: "Roboto",
+                lineHeight: 2,
+              },
+            },
+            title: {
+              display: true,
+              text: 'Order Count',
+              color: '#fff',
+            },
+          },
+          y1: {
+            type: 'linear',
+            position: 'right',
+            grid: {
+              drawBorder: false,
+              drawOnChartArea: false, // Remove grid lines
+            },
+            ticks: {
+              color: "#fff",
+              font: {
+                size: 16,
+                weight: 300,
+                family: "Roboto",
+                lineHeight: 2,
+              },
+            },
+            title: {
+              display: true,
+              text: 'Booked Amount (SAR)',
+              color: '#fff',
+            },
+          },
+          x: {
+            grid: {
+              drawBorder: false,
+              color: 'rgba(255, 255, 255, .2)',
+            },
+            ticks: {
+              color: '#f8f9fa',
+              font: {
+                size: 16,
+                weight: 300,
+                family: "Roboto",
+                lineHeight: 2,
+              },
+            },
+          },
+        },
+      },
+    });
+
+
+    var ctx2 = document.getElementById("chart-line").getContext("2d");
+    // FAKE
+    new Chart(ctx2, {
+      type: "line",
+      data: {
+        labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+        datasets: [{
+          label: "Mobile apps",
+          tension: 0,
+          borderWidth: 0,
+          pointRadius: 5,
+          pointBackgroundColor: "rgba(255, 255, 255, .8)",
+          pointBorderColor: "transparent",
+          borderColor: "rgba(255, 255, 255, .8)",
+          borderColor: "rgba(255, 255, 255, .8)",
+          borderWidth: 4,
+          backgroundColor: "transparent",
+          fill: true,
+          data: [50, 40, 300, 320, 500, 350, 200, 230, 500],
+          maxBarThickness: 6
+
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          watermark: true, // Enable the watermark plugin
+          legend: {
+            display: true,
+          }
+        },
+        interaction: {
+          intersect: true,
+          mode: 'index',
+        },
+        scales: {
+          y: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              color: '#f8f9fa',
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+          x: {
+            grid: {
+              drawBorder: false,
+              display: false,
+              drawOnChartArea: false,
+              drawTicks: false,
+              borderDash: [5, 5]
+            },
+            ticks: {
+              display: true,
+              color: '#f8f9fa',
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+        },
+      },
+    });
+
+    var ctx3 = document.getElementById("chart-line-tasks").getContext("2d");
+    // FAKE
+    new Chart(ctx3, {
+      type: "line",
+      data: {
+        labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+        datasets: [{
+          label: "Mobile apps",
+          tension: 0,
+          borderWidth: 0,
+          pointRadius: 5,
+          pointBackgroundColor: "rgba(255, 255, 255, .8)",
+          pointBorderColor: "transparent",
+          borderColor: "rgba(255, 255, 255, .8)",
+          borderWidth: 4,
+          backgroundColor: "transparent",
+          fill: true,
+          data: [50, 40, 300, 220, 500, 250, 400, 230, 500],
+          maxBarThickness: 6
+
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          }
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
+        scales: {
+          y: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              padding: 10,
+              color: '#f8f9fa',
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+          x: {
+            grid: {
+              drawBorder: false,
+              display: false,
+              drawOnChartArea: false,
+              drawTicks: false,
+              borderDash: [5, 5]
+            },
+            ticks: {
+              display: true,
+              color: '#f8f9fa',
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+        },
+      },
+    });
+  </script>
+
+  <script>
+    let chart;
+
+    function loadChartData(year=null, brands=[]) {
+      let url = "/multi_brand_chart_data";
+      let params = new URLSearchParams();
+
+      if (year) {
+        params.set('year', year);
+      }
+      if (brands && brands.length > 0) {
+        brands.forEach(b => params.append('brand', b));
+      }
+
+      if (params.toString()) {
+        url += '?' + params.toString();
+      }
+
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          // Populate year dropdown if not done yet
+          const yearSelect = document.getElementById('yearSelect');
+          yearSelect.innerHTML = "";
+          data.available_years.forEach(y => {
+            const opt = document.createElement('option');
+            opt.value = y;
+            opt.text = y;
+            if (y === data.selected_year) {
+              opt.selected = true;
+            }
+            yearSelect.appendChild(opt);
+          });
+
+          // Populate brand multi-select
+          const brandSelect = document.getElementById('brandSelect');
+          brandSelect.innerHTML = "";
+          data.available_brands.forEach(brand => {
+            const opt = document.createElement('option');
+            opt.value = brand;
+            opt.text = brand;
+            if (data.selected_brands.includes(brand)) {
+              opt.selected = true;
+            }
+            brandSelect.appendChild(opt);
+          });
+
+          // If chart exists, destroy it before creating a new one
+          if (chart) {
+            chart.destroy();
+          }
+
+          const ctx = document.getElementById("multiBrandChart").getContext("2d");
+          chart = new Chart(ctx, {
+            type: "bar",
+            data: {
+              labels: data.months,
+              datasets: data.datasets
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  display: true,
+                  labels: {
+                    color: '#fff'
+                  }
+                },
+                tooltip: {
+                  mode: 'index',
+                  intersect: false,
+                  // Add the itemSort callback here
+                  itemSort: function(a, b) {
+                    // Sort by value descending (b - a)
+                    return b.raw - a.raw;
+                  }
+                },
+              },
+              interaction: {
+                intersect: false,
+                mode: 'index',
+              },
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  title: {
+                    display: true,
+                    text: 'Net Sales',
+                    color: '#fff'
+                  },
+                  ticks: {
+                    color: '#fff'
+                  },
+                  grid: {
+                    color: 'rgba(255, 255, 255, 0.2)'
+                  }
+                },
+                x: {
+                  title: {
+                    display: true,
+                    text: 'Month',
+                    color: '#fff'
+                  },
+                  ticks: {
+                    color: '#fff'
+                  },
+                  grid: {
+                    color: 'rgba(255, 255, 255, 0.2)'
+                  }
+                }
+              }
+            }
+          });
+        })
+        .catch(error => console.error('Error fetching chart data:', error));
+    }
+
+    document.getElementById('applyFilters').addEventListener('click', function() {
+      const year = document.getElementById('yearSelect').value;
+      const brandSelect = document.getElementById('brandSelect');
+      const selectedBrands = Array.from(brandSelect.selectedOptions).map(opt => opt.value);
+      loadChartData(year, selectedBrands);
+    });
+
+    // Initial load with default year and all brands
+    loadChartData();
+  </script>
+</body>
+</html>

@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block page_heading_1 %}Home{% endblock %}
+{% block page_heading_2 %}Settings{% endblock %} 
+{% block page_heading_3 %}Manage Dropdowns{% endblock %} 
+
+{% block heading_width %}width: 210px; {% endblock %}
+
+{% block content %}
+<!-- <h1>Manage {{ label }}</h1> -->
+                  
+<form method="post">
+  <table class="table table-sm">
+    <thead>
+      <tr>
+        <th>Manage {{ label }}</th> 
+      </tr>
+      <tr>
+        <th>ID</th>
+        {% for f in fields %}
+          <th>{{ f.replace('_',' ').title() }}</th>
+        {% endfor %}
+        <th>CreatedBy</th>
+        <th>CreatedAt</th>
+        <th>UpdatedBy</th>
+        <th>UpdatedAt</th>
+        <th>Action</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for it in items %}
+        <tr>
+          <td>{{ it.id or it.ID}}</td>
+          {% for f in fields %}
+            <td>
+              <input
+                class="form-control form-control-sm"
+                type="text"
+                name="update_{{ f }}_{{ it.id or it.ID}}"
+                value="{{ it|attr(f) }}"
+              >
+            </td>
+          {% endfor %}
+          <td>{{ it.CreatedBy }}</td>
+          <td>{{ it.CreatedAt }}</td>
+          <td>{{ it.UpdatedBy }}</td>
+          <td>{{ it.UpdatedAt }}</td>
+          <td>
+            <button type="submit" class="btn btn-sm btn-primary">
+              Save
+            </button>
+          </td>
+          <td>
+            <button 
+              type="submit" 
+              name="delete" 
+              value="{{ it.id or it.ID }}" 
+              class="btn btn-sm btn-danger"
+              onclick="return confirm('Are you sure you want to delete this item?');"
+            >
+              Delete
+            </button>
+          </td>
+        </tr>
+      {% endfor %}
+
+      {# New record row #}
+      <tr class="table-success">
+        <td>New</td>
+        {% for f in fields %}
+          <td>
+            <input
+              class="form-control form-control-sm"
+              type="text"
+              name="new_{{ f }}"
+              placeholder="{{ f.replace('_',' ').title() }}"
+            >
+          </td>
+        {% endfor %}
+        <td colspan="5">
+          <button 
+            type="submit" 
+            name="add_new" 
+            value="1"      
+            class="btn btn-sm btn-success"
+          >
+            Add New {{ label }}
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</form>
+  
+{% endblock %}
+
+
+{% block columns_toggle %}{% endblock %}
+{% block filters_toggle %}{% endblock %}
+{% block filters %}{% endblock %}
+
+{% block script_filters %}{% endblock %}
+
+{% block script_columns_toggle %}{% endblock %}
+{% block script_filters_toggle %}{% endblock %}

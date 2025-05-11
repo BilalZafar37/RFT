@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="apple-touch-icon" sizes="76x76" href="/static/img/apple-icon.png">
+  <link rel="icon" type="image/png" href="/static/img/favicon.png">
+  <title>
+    RFT System</title>
+  <!-- <link rel="stylesheet" href="/static/css/index.css"> -->
+  <!-- Fonts and icons -->
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900|Roboto+Slab:400,700" />
+  <link href="/static/css/nucleo-icons.css" rel="stylesheet" />
+  <link href="/static/css/nucleo-svg.css" rel="stylesheet" />
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <!-- <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"> -->
+  <link id="pagestyle" href="/static/css/material-dashboard.css?v=3.1.0" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet"> -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+
+  <!-- <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet"> -->
+
+  <!-- new -->
+  <link rel="stylesheet" href="/static/css/index.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<style>
+  svg {
+    height: 30px;
+    width: 20px;
+  }
+
+  body {
+    min-height: 100vh;
+    min-height: 100dvh;
+   /*  background-color: rgb(23, 23, 23);  */
+    color: var(--text-clr);
+    display: grid;
+    grid-template-columns: auto 1fr;
+  }
+
+  .Nav {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .para {
+    font-size: 12px;
+  }
+
+  .nav-button {
+    position: absolute;
+    border: 1px solid #ccc;
+    padding: 8px 12px;
+    cursor: pointer;
+    z-index: 10;
+  }
+
+  .nav-button.right {
+    right: 10px;
+    background-color: rgb(29, 29, 29);
+    color: grey;
+    border-radius: 15px;
+  }
+
+  .nav-button:hover {
+    background-color: grey;
+    color: black;
+  }
+
+  #search {
+    color: #ccc;
+  }
+  {% block styles %}
+  {% endblock %} 
+  
+  /* Use this class on your shipment number element, e.g. <span class="shipment-clickable">#12345</span> */
+  
+   .shipment-clickable {
+     display: inline-block;
+     color: #007bff;          /* base link-blue color */
+     text-decoration: none;
+     position: relative;
+     transition: color 0.2s ease, transform 0.2s ease;
+     cursor: pointer;
+   }
+  
+   .shipment-clickable::after {
+     content: '';
+     position: absolute;
+     left: 0;
+     bottom: -2px;
+     width: 100%;
+     height: 2px;
+     background: #007bff;
+     transform: scaleX(0);
+     transform-origin: left center;
+     transition: transform 0.2s ease;
+   }
+  
+   .shipment-clickable:hover {
+     color: #0056b3;          /* darker blue on hover */
+     transform: translateY(-2px);
+   }
+  
+   .shipment-clickable:hover::after {
+     transform: scaleX(1);
+   }
+  
+   .shipment-clickable:active {
+     color: #003f7f;
+     transform: translateY(0);
+   }
+  /*  */
+    input[type="file"] {
+      position: relative;
+    }
+  
+    input[type="file"]::file-selector-button {
+      width: 136px;
+      color: transparent;
+    }
+  
+    /* Faked label styles and icon */
+    input[type="file"]::before {
+      position: absolute;
+      pointer-events: none;
+      top: 10px;
+      left: 16px;
+      height: 20px;
+      width: 20px;
+      content: "";
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230964B0'%3E%3Cpath d='M18 15v3H6v-3H4v3c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-3h-2zM7 9l1.41 1.41L11 7.83V16h2V7.83l2.59 2.58L17 9l-5-5-5 5z'/%3E%3C/svg%3E");
+  
+    }
+  
+    input[type="file"]::after {
+      position: absolute;
+      pointer-events: none;
+      top: 11px;
+      left: 40px;
+      color: #0964b0;
+      content: "Upload File";
+    }
+  
+    /* ------- From Step 1 ------- */
+  
+    /* file upload button */
+    input[type="file"]::file-selector-button {
+      border-radius: 4px;
+      padding: 0 16px;
+      height: 40px;
+      cursor: pointer;
+      background-color: white;
+      border: 1px solid rgba(0, 0, 0, 0.16);
+      box-shadow: 0px 1px 0px rgba(0, 0, 0, 0.05);
+      margin-right: 16px;
+      transition: background-color 200ms;
+    }
+  
+    /* file upload button hover state */
+    input[type="file"]::file-selector-button:hover {
+      background-color: #f3f4f6;
+    }
+  
+    /* file upload button active state */
+    input[type="file"]::file-selector-button:active {
+      background-color: #e5e7eb;
+    }
+              /* end of file upload button styling */
+    /* ------------------------ */
+  
+
+  .filter-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding-left: 19px;
+  }
+
+  .filter-container select,
+  .filter-container input {
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+  .bg-gradient-primary {
+    background-image: linear-gradient(195deg, #4054ec 0%, #D81B60 100%);
+  }
+  .dropdown-container {
+    display: block;
+    padding-left: 8px;
+  }
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  .dropdown-btn {
+    padding: 6px 8px 6px 16px;
+    text-decoration: none;
+    font-size: 20px;
+    color: #818181;
+    display: block;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    outline: none;
+  }
+  .hov:hover {
+    display: flex;
+    width: 169px;
+    border: none;
+    border-radius: 5px;
+    background-image: linear-gradient(195deg, #4054ec 0%, #D81B60 100%);
+  }
+  .numbadge {
+    --bs-badge-padding-x: 0.5em;
+    --bs-badge-padding-y: 0.5em;
+    --bs-badge-font-size: 0.75em;
+    --bs-badge-font-weight: 700;
+    --bs-badge-color: #fff;
+    --bs-badge-border-radius: 10rem;
+    display: inline-block;
+    padding: var(--bs-badge-padding-y) var(--bs-badge-padding-x);
+    font-size: var(--bs-badge-font-size);
+    font-weight: var(--bs-badge-font-weight);
+    line-height: 1;
+    color: var(--bs-badge-color);
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: var(--bs-badge-border-radius);
+  }
+  .border2 {
+    border: 2px solid #000 !important;
+  }
+  .input-custom {
+    background-color: #f8f9fa;
+    border: none;
+    border-bottom: 2px solid #ced4da;
+    padding: 10px;
+    border-radius: 0;
+    outline: none;
+  }
+
+  .input-custom:focus {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #4054ec;
+    box-shadow: none;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  label {
+    font-weight: bold;
+  }
+
+  .btn-primary {
+    background-color: #4054ec;
+    border-color: #4054ec;
+  }
+
+  .btn-primary:hover {
+    background-color: #3547d3;
+    border-color: #3547d3;
+  }
+  .instructions {
+      /* font-size: 5px; */
+      color: #51d94f; /* Bootstrap danger color */
+      background-color: #fbfe12; /* Bootstrap danger background */
+      border: 1px solid #ebccd1; /* Bootstrap danger border */
+      padding: 5px;
+      border-radius: 4px;
+      margin-bottom: 15px;
+      font-weight: 500;
+  }
+  /* regular highlight (steady) for bulk container update one class (#fff3cd)*/
+  .highlight-col {
+    background-color: lightskyblue !important;
+  }
+</style>
+
+<body class="g-sidenav-show bg-gray-600 dark-version">
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+  <script>
+    $(document).ready(function () {
+        $("#export_table").select2({
+            multiple: true,
+            allow_clear:true,
+        });
+    });
+  </script>
+
+  {% include 'sidebar2.html' %}  
+  <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg">
+    <!-- Navbar -->
+    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur" data-scroll="true">
+      <div class="container-fluid py-1 px-3">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
+            <li class="breadcrumb-item text-sm"><a class="opacity-5 text-dark" href="javascript:;">Home</a></li>
+            <li class="breadcrumb-item text-sm text-dark active" aria-current="page">{% block page_heading_1 %}{% endblock %}</li>
+          </ol>
+          <h6 class="font-weight-bolder mb-0">{% block page_heading_2 %}{% endblock %}</h6>
+        </nav>
+        <ul class="navbar-nav justify-content-end">
+          <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
+            <a href="javascript:;" class="nav-link text-body p-0" id="iconNavbarSidenav">
+              <div class="sidenav-toggler-inner">
+                <i class="sidenav-toggler-line"></i>
+                <i class="sidenav-toggler-line"></i>
+                <i class="sidenav-toggler-line"></i>
+              </div>
+            </a>
+          </li>
+          <li class="nav-item d-flex align-items-center">
+            <a href="#" class="nav-link text-body font-weight-bold px-0">
+              <i class="fa fa-user me-sm-1" style="font-size: 1.275rem;"></i>
+              <span class="d-sm-inline d-none" style="font-size: 1.275rem;">{{session['username']}}</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <!-- End Navbar -->
+    <div class="container-fluid py-4">
+      <div class="row">
+        <div class="col-12">
+          <div class="card my-4">
+            <div class="card-header p-0 mt-n4 mx-3 sticky-top" style="top: 18px;">
+              <div  class="bg-dark-blue shadow-blur border-radius-lg pt-4 pb-3" style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;">
+
+                <h6 class="btn-outline-primary bg-gradient-primary text-white text-capitalize ps-3" 
+                  style="{% block heading_width %}width: 210px; {% endblock %}cursor: pointer; border-top-right-radius: 5px; border-bottom-right-radius: 5px; ">{% block page_heading_3 %}{% endblock %}
+                </h6>
+                {% block columns_toggle %}
+                 <!-- FOR Columns DROPDOWN -->
+                <div class="dropdown" style="margin-left:auto; margin-right:10px;">
+                  <button class="btn btn-secondary dropdown-toggle" type="button"
+                          data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-columns-gap"></i>
+                  </button>
+                  <ul class="dropdown-menu dropdown-menu-end">
+                    {% for col in columns %}
+                      <li>
+                        <label class="dropdown-item">
+                          <input type="checkbox"
+                                 class="col-toggle"
+                                 data-col="{{ col.name }}"
+                                 {% if col.visible_by_default is not defined or col.visible_by_default %}checked{% endif %}>
+                          {{ col.label }}
+                        </label>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                </div>
+                {% endblock %}
+
+                {% block filters_toggle %}
+                <!-- FOR FILTERS DROPDOWN -->
+                <div class="dropdown" style="margin-left:5px;">
+                  <button class="btn btn-secondary dropdown-toggle" type="button"
+                          data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-funnel-fill"></i>
+                  </button>
+                  <ul class="dropdown-menu dropdown-menu-end">
+                    {% for col in columns if col.filter_type != 'none' %}
+                      <li>
+                        <!-- <div class="filter-item" data-col="{{ col.name }}"> -->
+                        <label>
+                          <input type="checkbox"
+                                  class="filter-toggle"
+                                  data-col="{{ col.name }}"
+                                  checked>
+                          {{ col.label }} Filter
+                        </label>
+                        <!-- </div> -->
+                      </li>
+                    {% endfor %}
+                  </ul>
+                </div>                
+                {% endblock %}
+
+              </div>
+            </div>
+            <div class="card-body px-0 pb-2">
+              {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                  {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert" style="color: white;">
+                      {{ message }}
+                      <button type="button" class="btn-close" style="color: white;" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                  {% endfor %}
+                {% endif %}
+              {% endwith %}
+              
+              {% block filters %}
+              <!-- ACTUAL FILTERSS -->
+              <div id="filters" class="bg-gradient-faded-dark-vertical filter-container m-3 rounded-3" style="z-index: 1;;
+                padding: 10px;
+                margin: 5px;
+                /* margin-bottom: 10px; */
+                ">
+                  {% for col in columns %}
+                  <div class="filter-control" data-col="{{ col.name }}">
+                    <label for="filter-{{ col.name }}">{{ col.label }}</label>
+                
+                    {% if col.filter_type == 'select' %}
+                      <select id="filter-{{ col.name }}"
+                              data-col="{{ col.name }}">
+                        <option value="">All</option>
+                        {% for opt in col.options %}
+                          <option value="{{ opt }}">{{ opt }}</option>
+                        {% endfor %}
+                      </select>
+                
+                    {% elif col.filter_type == 'range' %}
+                      <input type="number"
+                             id="filter-{{ col.name }}_min"
+                             data-col="{{ col.name }}_min"
+                             placeholder="Min"/>
+                      <input type="number"
+                             id="filter-{{ col.name }}_max"
+                             data-col="{{ col.name }}_max"
+                             placeholder="Max"/>
+                
+                    {% elif col.filter_type == 'date' %}
+                      <input type="date"
+                             id="filter-{{ col.name }}"
+                             data-col="{{ col.name }}"/>
+                
+                    {% else %}
+                      <input type="text"
+                             id="filter-{{ col.name }}"
+                             data-col="{{ col.name }}"
+                             placeholder="Search…"/>
+                    {% endif %}
+                  </div>
+                  {% endfor %}  
+                  {% block button_submit %}
+                  {% endblock %}                                      
+              </div>
+              {% endblock %}
+              {% block bulkupdate %}
+              {% endblock %}
+
+              <div id="show_submited_data" class="shadow-success border-radius-lg mb-3 ms-3">
+                <div class=" py-2 backgroundColor text-dark">
+                  <div class="p-0 table-responsive">
+                  {% block content %}  
+                    <table id="myTable" class="table align-items-center mb-0 table-responsive ">
+                      <thead>
+                        <tr>
+                          {% for col in columns %}
+                            <th data-col="{{ col.name }}">{{ col.label }}</th>
+                          {% endfor %}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for row in rows %}
+                          <tr>
+                            {% for col in columns %}
+                              <td class="col-{{col.name}}">{{ row|attr(col.name) }}</td>
+                            {% endfor %}
+                          </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  {% endblock %}     
+                  </div>         
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% include 'footer_credits.html' %}
+    </div>
+  </main>
+  
+
+  <!-- Core JS Files -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+  <script src="/static/js/core/popper.min.js"></script>
+  <script src="/static/js/core/bootstrap.min.js"></script>
+  <script src="/static/js/plugins/perfect-scrollbar.min.js"></script>
+  <script src="/static/js/plugins/smooth-scrollbar.min.js"></script>
+  <script src="/static/js/generalScripts.js"></script>
+
+  <script src="/static/js/index.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+    crossorigin="anonymous">
+  </script>
+
+
+  {% block script_filters %}
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const table        = document.getElementById('myTable');
+    const filtersDiv   = document.getElementById('filters');
+    const filterCtrls  = filtersDiv.querySelectorAll('[data-col]');
+
+    // map column key → its index
+    const headerCells = table.tHead.rows[0].cells;
+    const colIndex = {};
+    Array.from(headerCells).forEach((th, i) => {
+      if (th.dataset.col) colIndex[th.dataset.col] = i;
+    });
+
+    let timeout;
+    filtersDiv.addEventListener('input', () => {
+      clearTimeout(timeout);
+      timeout = setTimeout(runFilters, 200);
+    });
+    filtersDiv.addEventListener('change', runFilters);
+
+    function runFilters() {
+      // build an object of filter criteria
+      const criteria = {};
+      filterCtrls.forEach(ctrl => {
+        const key = ctrl.dataset.col;
+        const val = ctrl.value;
+        if (!val) return;
+
+        if (key.endsWith('_min') || key.endsWith('_max')) {
+          const base = key.replace(/_(min|max)$/, '');
+          criteria[base] = criteria[base] || {};
+          criteria[base][ key.endsWith('_min') ? 'min' : 'max' ] = parseFloat(val);
+        }
+        else {
+          criteria[key] = val;
+        }
+      });
+
+      // run each row through the filters
+      Array.from(table.tBodies[0].rows).forEach(row => {
+        let show = true;
+
+        for (let [col, crit] of Object.entries(criteria)) {
+          const idx  = colIndex[col];
+          const cell = row.cells[idx];
+          if (!cell) continue;
+
+          // 1) if there's an <input>, <select> or <textarea>, read its .value()
+          let cellValue = '';
+          const ctl = cell.querySelector('input, select, textarea');
+          if (ctl) {
+            cellValue = ctl.value.trim();
+          } else {
+            cellValue = cell.textContent.trim();
+          }
+
+          // 2) apply the right kind of test
+          if (typeof crit === 'object') {
+            // numeric range
+            const num = parseFloat(cellValue) || 0;
+            if ((crit.min != null && num < crit.min) ||
+                (crit.max != null && num > crit.max)) {
+              show = false;
+            }
+          }
+          else if (/^\d{4}-\d{2}-\d{2}$/.test(crit)) {
+            // exact date match (ISO yyyy-MM-dd)
+            if (cellValue !== crit) show = false;
+          }
+          else {
+            // substring match (case-insensitive)
+            if (!cellValue.toLowerCase().includes(crit.toLowerCase())) {
+              show = false;
+            }
+          }
+
+          if (!show) break;
+        }
+
+        row.style.display = show ? '' : 'none';
+      });
+    }
+  });
+  </script>
+
+  <!-- <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const table        = document.getElementById('myTable');
+      const filtersDiv   = document.getElementById('filters');
+      const filterCtrls  = filtersDiv.querySelectorAll('[data-col]');
+    
+      // Build colIndex: map column *key* → its index in the row
+      const headerCells = table.tHead.rows[0].cells;
+      const colIndex = {};
+      Array.from(headerCells).forEach((th, i) => {
+        if (th.dataset.col) {
+          colIndex[th.dataset.col] = i;
+        }
+      });
+    
+      let timeout;
+      filtersDiv.addEventListener('input', () => {
+        clearTimeout(timeout);
+        timeout = setTimeout(runFilters, 200);
+      });
+      filtersDiv.addEventListener('change', runFilters);
+    
+      function runFilters() {
+        const criteria = {};
+    
+        filterCtrls.forEach(ctrl => {
+          const key = ctrl.dataset.col;
+          const val = ctrl.value;
+          if (!val) return;
+    
+          if (key.endsWith('_max')) {
+            const base = key.slice(0, -4);
+            (criteria[base] || (criteria[base]={})).max = parseFloat(val);
+          }
+          else if (key.endsWith('_min')) {
+            const base = key.slice(0, -4);
+            (criteria[base] || (criteria[base]={})).min = parseFloat(val);
+          }
+          else {
+            criteria[key] = val;
+          }
+        });
+    
+        Array.from(table.tBodies[0].rows).forEach(row => {
+          let show = true;
+          for (const [col, crit] of Object.entries(criteria)) {
+            const idx  = colIndex[col];
+            const cell = row.cells[idx]?.textContent.trim() || '';
+            if (typeof crit === 'object') {
+              const num = parseFloat(cell)||0;
+              if ((crit.min!=null && num<crit.min) || (crit.max!=null && num>crit.max)) {
+                show = false; break;
+              }
+            }
+            else if (/^\d{4}-\d{2}-\d{2}$/.test(crit)) {
+              if (cell !== crit) { show = false; break; }
+            }
+            else {
+              if (!cell.toLowerCase().includes(crit.toLowerCase())) {
+                show = false; break;
+              }
+            }
+          }
+          row.style.display = show ? '' : 'none';
+        });
+      }
+    });
+  </script> -->
+  {% endblock %}
+
+  {% block script_columns_toggle %}
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1) Column toggles
+      document.querySelectorAll('.col-toggle').forEach(cb => {
+        const col = cb.dataset.col;
+        // restore from localStorage if you like, otherwise default 'checked'
+        const stored = localStorage.getItem(`colvis:${col}`);
+        if (stored !== null) cb.checked = stored === '1';
+    
+        function apply() {
+          document.querySelectorAll(`.col-${col}`).forEach(el => {
+            el.style.display = cb.checked ? '' : 'none';
+          });
+          // also hide/show the <th>
+          document.querySelectorAll(`th[data-col="${col}"]`).forEach(th => {
+            th.style.display = cb.checked ? '' : 'none';
+          });
+          localStorage.setItem(`colvis:${col}`, cb.checked ? '1' : '0');
+        }
+    
+        cb.addEventListener('change', apply);
+        apply();
+      });
+    
+      // // 2) Filter toggles
+      // document.querySelectorAll('.filter-toggle').forEach(cb => {
+      //   const col = cb.dataset.col;
+      //   // restore state if desired
+      //   const stored = localStorage.getItem(`filtvis:${col}`);
+      //   if (stored !== null) cb.checked = stored === '1';
+    
+      //   function apply() {
+      //     const ctrl = document.querySelector(`[data-col="${col}"]`);
+      //     if (ctrl) ctrl.closest('div').style.display = cb.checked ? '' : 'none';
+      //     localStorage.setItem(`filtvis:${col}`, cb.checked ? '1' : '0');
+      //   }
+    
+      //   cb.addEventListener('change', apply);
+      //   apply();
+      // });
+    });
+  </script>
+  {% endblock %}
+
+  {% block script_filters_toggle %}
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // cache the filters container
+      const filtersDiv = document.getElementById('filters');
+
+      // find all the checkboxes in the dropdown
+      document.querySelectorAll('.filter-toggle').forEach(cb => {
+        const col = cb.dataset.col;
+
+        // restore saved visibility, if any
+        const stored = localStorage.getItem(`filtvis:${col}`);
+        if (stored !== null) cb.checked = stored === '1';
+
+        // the matching filter-control div
+        const control = filtersDiv.querySelector(`.filter-control[data-col="${col}"]`);
+
+        function apply() {
+          if (control) {
+            control.style.display = cb.checked ? '' : 'none';
+          }
+          localStorage.setItem(`filtvis:${col}`, cb.checked ? '1' : '0');
+        }
+
+        cb.addEventListener('change', apply);
+        apply();
+      });
+    });
+  </script>
+  {% endblock %}
+
+  {% block script_extra %}
+
+  {% endblock %}
+</body>
+</html>

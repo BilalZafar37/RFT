@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+
+{% block page_heading_1 %}Home{% endblock %} 
+{% block page_heading_2 %}Upload{% endblock %} 
+{% block page_heading_3 %}Upload Management{% endblock %} 
+
+{% block styles%}
+/*  */
+    input[type="file"] {
+    position: relative;
+  }
+
+  input[type="file"]::file-selector-button {
+    width: 136px;
+    color: transparent;
+  }
+
+  /* Faked label styles and icon */
+  input[type="file"]::before {
+    position: absolute;
+    pointer-events: none;
+    top: 10px;
+    left: 16px;
+    height: 20px;
+    width: 20px;
+    content: "";
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230964B0'%3E%3Cpath d='M18 15v3H6v-3H4v3c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-3h-2zM7 9l1.41 1.41L11 7.83V16h2V7.83l2.59 2.58L17 9l-5-5-5 5z'/%3E%3C/svg%3E");
+
+  }
+
+  input[type="file"]::after {
+    position: absolute;
+    pointer-events: none;
+    top: 11px;
+    left: 40px;
+    color: #0964b0;
+    content: "Upload File";
+  }
+
+  /* ------- From Step 1 ------- */
+
+  /* file upload button */
+  input[type="file"]::file-selector-button {
+    border-radius: 4px;
+    padding: 0 16px;
+    height: 40px;
+    cursor: pointer;
+    background-color: white;
+    border: 1px solid rgba(0, 0, 0, 0.16);
+    box-shadow: 0px 1px 0px rgba(0, 0, 0, 0.05);
+    margin-right: 16px;
+    transition: background-color 200ms;
+  }
+
+  /* file upload button hover state */
+  input[type="file"]::file-selector-button:hover {
+    background-color: #f3f4f6;
+  }
+
+  /* file upload button active state */
+  input[type="file"]::file-selector-button:active {
+    background-color: #e5e7eb;
+  }
+            /* end of file upload button styling */
+  /* ------------------------ */
+
+  .tooltip {
+      z-index: 999999; /* Higher than default Bootstrap elements */
+  }
+{% endblock %}
+
+{% block heading_width %}width: 210px; {% endblock %}
+
+{% block content %}  
+<form id="main" name="main" action="{{ url_for('main.upload_file') }}" method="POST" enctype="multipart/form-data">
+  <div class="card-body px-0 pb-2">
+    <div id="show_submited_data" class="shadow-success border-radius-lg mb-3 ms-3" style="width:600px">
+      <div class="container-fluid py-2 backgroundColor text-dark">
+        <!-- <form class = "" action="{{ url_for('main.upload_file') }}" method="post" enctype="multipart/form-data"> -->
+          <label for="upload-file">Upload ME2N here</label>
+          <input type="file" name="upload-file" value="" accept=".xlsx, .xls">
+          <button class="btn bg-gradient-info btn-sm mb-0 me-3" id="upload" type="submit" name="upload-file">Upload ME2N</button>
+        <!-- </form> -->
+      </div>
+    </div>
+  </div>
+  <div class="card-body px-0 pb-2">
+    <div id="show_submited_data" class="shadow-success border-radius-lg mb-3 ms-3" style="width:600px">
+      <div class="container-fluid py-2 backgroundColor text-dark">
+        <!-- <form class = "" action="{{ url_for('main.upload_file') }}" method="post" enctype="multipart/form-data"> -->
+          <label for="upload-file">Chose Table to export</label>
+          <select id="export_table" name="export_table_name">
+            {% for t in table_names %}
+            <option value="{{t}}">{{t}}</option>
+            {% endfor %}
+          </select>
+          <button class="btn bg-gradient-info btn-sm mb-0 me-3" name="export_table" type="submit">Export</button>
+        <!-- </form> -->
+      </div>
+    </div>
+  </div>
+  <table class="table table-responsive">
+    <thead>
+      <tr>
+        <th>Upload History</th>
+      </tr>
+      <tr>
+        <th>Batch ID</th>
+        <th># Unique POs</th>
+        <th>Upload time</th>
+        <th>Uploaded By</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for b in batches %}
+      <tr>
+        <td>{{ b.batch_id }}</td>
+        <td>{{ b.num_unique_po }}</td>
+        <td>{{ b.upload_time }}</td>
+        <td>{{ b.uploaded_by }}</td>
+        <td>
+          <button class="btn bg-gradient-info" type="submit" name="export_batch" value="{{ b.batch_id }}">Export</button>
+          <button class="btn bg-gradient-success " type="submit" name="finalize_upload" value="{{ b.batch_id }}">Push to RFT</button>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</form>
+
+{% endblock %}  
+
+{% block columns_toggle %}
+{% endblock %}
+{% block filters_toggle %}
+{% endblock %}
+
+
+
+{% block script_filters %}
+{% endblock %}  
+{% block script_columns_toggle %}
+{% endblock %}  
+{% block script_filters_toggle %}
+{% endblock %}  

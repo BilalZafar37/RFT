@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+
+{% block page_heading_1 %}Home{% endblock %}
+{% block page_heading_2 %}Settings{% endblock %} 
+{% block page_heading_3 %}Settings{% endblock %} 
+
+{% block heading_width %}width: 210px; {% endblock %}
+
+{% block styles %}
+/* === Page Reset & Base Typography === */
+  body {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    background: #f4f6f8;
+    color: #333;
+    margin: 0;
+    padding: 2rem;
+  }
+  h4 {
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    color: #222;
+  }
+  h5 {
+    margin: 0 0 .5rem;
+    font-size: 1.2rem;
+    color: #444;
+  }
+  form {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  button[type="submit"] {
+    margin-top: 1rem;
+    padding: .6rem 1.2rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: .4rem;
+    background: #4054ec;
+    color: #fff;
+    cursor: pointer;
+    transition: background .2s;
+  }
+  button[type="submit"]:hover {
+    background: #3547d3;
+  }
+
+  /* === Layout Zones === */
+  .layout-zones {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+  .zone {
+    flex: 1 1 300px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: .6rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    padding: 1rem;
+  }
+  .zone h5 {
+    border-bottom: 1px solid #eee;
+    padding-bottom: .3rem;
+  }
+
+  /* === Draggable Lists === */
+  .draggable-zone {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-gap: 1rem;
+    min-height: 50px;
+  }
+  /* fullZone: single column */
+  #fullZone {
+    grid-template-columns: 1fr;
+  }
+  /* halfZone: two per row */
+  #halfZone {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  }
+
+  .draggable-zone li {
+    display: flex;
+    align-items: center;
+    padding: 1.2rem 1.5rem;
+    background: #fafafa;
+    border: 1px solid #ddd;
+    border-radius: .6rem;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.04);
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #333;
+    cursor: default;
+    transition: transform .15s, box-shadow .2s;
+  }
+  .draggable-zone li:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+  }
+  .draggable-zone li.dragging {
+    opacity: .7;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+  }
+
+  /* === Drag Handle Icon === */
+  .draggable-zone li .handle {
+    margin-right: 1rem;
+    font-size: 1.4rem;
+    color: #888;
+    cursor: grab;
+  }
+
+  /* === Hidden Inputs (no styling) === */
+  input[type="hidden"] { display: none; }
+
+  /* === Responsive tweaks === */
+  @media (max-width: 600px) {
+    .layout-zones { flex-direction: column; }
+  }
+{% endblock %}
+
+
+{% block content %}
+
+<!-- settings.html -->
+<form id="settingsForm" method="POST" action="{{ url_for('main.settings') }}">
+  <h4>Dashboard Chart Layout</h4>
+
+  <div class="layout-zones">
+
+    <div class="zone">
+      <h5>🔲 Full-Width Chart</h5>
+      <ul id="fullZone" class="draggable-zone">
+        {% for chart in settings['dashboard.charts_order'] 
+                     if settings['dashboard.chart_layout'][chart]=='col-lg-12' %}
+        <li data-key="{{chart}}">
+          <span class="handle"><i class="fas fa-grip-lines"></i></span>
+          {{ chart.replace('_',' ')|title }}
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="zone">
+      <h5>⬜⬜ Half-Width charts</h5>
+      <ul id="halfZone" class="draggable-zone grid-2col">
+        {% for chart in settings['dashboard.charts_order'] 
+                     if settings['dashboard.chart_layout'][chart]=='col-lg-6' %}
+        <li data-key="{{chart}}">
+          <span class="handle"><i class="fas fa-grip-lines"></i></span>
+          {{ chart.replace('_',' ')|title }}
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+  </div>
+
+  <input type="hidden" name="charts_order"  id="chartsOrderInput">
+  <input type="hidden" name="charts_layout" id="chartsLayoutInput">
+
+  <button type="submit" class="btn btn-primary mt-3">Save Layout</button>
+</form>
+
+  
+{% endblock %}
+
+
+{% block columns_toggle %}{% endblock %}
+{% block filters_toggle %}{% endblock %}
+{% block filters %}{% endblock %}
+
+{% block script_filters %}
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const fullZone   = document.getElementById('fullZone');
+  const halfZone   = document.getElementById('halfZone');
+  const orderIn    = document.getElementById('chartsOrderInput');
+  const layoutIn   = document.getElementById('chartsLayoutInput');
+
+  function serialize() {
+    // capture keys in order: full first, then half
+    const fullKeys = Array.from(fullZone.children).map(li => li.dataset.key);
+    const halfKeys = Array.from(halfZone.children).map(li => li.dataset.key);
+    // overall order
+    orderIn.value = JSON.stringify([...fullKeys, ...halfKeys]);
+
+    // layout map
+    const layoutMap = {};
+    fullKeys.forEach(k=> layoutMap[k] = 'col-lg-12');
+    halfKeys.forEach(k=> layoutMap[k] = 'col-lg-6');
+    layoutIn.value = JSON.stringify(layoutMap);
+  }
+
+  // make both lists part of the same group, so you can drag between them
+  Sortable.create(fullZone, {
+    group: 'charts',
+    handle: '.handle',
+    animation: 150,
+    onStart: e => e.item.classList.add('dragging'),
+    onEnd:   e => { e.item.classList.remove('dragging'); serialize(); }
+  });
+  Sortable.create(halfZone, {
+    group: 'charts',
+    handle: '.handle',
+    animation: 150,
+    onStart: e => e.item.classList.add('dragging'),
+    onEnd:   e => { e.item.classList.remove('dragging'); serialize(); }
+  });
+
+  // initialize values on load
+  serialize();
+});
+</script>
+ 
+{% endblock %}
+{% block script_columns_toggle %}{% endblock %}
+{% block script_filters_toggle %}{% endblock %}

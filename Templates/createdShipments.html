@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+
+{% block page_heading_1 %}Home{% endblock %} 
+{% block page_heading_2 %}Shipments{% endblock %} 
+{% block page_heading_3 %}Created Shipments{% endblock %} 
+
+{% block button_submit %}
+<button id="submit" type="submit" style="width: 600px;" form="main_form" class="btn bg-gradient-success">Update Shipment</button>
+{% endblock %} 
+
+
+
+{% block content %}  
+<form id="main_form" name="main_form" action="{{ url_for('main.createdShipments') }}" method="POST" enctype="multipart/form-data">
+  <table id="myTable" class="table align-items-center mb-0 table-responsive" style="color: black;">
+    <thead>
+      <tr>
+        <th data-col="ShipmentNumber">Shipment #</th>
+        <th data-col="Status">Shipment Status</th>
+        <th data-col="BiyanNumber">Biyan #</th>
+        <th data-col="biyanPDF">Biyan PDF</th>
+        <th data-col="SADDADNumber">Saddad #</th>
+        <th data-col="saddadPDF">Saddad PDF</th>
+        <th data-col="saddadPDF">payment Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for shp in rows %}
+        {% set sn = shp.ShipmentNumber %}
+        <tr>
+          <!-- 1. ShipmentNumber (text cell for filtering) -->
+          <td>
+            <input type="hidden" name="ShipmentNumber_{{ sn }}" value="{{ sn }}"/>
+            <a class="shipment-clickable" href="{{ url_for('main.updateShipments', shipment_id=shp.ShipmentID) }}">{{ sn }}</a>
+          </td>
+
+          <!-- 2. Status (select for input/filtering) -->
+          <td>
+            {{shp.ShipmentLevelStatus}}
+            <select name="Status_{{ sn }}" class="form-select-lg" data-col="Status" onchange="trackChange(this, '{{ sn }}')">
+              <option value="" {% if not shp.ShipmentLevelStatus %}selected{% endif %}>&mdash;</option>
+              {% for s in shipmentstatuses %}
+                <option value="{{ s }}" {% if shp.ShipmentLevelStatus == s %}selected{% endif %}>
+                  {{ s }}
+                </option>
+              {% endfor %}
+            </select>
+          </td>
+
+          <!-- 3. BiyanNumber -->
+          <td>
+            <input
+              type="text"
+              name="BiyanNumber_{{ sn }}"
+              value="{{ shp.BiyanNumber or '' }}"
+              class="form-control-lg"
+              data-col="BiyanNumber"
+              oninput="trackChange(this, '{{ sn }}')"
+            />
+          </td>
+
+          <!-- 4. Biyan PDF (we filter on filename if you want) -->
+          <td>
+            <input
+              type="file"
+              name="biyanPDF_file_{{ sn }}"
+              accept="application/pdf"
+              class="form-control-sm"
+              data-col="biyanPDF"
+              oninput="trackChange(this, '{{ sn }}')"
+            />
+            {% set bfile = sn ~ '_biyanPDF.pdf' %}
+            {% if bfile in existing_biyan_files %}
+              <a href="{{ url_for('static', filename='Biyan-files/' ~ bfile) }}"
+                 target="_blank"
+                 class="small">
+                (view)
+              </a>
+            {% endif %}
+          </td>
+
+          <!-- 5. SADDADNumber -->
+          <td>
+            <input
+              type="text"
+              name="SADDADNumber_{{ sn }}"
+              value="{{ shp.SADDADNumber or '' }}"
+              class="form-control-sm"
+              data-col="SADDADNumber"
+              oninput="trackChange(this, '{{ sn }}')"
+            />
+          </td>
+
+          <!-- 6. Saddad PDF -->
+          <td>
+            <input
+              type="file"
+              name="saddadPDF_file_{{ sn }}"
+              accept="application/pdf"
+              class="form-control form-control-sm"
+              data-col="saddadPDF"
+              oninput="trackChange(this, '{{ sn }}')"
+            />
+            {% set sfile = sn ~ '_saddad.pdf' %}
+            {% if sfile in existing_saddad_files %}
+              <a href="{{ url_for('static', filename='SADDAD-files/' ~ sfile) }}"
+                 target="_blank"
+                 class="small">
+                (view)
+              </a>
+            {% endif %}
+          </td>
+          <td>
+            <span class="badge badge-sm {%if shp.SADDADNumber and shp.BiyanNumber%} bg-gradient-success {% endif %} 
+                                        {%if not shp.SADDADNumber and not shp.BiyanNumber%} bg-gradient-danger {% endif %} 
+                                        {%if not shp.SADDADNumber or not shp.BiyanNumber%} bg-gradient-warning {% endif %}"
+                                      >{%if not shp.SADDADNumber and not shp.BiyanNumber %}Pending Payments{% endif %}
+                                        {%if shp.SADDADNumber and not shp.BiyanNumber %} Pending Biyan {% endif %}
+                                        {%if shp.BiyanNumber and not shp.SADDADNumber%}Pending SADDAD {% endif %} 
+                                        {%if shp.BiyanNumber and shp.SADDADNumber%}Biyan & SADDAD Paid {% endif %}
+                                      </span>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</form>
+{% endblock %}
+
+{% block script_extra %}
+<script>
+  let changedElements = {};
+
+  // Function to track changes in select elements
+  function trackChange(element, recordId) {
+    const name = element.name;
+    const value = element.value;
+
+    changedElements[name] = value;
+
+    // Also include the POID to ensure it's submitted
+    changedElements[`ShipmentNumber_${recordId}`] = recordId;
+  }
+
+  document.getElementById('main_form').addEventListener('submit', function(event) {
+    event.preventDefault(); // Stop default form submit
+
+    const originalForm = document.getElementById('main_form');
+    const formData = new FormData();
+
+    // Add only changed inputs
+    for (let name in changedElements) {
+      const input = originalForm.elements[name];
+      if (input && input.type === 'file') {
+        if (input.files.length > 0) {
+          formData.append(name, input.files[0]);
+        }
+      } else {
+        formData.append(name, changedElements[name]);
+      }
+    }
+
+    // Send it via POST
+    fetch('{{ url_for("main.createdShipments") }}', {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.redirect) {
+        window.location.href = data.redirect;  // causes a real redirect → flash will show
+      }
+    })
+    .catch(error => {
+      console.error('Upload failed', error);
+    });
+  });
+
+</script>
+{% endblock %}
+
+
