@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block page_heading_1 %}Home{% endblock %}
+{% block page_heading_2 %}Settings{% endblock %} 
+{% block page_heading_3 %}Manage Categories{% endblock %} 
+
+{% block heading_width %}width: 210px; {% endblock %}
+
+{% block content %}
+<<!-- Current Categories Table -->
+<table class="table table-bordered table-striped">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Brand</th>
+      <th>CatCode</th>
+      <th>CatName</th>
+      <th>Desc</th>
+      <th>SubCat</th>
+      <th>UpdatedBy</th>
+      <th>UpdatedAt</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for cat in categories %}
+    <tr>
+      <td>{{ cat.ID }}</td>
+      <td>
+        <form method="POST" class="form-inline" action="{{ url_for('dropdowns.manage_categories') }}">
+          <input type="hidden" name="action" value="edit">
+          <input type="hidden" name="ID" value="{{ cat.ID }}">
+          <input type="text" name="Brand" class="form-control" value="{{ cat.Brand }}">
+      </td>
+      <td>
+          <input type="text" name="CatCode" class="form-control" value="{{ cat.CatCode }}">
+      </td>
+      <td>
+          <input type="text" name="CatName" class="form-control" value="{{ cat.CatName }}">
+      </td>
+      <td>
+          <input type="text" name="CatDesc" class="form-control" value="{{ cat.CatDesc }}">
+      </td>
+      <td>
+          <input type="text" name="SubCat" class="form-control" value="{{ cat.SubCat }}">
+      </td>
+      <td>
+          <input type="text" name="UpdatedBy" class="form-control" value="{{ cat.UpdatedBy }}">
+      </td>
+      <td>{{ cat.UpdatedAt.strftime("%Y-%m-%d %H:%M:%S") if cat.UpdatedAt else "" }}</td>
+      <td>
+          <button type="submit" class="btn btn-sm btn-primary">Save</button>
+        </form>
+        <form method="POST" style="display:inline;" action="{{ url_for('dropdowns.manage_categories') }}">
+          <input type="hidden" name="action" value="delete">
+          <input type="hidden" name="ID" value="{{ cat.ID }}">
+          <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!-- Add New Category -->
+<h3>Add New Category</h3>
+<form method="POST" class="form-inline" action="{{ url_for('dropdowns.manage_categories') }}">
+  <input type="hidden" name="action" value="add">
+  <input type="text" name="Brand" class="form-control" placeholder="Brand" required>
+  <input type="text" name="CatCode" class="form-control" placeholder="CatCode" required>
+  <input type="text" name="CatName" class="form-control" placeholder="CatName" required>
+  <input type="text" name="CatDesc" class="form-control" placeholder="Desc">
+  <input type="text" name="SubCat" class="form-control" placeholder="SubCat">
+  <!-- <input type="text" name="UpdatedBy" class="form-control" placeholder="UpdatedBy"> -->
+  <button type="submit" class="btn btn-sm btn-success">Add Category</button>
+</form>
+
+<!-- Upload Categories from Excel -->
+<h3 class="mt-4">Upload Categories</h3>
+<form method="POST" action="{{ url_for('dropdowns.manage_categories') }}" enctype="multipart/form-data" class="form-inline">
+  <input type="hidden" name="action" value="upload">
+  <input type="file" name="file" class="form-control-file" required>
+  <button type="submit" class="btn btn-sm btn-info">Upload Excel</button>
+  <a href="/download_template">
+    <button class="btn btn-slack" type="button" >
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-filetype-xls" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M14 4.5V14a2 2 0 0 1-2 2h-1v-1h1a1 1 0 0 0 1-1V4.5h-2A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v9H2V2a2 2 0 0 1 2-2h5.5zM6.472 15.29a1.2 1.2 0 0 1-.111-.449h.765a.58.58 0 0 0 .254.384q.106.073.25.114.143.041.319.041.246 0 .413-.07a.56.56 0 0 0 .255-.193.5.5 0 0 0 .085-.29.39.39 0 0 0-.153-.326q-.152-.12-.462-.193l-.619-.143a1.7 1.7 0 0 1-.539-.214 1 1 0 0 1-.351-.367 1.1 1.1 0 0 1-.123-.524q0-.366.19-.639.19-.272.527-.422.338-.15.777-.149.457 0 .78.152.324.153.5.41.18.255.2.566h-.75a.56.56 0 0 0-.12-.258.6.6 0 0 0-.247-.181.9.9 0 0 0-.369-.068q-.325 0-.513.152a.47.47 0 0 0-.184.384q0 .18.143.3a1 1 0 0 0 .405.175l.62.143q.326.075.566.211a1 1 0 0 1 .375.358q.135.222.135.56 0 .37-.188.656a1.2 1.2 0 0 1-.539.439q-.351.158-.858.158-.381 0-.665-.09a1.4 1.4 0 0 1-.478-.252 1.1 1.1 0 0 1-.29-.375m-2.945-3.358h-.893L1.81 13.37h-.036l-.832-1.438h-.93l1.227 1.983L0 15.931h.861l.853-1.415h.035l.85 1.415h.908L2.253 13.94zm2.727 3.325H4.557v-3.325h-.79v4h2.487z"/>
+      </svg>
+    </button>
+  </a>
+</form>
+{% endblock %}
+
+
+{% block columns_toggle %}{% endblock %}
+{% block filters_toggle %}{% endblock %}
+{% block filters %}{% endblock %}
+
+{% block script_filters %}{% endblock %}
+
+{% block script_columns_toggle %}{% endblock %}
+{% block script_filters_toggle %}{% endblock %}

@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block page_heading_1  %}Reports{% endblock %}
+{% block page_heading_2  %}Containers{% endblock %}
+{% block page_heading_3  %}Containers Deadline Reports{% endblock %}
+{% block heading_width   %}width: 250px; {% endblock %}
+
+{% block styles %}
+/* the dropdown list items */
+    .select2-container--default 
+      .select2-results__option {
+      color: black !important;
+    }
+    .select2-container--default .select2-selection--multiple , .select2-selection__choice {
+      background-color: rgb(23, 23, 23) !important;
+    }
+
+    .select2-container {
+      max-width: 607.321px !important;
+      min-width: 190px !important;
+      width: auto !important;
+    }
+
+    /* Ensure the dropdown itself also follows the same width */
+    .select2-dropdown {
+        max-width: 607.321px !important;
+        min-width: 190px !important;
+        width: auto !important;
+    }
+
+    /* Style the inner text field where the selection appears */
+    .select2-selection {
+        max-width: 607.321px !important;
+        min-width: 190px !important;
+        width: auto !important;
+    }
+{% endblock %} 
+
+{% block export_btn_class %} {#shipment list page spacific block#}
+{% endblock %}
+
+{% block export_btn %}
+<div class="dropdown" style="margin-left:auto; margin-right:10px;">
+  <form id="export1" name="export1" action="{{ url_for('main.containers_deadline_report') }}" method="post">
+    <select id="export_brands" name="export_brands" multiple>
+      {% for brand in session["user_brand_access"] %}
+      <option value="{{brand}}">{{brand}}</option>
+      {% endfor %}
+    </select>
+    <button class="btn btn-secondary" type="submit" name="export">
+      Export to excel
+      <i class="fa fa-file-export"></i>
+    </button>
+  </form>
+</div>
+{% endblock %}
+
+{% block content %}  
+<table id="myTable" class="table mb-0 table-responsive table-hover table-bordered">
+    <thead>
+    <tr>
+        <th class="text-center sticky-left-1">Sr.</th>
+        {% for col in columns %}
+          <th data-col="{{ col.name }}"  class="text-center">
+            {{ col.label }}
+            {% if col.name in ('Status', 'Brand', 'DeadlineDate','Days') %}
+              <i class="fas fa-caret-up sort-arrow-OR" onclick="sortTableWithToggle(this, {{loop.index}})"></i>
+            {% endif %}
+          </th>
+        {% endfor %}
+    </tr>
+    </thead>
+    <tbody>
+    {% for row in rows %}
+        <tr>
+          <td class="text-center sticky-left-1">{{loop.index}}</td>
+        {% for col in columns %}
+            <td 
+                style="background-color:
+                  {% if row['Days'] is none %}#A93226 {% elif row['Days'] and row['Days'] <= 0 %}#FFC7CE
+                  {% elif row['Days'] and row['Days'] <= 2 %}#FFEB9C {% elif row['Days'] and row['Days'] <= 5 %}#C6EFCE
+                  {% else %}#A9D08E {% endif %};
+                "
+                class="col-{{col.name}} text-center">{{ row[col.name] | pretty_date if col.name != 'Cont.' else  row[col.name] }}
+            </td>
+        {% endfor %}
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}    
+
+{% block script_extra %} 
+  <script>
+    function sortTableWithToggle(element, columnIndex) {
+      const table = document.querySelector("#myTable");
+      const rows = Array.from(table.getElementsByTagName("tbody")[0].getElementsByTagName("tr"));
+
+      // Determine the sort order based on the current arrow class
+      const isDescending = element.classList.contains("fa-caret-down");
+      const newOrder = isDescending ? "asc" : "desc";
+
+      // Toggle the arrow class for the clicked column only
+      const allArrows = document.querySelectorAll(".sort-arrow-SA, .sort-arrow-OR");
+      allArrows.forEach(arrow => {
+        if (arrow !== element) {
+          arrow.classList.remove("fa-caret-up", "fa-caret-down");
+          arrow.classList.add("fa-caret-down"); // Reset other arrows to down
+        }
+      });
+
+      element.classList.toggle("fa-caret-down", !isDescending);
+      element.classList.toggle("fa-caret-up", isDescending);
+
+      // Sort only visible rows
+      const visibleRows = rows.filter(row => row.style.display !== "none");
+
+      visibleRows.sort((a, b) => {
+        const cellA = a.cells[columnIndex]?.innerText.trim() || "";
+        const cellB = b.cells[columnIndex]?.innerText.trim() || "";
+      
+        // Always treat empty as smallest
+        if (!cellA && !cellB) return 0;
+        // Appear on top when sorting ascending
+        // Appear at bottom when sorting descending
+        if (!cellA) return newOrder === "asc" ? -1 : 1;
+        if (!cellB) return newOrder === "asc" ? 1 : -1;
+      
+        // Detect number
+        const numA = parseFloat(cellA.replace(/,/g, ''));
+        const numB = parseFloat(cellB.replace(/,/g, ''));
+        const isNumeric = !isNaN(numA) && !isNaN(numB);
+      
+        // Detect date (support formats like 10-Jul-2025)
+        const parseDate = str => {
+          const parts = str.split("-");
+          if (parts.length === 3 && parts[1].length === 3) {
+            return new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
+          }
+          return new Date(str); // fallback
+        };
+        const dateA = parseDate(cellA);
+        const dateB = parseDate(cellB);
+        const isDate = !isNaN(dateA.getTime()) && !isNaN(dateB.getTime());
+      
+        let comparison = 0;
+        const cleanText = str => str
+          .replace(/\s+/g, ' ')         // replace multiple spaces/newlines with single space
+          .replace(/[\u200B\u00A0]/g, '') // remove invisible characters
+          .trim()
+          .toLowerCase()
+          .normalize('NFKD');            // normalize accents etc.
+        
+        if (isNumeric) {
+          comparison = numA - numB;
+        } else if (isDate) {
+          comparison = dateA - dateB;
+        } else {
+          const aText = cleanText(cellA);
+          const bText = cleanText(cellB);
+          comparison = aText.localeCompare(bText);
+        }
+      
+        return newOrder === "desc" ? -comparison : comparison;
+      });
+      
+      // Reattach sorted rows
+      visibleRows.forEach(row => table.getElementsByTagName("tbody")[0].appendChild(row));
+    }
+  </script>
+{% endblock %} 

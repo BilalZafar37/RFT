@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block page_heading_1  %}Finance{% endblock %}
+{% block page_heading_2  %}Reports{% endblock %}
+{% block page_heading_3  %}IN_Transit/ Open PO report{% endblock %}
+{% block heading_width %}width: 220px; {% endblock %}
+
+
+
+{% block content %}
+<!-- <div class="table-responsive p-0"> -->
+  <table id="myTable" class="table align-items-center mb-0 table-responsive table-hover" style="color: black;">
+    <thead>
+      <tr>
+        {% for col in columns %}
+          <th data-col="{{ col.name }}">{{ col.label }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in summary %}
+        <tr>
+          {% for col in columns %}
+            <td class="col-{{col.name}}">{{ row|attr(col.name) }}</td>
+          {% endfor %}
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+<!-- </div> -->
+{% endblock %}

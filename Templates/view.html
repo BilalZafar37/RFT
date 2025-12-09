@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="apple-touch-icon" sizes="76x76" href="/static/img/apple-icon.png">
+  <link rel="icon" type="image/png" href="/static/img/favicon.png">
+  <title>
+    RFT System</title>
+  <link rel="stylesheet" href="/static/css/index.css">
+  <!-- Fonts and icons -->
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900|Roboto+Slab:400,700" />
+  <link href="/static/css/nucleo-icons.css" rel="stylesheet" />
+  <link href="/static/css/nucleo-svg.css" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js" crossorigin="anonymous"></script>
+
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  <link id="pagestyle" href="/static/css/material-dashboard.css?v=3.1.0" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+</head>
+
+<style>
+  .section-title {
+    /* background-color:  */
+    color: white;
+    padding: 5px;
+    margin-top: 20px;
+    border: 1px solid #ccc;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1em;
+  }
+  table, th, td {
+    border: 1px solid #ddd;
+  }
+  th, td {
+    padding: 6px;
+    text-align: left;
+  }
+
+  .tooltip {
+    z-index: 999999; /* Higher than default Bootstrap elements */
+  }
+
+  .po-cell {
+      max-width: calc(8ch + 4px); /* Adjust for padding/margins or slight variations */
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      cursor: pointer;
+      display: inline-block; /* Ensures consistent behavior for text-overflow */
+  }
+
+  .po-cell.expanded {
+      max-width: none; /* Show full content when expanded */
+      white-space: normal; /* Allow multi-line text if needed */
+  }
+
+  .bg-gradient-primary {
+    background-image: linear-gradient(195deg, #4054ec 0%, #D81B60 100%);
+  }
+  .dropdown-container {
+    display: block;
+    padding-left: 8px;
+  }
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  .dropdown-btn {
+    padding: 6px 8px 6px 16px;
+    text-decoration: none;
+    font-size: 20px;
+    color: #818181;
+    display: block;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    outline: none;
+  }
+  .hov:hover {
+    display: flex;
+    width: 169px;
+    border: none;
+    border-radius: 5px;
+    background-image: linear-gradient(195deg, #4054ec 0%, #D81B60 100%);
+  }
+  .numbadge {
+    --bs-badge-padding-x: 0.5em;
+    --bs-badge-padding-y: 0.5em;
+    --bs-badge-font-size: 0.75em;
+    --bs-badge-font-weight: 700;
+    --bs-badge-color: #fff;
+    --bs-badge-border-radius: 10rem;
+    display: inline-block;
+    padding: var(--bs-badge-padding-y) var(--bs-badge-padding-x);
+    font-size: var(--bs-badge-font-size);
+    font-weight: var(--bs-badge-font-weight);
+    line-height: 1;
+    color: var(--bs-badge-color);
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: var(--bs-badge-border-radius);
+  }
+  .border2 {
+    border: 2px solid #000 !important;
+  }
+  .input-custom {
+    background-color: #f8f9fa;
+    border: none;
+    border-bottom: 2px solid #ced4da;
+    padding: 10px;
+    border-radius: 0;
+    outline: none;
+  }
+
+  .input-custom:focus {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #4054ec;
+    box-shadow: none;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  label {
+    font-weight: bold;
+  }
+
+  .btn-primary {
+    background-color: #4054ec;
+    border-color: #4054ec;
+  }
+
+  .btn-primary:hover {
+    background-color: #3547d3;
+    border-color: #3547d3;
+  }
+  .instructions {
+      /* font-size: 5px; */
+      color: #51d94f; /* Bootstrap danger color */
+      background-color: #fbfe12; /* Bootstrap danger background */
+      border: 1px solid #ebccd1; /* Bootstrap danger border */
+      padding: 5px;
+      border-radius: 4px;
+      margin-bottom: 15px;
+      font-weight: 500;
+  }
+  .filter-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding-left: 19px;
+  }
+
+  .filter-container select,
+  .filter-container input {
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+  .form-99{
+    padding: 25px;
+    color: #000 !important;
+  }
+  label{
+    color: #000 !important;
+  }
+</style>
+
+<body class="g-sidenav-show bg-gray-200">
+  <!-- SERCHABLE DROPDOWNS -->
+  <!-- Include jQuery and Select2 JS -->
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+  <script>
+      $(document).ready(function () {
+          $("#brandFilter ").select2({
+              multiple: true,
+              allow_clear:true,
+          });
+      });
+  </script>
+  {% include 'sidebar.html' %}  
+  <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg">
+    <!-- Navbar -->
+    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur" data-scroll="true">
+      <div class="container-fluid py-1 px-3">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
+            <li class="breadcrumb-item text-sm"><a class="opacity-5 text-dark" href="javascript:;">Home</a></li>
+            <li class="breadcrumb-item text-sm text-dark active" aria-current="page">Freights</li>
+          </ol>
+            <h6 class="font-weight-bolder mb-0">Shipments</h6>
+        </nav>
+        <ul class="navbar-nav justify-content-end">
+          <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
+            <a href="javascript:;" class="nav-link text-body p-0" id="iconNavbarSidenav">
+              <div class="sidenav-toggler-inner">
+                <i class="sidenav-toggler-line"></i>
+                <i class="sidenav-toggler-line"></i>
+                <i class="sidenav-toggler-line"></i>
+              </div>
+            </a>
+          </li>
+          <li>
+            <img id="robote" src="static/img/robot.gif" style="position: absolute; z-index: 9; right: 500px; display: none;">
+          </li>
+          <li class="nav-item d-flex align-items-center">
+            <a href="#" class="nav-link text-body font-weight-bold px-0">
+              <i class="fa fa-user me-sm-1" style="font-size: 1.275rem;"></i>
+              <span class="d-sm-inline d-none" style="font-size: 1.275rem;">{{session['username']}}</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <!-- End Navbar -->
+    <div class="container-fluid py-4">
+      <div class="row">
+        <div class="col-12">
+          <div class="card my-4">
+            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+              <div class="bg-gradient-dark shadow-primary border-radius-lg pt-4 pb-3">
+                <h6 class="btn-outline-primary bg-gradient-primary text-white text-capitalize ps-3" style="width: 300px; cursor: pointer; border-top-right-radius: 5px; border-bottom-right-radius: 5px;">
+                  History Track
+                </h6>
+              </div>
+            </div>
+            <div class="card-body px-0 pb-0" style="padding: 2px;">
+                <h3>Shipment Info</h3>
+                <table class="table table-bordered">
+                  <tr><th>Shipment Number</th><td>{{ shipment.ShipmentNumber }}</td></tr>
+                  <tr><th>Shipping Line</th><td>{{ shipment.ShippingLine }}</td></tr>
+                  <tr><th>Invoice Number</th><td>{{ shipment.InvoiceNumber }}</td></tr>
+                  <tr><th>Destination</th><td>{{ shipment.DestinationCountry }}</td></tr>
+                  <tr><th>Created</th><td>{{ shipment.CreatedDate }}</td></tr>
+                </table>
+                
+                <h4>PO Line Items</h4>
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>PO Number</th><th>PO Date</th><th>Article</th><th>Qty</th><th>Value</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for line, po in po_lines %}
+                      <tr>
+                        <td>{{ po.PONumber }}</td>
+                        <td>{{ po.PODate }}</td>
+                        <td>{{ line.Article }}</td>
+                        <td>{{ line.Qty }}</td>
+                        <td>{{ line.TotalValue }}</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+                
+                <h4>Container Details</h4>
+                <table class="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th>Container #</th><th>Type</th><th>Port</th><th>ATD</th><th>ATA</th><th>Remarks</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for c in containers %}
+                      <tr>
+                        <td>{{ c.ContainerNumber }}</td>
+                        <td>{{ c.ContainerType }}</td>
+                        <td>{{ c.LoadingPort }}</td>
+                        <td>{{ c.ATDOrigin }}</td>
+                        <td>{{ c.ATAWH }}</td>
+                        <td>{{ c.Remarks or '-' }}</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+                
+                <h4>Status History (Shipment Level)</h4>
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>#</th><th>Date</th><th>Status</th><th>Updated By</th><th>Comment</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for s in status_history %}
+                    <tr>
+                      <td>{{ loop.index }}</td>
+                      <td>{{ s.StatusDate.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                      <td>{{ s.Status }}</td>
+                      <td>{{ s.UpdatedBy }}</td>
+                      <td>{{ s.Comments or '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+                
+            </div>
+          </div>
+        </div>
+      </div>
+      {% include 'footer_credits.html' %}
+    </div>
+  </main>
+  <div class="fixed-plugin">
+    <div class="card shadow-lg">
+      <div class="card-header pb-0 pt-3">
+        <div class="float-start">
+          <h5 class="mt-3 mb-0"></h5>
+          <p></p>
+        </div>
+        <div class="float-end mt-4">
+          <button class="btn btn-link text-dark p-0 fixed-plugin-close-button">
+            <i class="material-icons">clear</i>
+          </button>
+        </div>
+        <!-- End Toggle Button -->
+      </div>
+    </div>
+  </div>
+  <!-- Core JS Files -->
+  <script src="/static/js/core/popper.min.js"></script>
+  <script src="/static/js/core/bootstrap.min.js"></script>
+  <script src="/static/js/plugins/perfect-scrollbar.min.js"></script>
+  <script src="/static/js/plugins/smooth-scrollbar.min.js"></script>
+  <script src="/static/js/generalScripts.js"></script>
+  <script src="/static/js/clockAndReminder.js"></script>
+  
+
+
+  <script>
+    function expandCell(cell) {
+        cell.classList.toggle("expanded");
+    }
+    // Ensure DOM is fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      // For tooltips
+      $('[data-toggle="tooltip"]').tooltip();
+    })
+  </script>
+  
+  <script>
+    var columnMapping =  column_mapping | tojson |safe;
+
+    function filterTable() {
+      // Grab the table and its rows
+      var table = document.querySelector(".table-responsive .table");
+      var tr = table.getElementsByTagName("tr");
+
+      // Create an object to store filter values.
+      // For multi-select filters like "brandFilter", we store an array.
+      var filterValues = {};
+
+      // Process multi-select filter: 'brandFilter'
+      var brandElem = document.getElementById("brandFilter");
+      if (brandElem) {
+        // Using jQuery for multi-select (adjust if necessary)
+        var selectedBrands = $(brandElem).val() || [];
+        // Normalize all selected brands to uppercase for case-insensitive matching
+        filterValues["brandFilter"] = selectedBrands.map(function(b) {
+          return b.trim().toUpperCase();
+        });
+      }
+
+      // Process all other filter inputs defined in the mapping
+      Object.keys(columnMapping).forEach(function(filterId) {
+        // Skip the multi-select which we already processed
+        if (filterId === "brandFilter") return;
+        var elem = document.getElementById(filterId);
+        if (elem) {
+          // Normalize the input value to uppercase for case-insensitive matching
+          filterValues[filterId] = elem.value.toUpperCase();
+        }
+      });
+
+      // Loop through all table rows (assuming the first row is headers)
+      for (var i = 1; i < tr.length; i++) {
+        var row = tr[i];
+        var tds = row.getElementsByTagName("td");
+        var rowVisible = true;
+
+        // Loop over each filter. Use the mapping to fetch the appropriate cell.
+        for (var filterId in filterValues) {
+          var filterValue = filterValues[filterId];
+
+          // Get the corresponding column index from our mapping
+          var colIndex = columnMapping[filterId];
+          var cell = tds[colIndex];
+
+          if (cell) {
+            var cellText = (cell.textContent || cell.innerText).trim().toUpperCase();
+
+            if (filterId === "brandFilter") {
+              // For multi-select: if any of the selected brands appear in the cell, it passes.
+              if (filterValue.length > 0) {
+                var matchFound = filterValue.some(function(val) {
+                  return cellText.indexOf(val) > -1;
+                });
+                if (!matchFound) {
+                  rowVisible = false;
+                  break;
+                }
+              }
+            } else if (filterId === "deliverystatusFilter") {
+              // For status, you might want an exact match. Adjust as needed.
+              if (filterValue && cellText !== filterValue) {
+                rowVisible = false;
+                break;
+              }
+            } else {
+              // For all other filters, check if the cell text contains the filter value.
+              if (filterValue && cellText.indexOf(filterValue) === -1) {
+                rowVisible = false;
+                break;
+              }
+            }
+          }
+        }
+        // Show or hide the row based on whether all filters were met
+        row.style.display = rowVisible ? "" : "none";
+      }
+    }
+
+    // Register event listeners for all filter inputs using the generic mapping
+    Object.keys(columnMapping).forEach(function(filterId) {
+      var elem = document.getElementById(filterId);
+      if (elem) {
+        // Use both 'input' and 'change' events to cover text fields and select elements
+        elem.addEventListener('input', filterTable);
+        elem.addEventListener('change', filterTable);
+      }
+    });
+
+    function sortTableWithToggle(element, columnIndex) {
+        const table = document.querySelector(".table-responsive .table");
+        const rows = Array.from(table.getElementsByTagName("tbody")[0].getElementsByTagName("tr"));
+
+        // Determine the sort order based on the current arrow class
+        const isDescending = element.classList.contains("fa-caret-down");
+        const newOrder = isDescending ? "asc" : "desc";
+
+        // Toggle the arrow class for the clicked column only
+        const allArrows = document.querySelectorAll(".sort-arrow-SA, .sort-arrow-OR");
+        allArrows.forEach(arrow => {
+            if (arrow !== element) {
+                arrow.classList.remove("fa-caret-up", "fa-caret-down");
+                arrow.classList.add("fa-caret-down"); // Reset other arrows to down
+            }
+        });
+
+        element.classList.toggle("fa-caret-down", !isDescending);
+        element.classList.toggle("fa-caret-up", isDescending);
+
+        // Sort only visible rows
+        const visibleRows = rows.filter(row => row.style.display !== "none");
+
+        visibleRows.sort((a, b) => {
+            const aValue = parseInt(a.getElementsByTagName("td")[columnIndex].innerText.trim()) || 0;
+            const bValue = parseInt(b.getElementsByTagName("td")[columnIndex].innerText.trim()) || 0;
+
+            return newOrder === "desc" ? bValue - aValue : aValue - bValue;
+        });
+
+        // Reattach sorted rows
+        visibleRows.forEach(row => table.getElementsByTagName("tbody")[0].appendChild(row));
+    }
+
+    // Add event listeners
+    // For multi-select, 'change' is the appropriate event
+    document.getElementById('brandFilter').addEventListener('change', filterTable);
+    document.getElementById('customerFilter').addEventListener('input', filterTable);
+    document.getElementById('soFilter').addEventListener('input', filterTable);
+    document.getElementById('siteFilter').addEventListener('input', filterTable);
+    document.getElementById('deliveryFilter').addEventListener('input', filterTable);
+    document.getElementById('billingFilter').addEventListener('input', filterTable);
+    document.getElementById('netvalFilter').addEventListener('input', filterTable);
+    document.getElementById('deliverystatusFilter').addEventListener('input', filterTable);
+    document.getElementById('createdOnFilter').addEventListener('input', filterTable);
+  </script>
+</body>
+</html>

@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="apple-touch-icon" sizes="76x76" href="/static/img/apple-icon.png">
+  <link rel="icon" type="image/png" href="/static/img/favicon.png">
+  <title>
+    RFT System
+  </title>
+  <!-- Fonts and icons -->
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900|Roboto+Slab:400,700" />
+  <link href="/static/css/nucleo-icons.css" rel="stylesheet" />
+  <link href="/static/css/nucleo-svg.css" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js" crossorigin="anonymous"></script>
+
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  <link id="pagestyle" href="/static/css/material-dashboard.css?v=3.1.0" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+</head>
+
+<style>
+  .tooltip {
+      z-index: 999999; /* Higher than default Bootstrap elements */
+  }
+
+  .po-cell {
+      max-width: calc(8ch + 4px); /* Adjust for padding/margins or slight variations */
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      cursor: pointer;
+      display: inline-block; /* Ensures consistent behavior for text-overflow */
+  }
+
+  .po-cell.expanded {
+      max-width: none; /* Show full content when expanded */
+      white-space: normal; /* Allow multi-line text if needed */
+  }
+
+  .bg-gradient-primary {
+    background-image: linear-gradient(195deg, #4054ec 0%, #D81B60 100%);
+  }
+  .dropdown-container {
+    display: block;
+    padding-left: 8px;
+  }
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  .dropdown-btn {
+    padding: 6px 8px 6px 16px;
+    text-decoration: none;
+    font-size: 20px;
+    color: #818181;
+    display: block;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    outline: none;
+  }
+  .hov:hover {
+    display: flex;
+    width: 169px;
+    border: none;
+    border-radius: 5px;
+    background-image: linear-gradient(195deg, #4054ec 0%, #D81B60 100%);
+  }
+  .numbadge {
+    --bs-badge-padding-x: 0.5em;
+    --bs-badge-padding-y: 0.5em;
+    --bs-badge-font-size: 0.75em;
+    --bs-badge-font-weight: 700;
+    --bs-badge-color: #fff;
+    --bs-badge-border-radius: 10rem;
+    display: inline-block;
+    padding: var(--bs-badge-padding-y) var(--bs-badge-padding-x);
+    font-size: var(--bs-badge-font-size);
+    font-weight: var(--bs-badge-font-weight);
+    line-height: 1;
+    color: var(--bs-badge-color);
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: var(--bs-badge-border-radius);
+  }
+  .border2 {
+    border: 2px solid #000 !important;
+  }
+  .input-custom {
+    background-color: #f8f9fa;
+    border: none;
+    border-bottom: 2px solid #ced4da;
+    padding: 10px;
+    border-radius: 0;
+    outline: none;
+  }
+
+  .input-custom:focus {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #4054ec;
+    box-shadow: none;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  label {
+    font-weight: bold;
+  }
+
+  .btn-primary {
+    background-color: #4054ec;
+    border-color: #4054ec;
+  }
+
+  .btn-primary:hover {
+    background-color: #3547d3;
+    border-color: #3547d3;
+  }
+  .instructions {
+      /* font-size: 5px; */
+      color: #51d94f; /* Bootstrap danger color */
+      background-color: #fbfe12; /* Bootstrap danger background */
+      border: 1px solid #ebccd1; /* Bootstrap danger border */
+      padding: 5px;
+      border-radius: 4px;
+      margin-bottom: 15px;
+      font-weight: 500;
+  }
+  .filter-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding-left: 19px;
+  }
+
+  .filter-container select,
+  .filter-container input {
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+</style>
+
+<body class="g-sidenav-show bg-gray-200">
+  <!-- SERCHABLE DROPDOWNS -->
+  <!-- Include jQuery and Select2 JS -->
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+  <script>
+      $(document).ready(function () {
+          $("#brandFilter ").select2({
+              multiple: true,
+              allow_clear:true,
+          });
+      });
+  </script>
+  {% include 'sidebar.html' %}  
+  <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg">
+    <!-- Navbar -->
+    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur" data-scroll="true">
+      <div class="container-fluid py-1 px-3">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
+            <li class="breadcrumb-item text-sm"><a class="opacity-5 text-dark" href="javascript:;">Home</a></li>
+            <li class="breadcrumb-item text-sm text-dark active" aria-current="page">Orders</li>
+          </ol>
+          
+          <h6 class="font-weight-bolder mb-0">Initial PO updates</h6>
+          
+        </nav>
+        <ul class="navbar-nav justify-content-end">
+          <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
+            <a href="javascript:;" class="nav-link text-body p-0" id="iconNavbarSidenav">
+              <div class="sidenav-toggler-inner">
+                <i class="sidenav-toggler-line"></i>
+                <i class="sidenav-toggler-line"></i>
+                <i class="sidenav-toggler-line"></i>
+              </div>
+            </a>
+          </li>
+          <li>
+            <img id="robote" src="static/img/robot.gif" style="position: absolute; z-index: 9; right: 500px; display: none;">
+          </li>
+          <li class="nav-item d-flex align-items-center">
+            <a href="#" class="nav-link text-body font-weight-bold px-0">
+              <i class="fa fa-user me-sm-1" style="font-size: 1.275rem;"></i>
+              <span class="d-sm-inline d-none" style="font-size: 1.275rem;">{{session['username']}}</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <!-- End Navbar -->
+    <div class="container-fluid py-4">
+      <div class="row">
+        <div class="col-12">
+          <div class="card my-4">
+            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+              <div class="bg-gradient-dark shadow-primary border-radius-lg pt-4 pb-3">
+                <h6 class="btn-outline-primary bg-gradient-primary text-white text-capitalize ps-3" style="width: 200px; cursor: pointer; border-top-right-radius: 5px; border-bottom-right-radius: 5px;">
+                  Initial PO Updates
+              </div>
+            </div>
+            <div class="card-body px-0 pb-0" style="padding: 2px;">
+              {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                  {% for category, message in messages %}
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+              <!-- TEST FLASH BLOCK -->
+                {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert" style="color: white;">
+                  {{ message }}
+                  <button type="button" class="btn-close" style="color: white;" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+              {% endfor %}
+                {% endif %}
+              {% endwith %}
+                  {% endfor %}
+                {% endif %}
+              {% endwith %}
+              <div class="filter-container " style="
+                z-index: 1; 
+                
+                background-color: #f5f5f5;
+                border: 1px solid #ddd !important;
+                padding: 10px;
+                margin: 5px;
+                /* margin-bottom: 10px; */
+                ">
+                <!-- Brand Name Filter -->
+                <!-- onchange="filterTable('brandFilter', 1)" -->
+                <select id="brandFilter" onchange="filterTable('brandFilter', 1)" multiple>
+                  <option value="" selected disabled>Brand Name</option>
+                  {% for brand in brand_names2 %}
+                  <option value="{{brand}}">{{brand}}</option>
+                  {% endfor %}
+                </select>
+
+                <!-- siteFilter Filter -->
+                <select id="siteFilter" onchange="filterTable('siteFilter', 0)">
+                  <option value="" selected disabled>Filter By Site</option>
+                  {% for site in sites2 %}
+                  <option value="{{site}}">{{site}}</option>
+                  {% endfor %}
+                </select>
+
+                <!-- overallcreditstatusFilter Filter -->
+                <!-- <select id="overallcreditstatusFilter" onchange="filterTable('overallcreditstatusFilter', 8)">
+                  <option value="" selected disabled>Filter by Credit Status</option>
+                  <option value="">Credit check was not executed/Status not set</option>
+                  <option value="A">Credit check was executed, document OK///Order is Automatically released and under logistics process</option>
+                  <option value="B">Credit check was executed, document not OK///Order checked by finance but under block</option>
+                  <option value="C">Credit check was executed, document not OK, partial release///Order checked by finance but under block</option>
+                  <option value="D">Document released by credit representative///Manually released by finance, now under logistics</option>
+                  <option value="E">Magento/Ecomm Order, document OK///Order is Automatically released and under logistics process</option>
+                </select> -->
+
+                <!-- User selected types Filter -->
+                <select id="deliverystatusFilter" onchange="filterTable('deliverystatusFilter', 1)">
+                  <option value="" selected disabled>Filter by Delivery Status</option>
+                  {% for status in status_list %}
+                  <option value="{{ status }}" >{{ status }}</option>
+                  {% endfor %}
+                </select>
+                
+                <!-- Customer Name Filter -->
+                <input id="customerFilter" placeholder="Filter Customer Name" oninput="filterTable('customerFilter', 2)" />
+                
+                <!-- Delivery Note Filter (Number Input) -->
+                <input type="number" id="deliveryFilter" oninput="filterTable('deliveryFilter', 4)" placeholder="Filter by Delivery Note" />
+
+                <!-- SO Filter (Number Input) -->
+                <input type="number" id="soFilter" oninput="filterTable('soFilter', 3)" placeholder="Filter by Sales Document" />
+
+                <!-- Billing DOC Filter (Number Input) -->
+                <input type="number" id="billingFilter" oninput="filterTable('billingFilter', 5)" placeholder="Filter by Billing Document" />
+
+                <!-- NET VAL Filter (Number Input) -->
+                <input type="number" id="netvalFilter" oninput="filterTable('netvalFilter', 6)" placeholder="Filter by NetValue" />
+
+                <!-- NET VAL Filter (Number Input) -->
+                <input type="month" id="createdOnFilter" oninput="filterTable('createdOnFilter', 6)" placeholder="Created Month e.g Jan,FEB" />
+
+                <!-- Submit/ serch btuuton for filter (search in db) -->
+                <button id="submit" type="submit" style="width: 600px;" form="main_form" class="btn bg-gradient-info">Submit Updates</button>
+
+              </div>
+              <form id="main_form" action="{{ url_for('main.initialPO_Updates') }}" method="POST">
+                <div class="table-responsive p-0">
+                  <table class="table  mb-0 table-responsive ">
+                    <thead>
+                      <tr>
+                        <th>SLA-LC</th>
+                        <th>PO Number</th>
+                        <th>Supplier</th>
+                        <th>Brand</th>
+                        <th>PO Date</th>
+                        <th>LC (Y/N)</th>
+                        <th>LC Number</th>
+                        <th>LC Date</th>
+                        <th>Mode Of Transport</th>
+                        <th>INCOTerms</th>
+                        <!-- <th>Loading Port</th>
+                        <th>Destination Country</th> -->
+
+                        <th>No.Article</th>
+                        <th>Total Qty</th>
+                        <th>Total Value</th>
+                      </tr>
+                    </thead>
+                    <tbody >
+                      {% for row in report_data %}
+                      {# {% if (row.Brand in session['user_brand_access']) or (row.Site in session['user_site_access']) %} #}
+                        <tr>
+                          <td hidden> <input name="POID" type="text" hidden value="{{ row.POID }}"></td>
+                          <td >SLA</td>
+                          <td>{{ row.PONumber }}</td>
+                          <td>{{ row.Supplier }}</td>
+                          <td>{{ row.Brand }}</td>
+                          <td>{{ row.PODate }}</td>
+                          <td>
+                            <select name="LCStatus_{{ row.POID }}" id="LCStatus_{{ row.POID }}" onchange="trackChange(this, '{{ row.POID }}')">
+                              <option value="" {{ 'selected' if row.LCStatus not in ('Yes', 'No') else '' }}></option>
+                              <option value="Yes" {{ 'selected' if row.LCStatus == 'Yes' else '' }}>Yes</option>
+                              <option value="No" {{ 'selected' if row.LCStatus == 'No' else '' }}>No</option>
+                            </select>
+                          </td>
+                          <td><input name="LCNumber_{{ row.POID }}" id="LCNumber_{{ row.POID }}" type="text" value="{% if row.LCNumber %} {{ row.LCNumber }} {% endif %}" oninput="trackChange(this, '{{ row.POID }}')" disabled></td>
+                          <td><input name="LCDate_{{ row.POID }}" id="LCDate_{{ row.POID }}"  type="date" value="{% if row.LCDate %}{{ row.LCDate }}{% endif %}" oninput="trackChange(this, '{{ row.POID }}')" disabled></td>
+                          <td>
+                            <select name="ModeOfTransport_{{ row.POID }}" id="ModeOfTransport_{{ row.POID }}" onchange="trackChange(this, '{{ row.POID }}')">
+                              {% for mot in modeOfTransport %}
+                                <option value="{{mot.mode}}" {{ 'selected' if row.ModeOfTransport == mot.mode else '' }}>{{mot.mode}}</option>
+                              {% endfor %}
+                            </select>
+                          </td>
+                          <td>
+                            <select name="INCOTerms_{{ row.POID }}"
+                                    id="INCOTerms_{{ row.POID }}"
+                                    onchange="trackChange(this, '{{ row.POID }}')">
+                              {% for terms in incoterms %}
+                                {# build the exact value you inserted in the DB #}
+                                {% set full = terms.code ~ ' - ' ~ terms.description %}
+                                <option 
+                                  value="{{ full }}"
+                                  {% if row.INCOTerms == full %}selected{% endif %}
+                                >
+                                  {{ full }}
+                                </option>
+                              {% endfor %}
+                            </select>
+                            
+                          </td>
+
+                          <td>{{ row.TotalArticles }}</td>
+                          <td>{{ row.TotalQty }}</td>
+                          <td>{{ (row.TotalValue | default(0) | float)}}</td>
+
+                          <td>
+                            <a class="cursor-pointer" href="/chat?order_id={{ row.ID }}&site={{ row.Site }}&so={{ row.SalesDocument }}&dn={{ row.Delivery }}&brand={{ row.BrandName }}">
+                              <i class="material-icons opacity-10">question_answer</i>
+                            </a>
+                            {% for dn_in_chats in dn_list %}
+                              {% if row.Delivery == dn_in_chats %}
+                                <a href="/chat?order_id={{ row.ID }}&site={{ row.Site }}&so={{ row.SalesDocument }}&dn={{ row.Delivery }}&brand={{ row.BrandName }}" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Active chat">
+                                  <img src="/static/img/new-message.png" alt="team1" style="box-shadow: 0 0 10px 2px red;">
+                                </a>
+                              {% endif %}
+                            {% endfor %}
+                          </td>   
+                          <td hidden>
+                            <p>{{ row.CreatedOn}}</p>
+                          </td>
+                          <!-- DELEET BUTTON -->
+                          {% if session['role'] == 'admin' %}
+                          <td>
+                            <a class="cursor-pointer" href="/archive_order?order_id={{ row.ID }}">
+                              <i class="material-icons opacity-10" style="color: red;">delete</i>
+                            </a>
+                          </td>
+                          {# {% endif %} #}
+                        </tr>
+                        {% endif %}
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% include 'footer_credits.html' %}
+    </div>
+  </main>
+  <div class="fixed-plugin">
+    <div class="card shadow-lg">
+      <div class="card-header pb-0 pt-3">
+        <div class="float-start">
+          <h5 class="mt-3 mb-0"></h5>
+          <p></p>
+        </div>
+        <div class="float-end mt-4">
+          <button class="btn btn-link text-dark p-0 fixed-plugin-close-button">
+            <i class="material-icons">clear</i>
+          </button>
+        </div>
+        <!-- End Toggle Button -->
+      </div>
+    </div>
+  </div>
+  <!-- Core JS Files -->
+  <script src="/static/js/core/popper.min.js"></script>
+  <script src="/static/js/core/bootstrap.min.js"></script>
+  <script src="/static/js/plugins/perfect-scrollbar.min.js"></script>
+  <script src="/static/js/plugins/smooth-scrollbar.min.js"></script>
+  <script src="/static/js/generalScripts.js"></script>
+  <script src="/static/js/clockAndReminder.js"></script>
+  
+  <!-- submiting changed elements -->
+  <script>
+    let changedElements = {};
+
+    // Function to track changes in select elements
+    function trackChange(element, recordId) {
+      const name = element.name;
+      const value = element.value;
+
+      changedElements[name] = value;
+
+      // Also include the POID to ensure it's submitted
+      changedElements[`POID_${recordId}`] = recordId;
+    }
+
+    // Function to submit only changed elements
+    document.getElementById('main_form').addEventListener('submit', function(event) {
+      event.preventDefault(); // Prevent default form submission
+
+      // Create a new form to submit only the changed elements
+      const newForm = document.createElement('form');
+      newForm.method = 'POST';
+      newForm.action = '{{ url_for("main.initialPO_Updates") }}';
+
+      // Append only the changed elements to the form
+      for (let name in changedElements) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = name;
+        input.value = changedElements[name];
+        newForm.appendChild(input);
+      }
+
+      // Append the new form to the body and submit
+      document.body.appendChild(newForm);
+      newForm.submit();
+    });
+  </script>
+
+  <!-- LCStatus select -->
+  <script>
+    // Attach to every LCStatus select on the page
+    document.querySelectorAll('select[id^="LCStatus_"]').forEach(select => {
+      const poid = select.id.split('_')[1];
+      const numInput  = document.getElementById(`LCNumber_${poid}`);
+      const dateInput = document.getElementById(`LCDate_${poid}`);
+  
+      function updateInputs() {
+        if (select.value === 'Yes') {
+          numInput.disabled  = false;
+          dateInput.disabled = false;
+        } else {
+          // clear & disable on No or empty
+          numInput.value  = '';
+          dateInput.value = '';
+          numInput.disabled  = true;
+          dateInput.disabled = true;
+        }
+      }
+  
+      select.addEventListener('change', updateInputs);
+      // initialize on page load
+      updateInputs();
+    });
+  </script>
+
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="apple-touch-icon" sizes="76x76" href="/static/img/apple-icon.png">
+  <link rel="icon" type="image/png" href="/static/img/favicon.png">
+  <title>
+    RFT System
+  </title>
+  <!-- Fonts and icons -->
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900|Roboto+Slab:400,700" />
+  <link href="/static/css/nucleo-icons.css" rel="stylesheet" />
+  <link href="/static/css/nucleo-svg.css" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js" crossorigin="anonymous"></script>
+
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  <link id="pagestyle" href="/static/css/material-dashboard.css?v=3.1.0" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+</head>
+
+<style>
+  .tooltip {
+      z-index: 999999; /* Higher than default Bootstrap elements */
+  }
+
+  .po-cell {
+      max-width: calc(8ch + 4px); /* Adjust for padding/margins or slight variations */
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      cursor: pointer;
+      display: inline-block; /* Ensures consistent behavior for text-overflow */
+  }
+
+  .po-cell.expanded {
+      max-width: none; /* Show full content when expanded */
+      white-space: normal; /* Allow multi-line text if needed */
+  }
+
+  .bg-gradient-primary {
+    background-image: linear-gradient(195deg, #4054ec 0%, #D81B60 100%);
+  }
+  .dropdown-container {
+    display: block;
+    padding-left: 8px;
+  }
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  .dropdown-btn {
+    padding: 6px 8px 6px 16px;
+    text-decoration: none;
+    font-size: 20px;
+    color: #818181;
+    display: block;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    outline: none;
+  }
+  .hov:hover {
+    display: flex;
+    width: 169px;
+    border: none;
+    border-radius: 5px;
+    background-image: linear-gradient(195deg, #4054ec 0%, #D81B60 100%);
+  }
+  .numbadge {
+    --bs-badge-padding-x: 0.5em;
+    --bs-badge-padding-y: 0.5em;
+    --bs-badge-font-size: 0.75em;
+    --bs-badge-font-weight: 700;
+    --bs-badge-color: #fff;
+    --bs-badge-border-radius: 10rem;
+    display: inline-block;
+    padding: var(--bs-badge-padding-y) var(--bs-badge-padding-x);
+    font-size: var(--bs-badge-font-size);
+    font-weight: var(--bs-badge-font-weight);
+    line-height: 1;
+    color: var(--bs-badge-color);
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: var(--bs-badge-border-radius);
+  }
+  .border2 {
+    border: 2px solid #000 !important;
+  }
+  .input-custom {
+    background-color: #f8f9fa;
+    border: none;
+    border-bottom: 2px solid #ced4da;
+    padding: 10px;
+    border-radius: 0;
+    outline: none;
+  }
+
+  .input-custom:focus {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #4054ec;
+    box-shadow: none;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  label {
+    font-weight: bold;
+  }
+
+  .btn-primary {
+    background-color: #4054ec;
+    border-color: #4054ec;
+  }
+
+  .btn-primary:hover {
+    background-color: #3547d3;
+    border-color: #3547d3;
+  }
+  .instructions {
+      /* font-size: 5px; */
+      color: #51d94f; /* Bootstrap danger color */
+      background-color: #fbfe12; /* Bootstrap danger background */
+      border: 1px solid #ebccd1; /* Bootstrap danger border */
+      padding: 5px;
+      border-radius: 4px;
+      margin-bottom: 15px;
+      font-weight: 500;
+  }
+  .filter-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding-left: 19px;
+  }
+
+  .filter-container select,
+  .filter-container input {
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+</style>
+
+<body class="g-sidenav-show bg-gray-200">
+  <!-- SERCHABLE DROPDOWNS -->
+  <!-- Include jQuery and Select2 JS -->
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+  <script>
+      $(document).ready(function () {
+          $("#sda ").select2({
+              multiple: false,
+              allow_clear:true,
+          });
+      });
+  </script>
+  {% include 'sidebar.html' %}  
+  <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg">
+    <!-- Navbar -->
+    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur" data-scroll="true">
+      <div class="container-fluid py-1 px-3">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
+            <li class="breadcrumb-item text-sm"><a class="opacity-5 text-dark" href="javascript:;">Home</a></li>
+            <li class="breadcrumb-item text-sm text-dark active" aria-current="page">Freights</li>
+          </ol>
+            <h6 class="font-weight-bolder mb-0">Create Shipments</h6>
+        </nav>
+        <ul class="navbar-nav justify-content-end">
+          <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
+            <a href="javascript:;" class="nav-link text-body p-0" id="iconNavbarSidenav">
+              <div class="sidenav-toggler-inner">
+                <i class="sidenav-toggler-line"></i>
+                <i class="sidenav-toggler-line"></i>
+                <i class="sidenav-toggler-line"></i>
+              </div>
+            </a>
+          </li>
+          <li>
+            <img id="robote" src="static/img/robot.gif" style="position: absolute; z-index: 9; right: 500px; display: none;">
+          </li>
+          <li class="nav-item d-flex align-items-center">
+            <a href="#" class="nav-link text-body font-weight-bold px-0">
+              <i class="fa fa-user me-sm-1" style="font-size: 1.275rem;"></i>
+              <span class="d-sm-inline d-none" style="font-size: 1.275rem;">{{session['username']}}</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <!-- End Navbar -->
+    <div class="container-fluid py-4">
+      <div class="row">
+        <div class="col-12">
+          <div class="card my-4">
+            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+              <div class="bg-gradient-dark shadow-primary border-radius-lg pt-4 pb-3">
+                <h6 class="btn-outline-primary bg-gradient-primary text-white text-capitalize ps-3" style="width: 200px; cursor: pointer; border-top-right-radius: 5px; border-bottom-right-radius: 5px;">
+                  Create Shipments
+                </h6>
+              </div>
+            </div>
+            <div class="card-body px-0 pb-0" style="padding: 2px;">
+              {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                  {% for category, message in messages %}
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+              <!-- TEST FLASH BLOCK -->
+                {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert" style="color: white;">
+                  {{ message }}
+                  <button type="button" class="btn-close" style="color: white;" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+              {% endfor %}
+                {% endif %}
+              {% endwith %}
+                  {% endfor %}
+                {% endif %}
+              {% endwith %}
+              <div class="filter-container " style="
+                z-index: 1; 
+                
+                background-color: #f5f5f5;
+                border: 1px solid #ddd !important;
+                padding: 10px;
+                margin: 5px;
+                /* margin-bottom: 10px; */
+                ">
+                <!-- Brand Name Filter -->
+                <!-- onchange="filterTable('brandFilter', 1)" -->
+                <select id="brandFilter" onchange="filterTable('brandFilter', 1)" multiple>
+                  <option value="" selected disabled>Brand Name</option>
+                  {% for brand in brand_names2 %}
+                  <option value="{{brand}}">{{brand}}</option>
+                  {% endfor %}
+                </select>
+
+                <!-- siteFilter Filter -->
+                <select id="siteFilter" onchange="filterTable('siteFilter', 0)">
+                  <option value="" selected disabled>Filter By Site</option>
+                  {% for site in sites2 %}
+                  <option value="{{site}}">{{site}}</option>
+                  {% endfor %}
+                </select>
+
+                <!-- User selected types Filter -->
+                <select id="deliverystatusFilter" onchange="filterTable('deliverystatusFilter', 1)">
+                  <option value="" selected disabled>Filter by Delivery Status</option>
+                  {% for status in status_list %}
+                  <option value="{{ status }}" >{{ status }}</option>
+                  {% endfor %}
+                </select>
+                
+                <!-- Customer Name Filter -->
+                <input id="customerFilter" placeholder="Filter Customer Name" oninput="filterTable('customerFilter', 2)" />
+                
+                <!-- Delivery Note Filter (Number Input) -->
+                <input type="number" id="deliveryFilter" oninput="filterTable('deliveryFilter', 4)" placeholder="Filter by Delivery Note" />
+
+                <!-- SO Filter (Number Input) -->
+                <input type="number" id="soFilter" oninput="filterTable('soFilter', 3)" placeholder="Filter by Sales Document" />
+
+                <!-- Billing DOC Filter (Number Input) -->
+                <input type="number" id="billingFilter" oninput="filterTable('billingFilter', 5)" placeholder="Filter by Billing Document" />
+
+                <!-- NET VAL Filter (Number Input) -->
+                <input type="number" id="netvalFilter" oninput="filterTable('netvalFilter', 6)" placeholder="Filter by NetValue" />
+
+                <!-- NET VAL Filter (Number Input) -->
+                <input type="month" id="createdOnFilter" oninput="filterTable('createdOnFilter', 6)" placeholder="Created Month e.g Jan,FEB" />
+
+                <!-- Submit/ serch btuuton for filter (search in db) -->
+                <button id="submit" type="submit" style="width: 500px;" form="main_form" class="badge badge-sm bg-gradient-info {{ 'd-none' if brand_wise else ''}} ">Create Shipment</button>
+
+              </div>
+              <form id="main_form" action="{{ url_for('main.createShipments') }}" method="POST">
+                <div class="table-responsive p-0">
+                  <table class="table  mb-0 table-responsive ">
+                    <thead>
+                      <tr>
+                        <th>Sr.<input style="width: 30% !important;" type="checkbox" id="select-all"></th>
+                        <!-- <th>POID</th> -->
+                        <th>PO Number</th>
+                        <th>Supplier</th>
+                        <th>Brand</th>
+                        
+                        <th>Article</th>
+                        <th>Cat. Name</th>
+                        <th>Cat. Desc.</th>
+                        <th>Qty</th>
+                        <th>Total Value</th>
+                        <th>Selected Qty</th>
+                        <th>Balance Qty</th>
+                        <th>Value Balance Qty</th>
+                        <th>LC Number</th>
+                        <th>LC Date</th>
+                        <th>Mode Of Transport</th>
+                        <th>INCOTerms</th>
+                      </tr>
+                    </thead>
+                    <tbody >
+                      {% for po, line, cat in report_data %}
+                      {# {% if (row.Brand in session['user_brand_access']) or (row.Site in session['user_site_access']) %} #}
+                        <tr>
+                          <td >{{ loop.index }}. <input type="checkbox" name="POID" id="POID" class="item-checkbox" value="{{ line.POLineID }}"></td>
+                          <td>{{ po.PONumber }}</td>
+                          <td>{{ po.Supplier }}</td>
+                          <td>{{ po.Brand }}</td>
+                          
+                          <td>{{ line.Article }}</td>
+                          <td>{{ cat.CatName }}</td>
+
+                          <td>{{ cat.CATDesc }} 
+                            {% if cat.SubCat == 'SDA'%}/ 
+                              <select name="sda" id="sda">
+                                {% for option in sda_options %} 
+                                  <option>{{option.SDANames}}</option>
+                                {% endfor %}
+                              </select>
+                            {% endif %}
+                          </td>
+
+                          <td class="orig-balance">{{ line.BalanceQty }}</td>
+                          <td class="total-value">{{ line.TotalValue }}</td>
+                          <td><input type="number" name="selected_qty"  class="selected-qty" value="{{ line.BalanceQty }}" max="{{ line.BalanceQty }}" min="0" step="1"></td>
+                          <td class="new-balance">0</td>
+                          <td class="value-balance">0</td>
+                          <td>{{ po.LCNumber }}</td>
+                          <td>{{ po.LCDate }}</td>
+                          <td>{{ po.ModeOfTransport }}</td>
+                          <td>{{ po.INCOTerms }}</td>
+
+                          <td>
+                            <a class="cursor-pointer" href="/chat?order_id={{ po.ID }}&site={{ po.Site }}">
+                              <i class="material-icons opacity-10">question_answer</i>
+                            </a>
+                            {% for dn_in_chats in dn_list %}
+                              {% if row.Delivery == dn_in_chats %}
+                                <a href="/chat?order_id={{ row.ID }}&site={{ row.Site }}&so={{ row.SalesDocument }}&dn={{ row.Delivery }}&brand={{ row.BrandName }}" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Active chat">
+                                  <img src="/static/img/new-message.png" alt="team1" style="box-shadow: 0 0 10px 2px red;">
+                                </a>
+                              {% endif %}
+                            {% endfor %}
+                          </td>   
+                          <td hidden>
+                            <p>{{ po.CreatedOn}}</p>
+                          </td>
+                          <!-- DELEET BUTTON -->
+                          {% if session['role'] == 'admin' %}
+                          <td>
+                            <a class="cursor-pointer" href="/archive_order?order_id={{ po.ID }}">
+                              <i class="material-icons opacity-10" style="color: red;">delete</i>
+                            </a>
+                          </td>
+                          {# {% endif %} #}
+                        </tr>
+                        {% endif %}
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% include 'footer_credits.html' %}
+    </div>
+  </main>
+  <div class="fixed-plugin">
+    <div class="card shadow-lg">
+      <div class="card-header pb-0 pt-3">
+        <div class="float-start">
+          <h5 class="mt-3 mb-0"></h5>
+          <p></p>
+        </div>
+        <div class="float-end mt-4">
+          <button class="btn btn-link text-dark p-0 fixed-plugin-close-button">
+            <i class="material-icons">clear</i>
+          </button>
+        </div>
+        <!-- End Toggle Button -->
+      </div>
+    </div>
+  </div>
+  <!-- Core JS Files -->
+  <script src="/static/js/core/popper.min.js"></script>
+  <script src="/static/js/core/bootstrap.min.js"></script>
+  <script src="/static/js/plugins/perfect-scrollbar.min.js"></script>
+  <script src="/static/js/plugins/smooth-scrollbar.min.js"></script>
+  <script src="/static/js/generalScripts.js"></script>
+  <script src="/static/js/clockAndReminder.js"></script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      document.querySelectorAll('.selected-qty').forEach(function (input) {
+        input.addEventListener('input', function () {
+          const row = input.closest('tr');
+    
+          const origBalance = parseFloat(row.querySelector('.orig-balance').textContent) || 0;
+          const totalValue = parseFloat(row.querySelector('.total-value').textContent) || 0;
+          const selectedQty = parseFloat(input.value) || 0;
+    
+          // Calculate new balance
+          const newBalance = origBalance - selectedQty;
+          row.querySelector('.new-balance').textContent = newBalance < 0 ? 0 : newBalance;
+    
+          // Calculate unit value and new value
+          const unitValue = origBalance > 0 ? totalValue / origBalance : 0;
+          const valueBalance = newBalance > 0 ? (unitValue * newBalance).toFixed(2) : '0.00';
+          row.querySelector('.value-balance').textContent = valueBalance;
+        });
+    
+        // Trigger once on load to populate correctly
+        input.dispatchEvent(new Event('input'));
+      });
+    });
+  </script>
+  
+
+  <script>
+    function expandCell(cell) {
+        cell.classList.toggle("expanded");
+    }
+    // Ensure DOM is fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      // For tooltips
+      $('[data-toggle="tooltip"]').tooltip();
+    })
+  </script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const checkboxes = document.querySelectorAll(".item-checkbox");
+      const selectAllCheckbox = document.getElementById("select-all");
+
+      selectAllCheckbox.addEventListener("change", function () {
+        checkboxes.forEach((cb) => {
+            cb.checked = this.checked;
+        });
+        //updateSelectedCount();
+      });
+    });
+  </script>
+
+</body>
+</html>
+
+
+{% for cid in unique_cids %}
+                      <tr>
+                        <td>
+                          <div class="text-center">
+                            <i class="add-row fa fa-plus-circle fa-3x" style="color: #0ba644;"></i>
+                          </div>
+                        </td>
+                        <td><input type="text" name="containers[{{ loop.index0 }}][container_number]" value="{{ report_data.containers[loop.index0].ContainerNumber or '' }}" /></td>
+                        <td>
+                          <select name="containers[{{ loop.index0 }}][container_type]">
+                            <option value="40ft" {% if report_data.containers[loop.index0].ContainerType == '40ft' %}selected{% endif %}>40ft</option>
+                            <option value="20ft" {% if report_data.containers[loop.index0].ContainerType == '20ft' %}selected{% endif %}>20ft</option>
+                          </select>
+                        </td>
+                        <td>
+                          <!-- The button to open the modal. Data attribute "data-container-id" identifies this container row (here, "0") -->
+                          <button type="button" class="add-items-btn btn btn-success" data-container-id="{{ loop.index0 }}">
+                            Add Items
+                          </button>
+
+                          <!-- Display a summary of items added for this container -->
+                          <div class="selected-items" id="selected-items-{{ loop.index0 }}"></div>
+                          
+                          <!-- Hidden input to store the JSON for container items -->
+                          <input type="hidden" name="containers[{{ loop.index0 }}][items]" id="container_items_{{ loop.index0 }}" value="">
+                        </td>
+                        <!-- STATUS -->
+                        <td>
+                          <select name="containers[{{ loop.index0 }}][status]">
+                            {% if not report_data.containers[loop.index0].ContainerLevelStatus %}
+                            <option selected></option>
+                            {% endif %}
+                            {% if containerstatuses == []  %}
+                            <option selected disabled>Not Allowed</option>
+                            {% endif %}
+                            {% for status in containerstatuses %}
+                            <option value="{{status.StatusName}}" {% if status.StatusName == report_data.containers[loop.index0].ContainerLevelStatus %}selected{% endif %}>{{status.StatusName}}</option>
+                            {% endfor %}
+                          </select>
+                        </td>
+                        
+                        <td><input type="date" name="containers[{{ loop.index0 }}][ata_op]"             value="{{ report_data.containers[loop.index0].ATAOrigin.strftime('%Y-%m-%d') if report_data.containers[loop.index0].ATAOrigin else '' }}" /></td>
+                        <td><input type="date" name="containers[{{ loop.index0 }}][atd_op]"             value="{{ report_data.containers[loop.index0].ATDOrigin.strftime('%Y-%m-%d') if report_data.containers[loop.index0].ATDOrigin else '' }}" /></td>
+                        <td><input type="date" name="containers[{{ loop.index0 }}][ata_dp]"             value="{{ report_data.containers[loop.index0].ATADP.strftime('%Y-%m-%d') if report_data.containers[loop.index0].ATADP else '' }}" /></td>
+                        <td><input type="date" name="containers[{{ loop.index0 }}][ccdate]"             value="{{ report_data.containers[loop.index0].CCDate.strftime('%Y-%m-%d') if report_data.containers[loop.index0].CCDate else '' }}" /></td>
+                        <td><input type="date" name="containers[{{ loop.index0 }}][atd_dp]"             value="{{ report_data.containers[loop.index0].ATDDPort.strftime('%Y-%m-%d') if report_data.containers[loop.index0].ATDDPort else '' }}" /></td>
+                        <td><input type="date" name="containers[{{ loop.index0 }}][ata_wh]"             value="{{ report_data.containers[loop.index0].ATAWH.strftime('%Y-%m-%d') if report_data.containers[loop.index0].ATAWH else '' }}" /></td>
+                        <td><input type="date" name="containers[{{ loop.index0 }}][yard_in_date]"       value="{{ report_data.containers[loop.index0].YardInDate.strftime('%Y-%m-%d') if report_data.containers[loop.index0].YardInDate  else '' }}" /></td>
+                        <td><input type="date" name="containers[{{ loop.index0 }}][yard_out_date]"      value="{{ report_data.containers[loop.index0].YardOutDate.strftime('%Y-%m-%d') if report_data.containers[loop.index0].YardOutDate else '' }}" /></td>
+                        <td><input type="text" name="containers[{{ loop.index0 }}][container_remarks]"  value="{{ report_data.containers[loop.index0].ContainerRemarks if report_data.containers[loop.index0].ContainerRemarks else '' }}" /></td>
+                      </tr>
+                    {% else %}
+                    <!-- Default Row -->
+                    {% if unique_cids|length < 0 %}
+                    <tr>
+                      <td>
+                        <div class="text-center">
+                          <i class="add-row fa fa-plus-circle fa-3x" style="color: #0ba644;"></i>
+                        </div>
+                      </td>
+                      <td><input type="text" name="containers[0][container_number]" value="" /></td>
+                      <td>
+                        <select name="containers[0][container_type]">
+                          <option value="40ft" >40ft</option>
+                          <option value="20ft" >20ft</option>
+                        </select>
+                      </td>
+                      <td>
+                        <!-- The button to open the modal. Data attribute "data-container-id" identifies this container row (here, "0") -->
+                        <button type="button" class="add-items-btn btn btn-success" data-container-id="0">
+                          Add Items
+                        </button>
+                        <!-- Display a summary of items added for this container -->
+                        <div class="selected-items" id="selected-items-0"></div>
+                        
+                        <!-- Hidden input to store the JSON for container items -->
+                        <input type="hidden" name="containers[0][items]" id="container_items_0" value="">
+                      </td>
+                      <!-- STATUS -->
+                      <td>
+                        <select name="containers[0][status]">
+                          <option selected disabled></option>
+                          {% if containerstatuses == []  %}
+                          <option selected disabled>Not Allowed</option>
+                          {% endif %}
+                          {% for status in containerstatuses %}
+                          <option value="{{status.StatusName}}" >{{status.StatusName}}</option>
+                          {% endfor %}
+                        </select>
+                      </td>
+                      
+                      <td><input type="date" name="containers[0][atd_op]"             value="" /></td>
+                      <td><input type="date" name="containers[0][ata_op]"             value="" /></td>
+                      <td><input type="date" name="containers[0][ata_dp]"             value="" /></td>
+                      <td><input type="date" name="containers[0][ccdate]"             value="" /></td>
+                      <td><input type="date" name="containers[0][atd_dp]"             value="" /></td>
+                      <td><input type="date" name="containers[0][ata_wh]"             value="" /></td>
+                      <td><input type="date" name="containers[0][yard_in_date]"       value="" /></td>
+                      <td><input type="date" name="containers[0][yard_out_date]"      value="" /></td>
+                      <td><input type="text" name="containers[0][container_remarks]"  value="" /></td>
+                    </tr>
+                    {% endif %}
+
+                    # def initialPO_Updates():
+                    #     if request.method == 'POST':
+                    #         form_data = request.form.to_dict()
+                    #         updated_poids = set()
+                    #         # updated_po_nums = []
+                    
+                    #         # Extract unique POIDs based on key names like LCNumber_12
+                    #         for key in form_data:
+                    #             if key.startswith('POID_'):
+                    #                 updated_poids.add(form_data[key])
+                            
+                    #         for poid in updated_poids:
+                    #             record = model.query(RFT_PurchaseOrder).filter(RFT_PurchaseOrder.POID == poid).first()
+                    #             if not record:
+                    #                 continue  # or flash a warning per POID
+                                
+                    #             lc_status = request.form.get(f'LCStatus_{poid}')
+                    #             lc_num = request.form.get(f'LCNumber_{poid}')
+                    #             lc_date = request.form.get(f'LCDate_{poid}')
+                    #             mot = request.form.get(f'ModeOfTransport_{poid}')
+                    #             incoterm = request.form.get(f'INCOTerms_{poid}')
+                                
+                    #             updated = False
+                    
+                    #             if lc_num:
+                    #                 record.LCNumber = lc_num
+                    #                 updated = True
+                                    
+                    #             if lc_status and lc_status == 'Yes':
+                    #                 record.LCStatus = lc_status
+                    #                 updated = True
+                    #             elif lc_status and lc_status == 'No':
+                    #                 record.LCStatus = lc_status
+                                    
+                    #                 # set the status for NO-LC items 
+                    #                 status_name = "PO-shared with supplier"
+                    #                 status_entry_po_level = RFT_StatusHistory(
+                    #                     EntityType='Purchase Order',
+                    #                     EntityID=record.POID,
+                    #                     Status=status_name,
+                    #                     StatusDate=func.now(),
+                    #                     UpdatedBy=session.get('username', 'system'),
+                    #                     Comments='Updated via Initial PO updates'
+                    #                 )
+                    #                 model.add(status_entry_po_level)
+                                    
+                    #                 status_entry_shipment_level = RFT_StatusHistory(
+                    #                     EntityType='Shipment',
+                    #                     EntityID=record.POID,
+                    #                     Status=status_name,
+                    #                     StatusDate=func.now(),
+                    #                     UpdatedBy=session.get('username', 'system'),
+                    #                     Comments='Updated via Initial PO updates'
+                    #                 )
+                    #                 model.add(status_entry_shipment_level)
+                                    
+                    #                 updated = True
+                                    
+                    #             if lc_date:
+                    #                 record.LCDate = lc_date
+                    #                 updated = True
+                    #             if mot:
+                    #                 record.ModeOfTransport = mot
+                    #                 updated = True
+                    #             if incoterm:
+                    #                 record.INCOTerms = incoterm
+                    #                 updated = True
+                    #             if updated:
+                    #                 record.LastUpdatedBy = session.get('username', 'system')
+                    
+                    #             # Add status history if both LC fields are filled
+                    #             if lc_status !='No':
+                    #                 if lc_num and lc_date:
+                    #                     status = RFT_StatusHistory(
+                    #                         EntityType='Purchase Order',
+                    #                         EntityID=poid,
+                    #                         Status='LC-Established',
+                    #                         StatusDate=datetime.now(),
+                    #                         UpdatedBy=session.get('username', 'system'),
+                    #                         Comments='...'
+                    #                     )
+                    #                     model.add(status)
+                    
+                    #             if updated:
+                    #                 flash(f"Purchase Order updated successfully --> {record.PONumber}", 'success')
+                    #             else:
+                    #                 flash("No records updated.", 'info')
+                                
+                    #         model.commit()
+                            
+                    #         return redirect(url_for('main.initialPO_Updates'))
+                    
+                    
+                    #     # Aggregate query: group by POID (and optionally PONumber) so each PO's total value and number of lines (articles) is computed.
+                    #     agg_query = model.query(
+                    #         RFT_PurchaseOrder.POID,
+                    #         RFT_PurchaseOrder.PONumber,
+                    #         RFT_PurchaseOrder.Supplier,
+                    #         RFT_PurchaseOrder.Brand,
+                    #         RFT_PurchaseOrder.PODate,
+                    #         RFT_PurchaseOrder.LCNumber,
+                    #         RFT_PurchaseOrder.LCStatus,
+                    #         func.CONVERT(literal_column("varchar"), RFT_PurchaseOrder.LCDate, literal(23)).label('FLCDate'),
+                    #         RFT_PurchaseOrder.ModeOfTransport,
+                    #         RFT_PurchaseOrder.INCOTerms,
+                    #         func.sum(FreightTrackingView.TotalValue).label("TotalValue"),
+                    #         func.sum(FreightTrackingView.Qty).label("TotalQty"),
+                    #         func.count(FreightTrackingView.POLineID).label("TotalArticles")
+                    #     ).filter(
+                    #         or_(
+                    #             FreightTrackingView.LCNumber == None,
+                    #             FreightTrackingView.LCDate == None,
+                    #             FreightTrackingView.INCOTerms == None,
+                    #             FreightTrackingView.ModeOfTransport == None,
+                    #         ),
+                    #         and_(
+                    #             or_(
+                    #                 FreightTrackingView.LCStatus == 'Yes',
+                    #                 FreightTrackingView.LCStatus == None
+                    #             )
+                    #         )
+                    #     ).group_by(FreightTrackingView.POID, 
+                    #             FreightTrackingView.PONumber,
+                    #             FreightTrackingView.Supplier,
+                    #             FreightTrackingView.Brand,
+                    #             FreightTrackingView.PODate,
+                    #             FreightTrackingView.LCNumber,
+                    #             FreightTrackingView.LCDate,
+                    #             FreightTrackingView.ModeOfTransport,
+                    #             FreightTrackingView.INCOTerms,
+                    #             FreightTrackingView.LCStatus)
+                        
+                    #     aggregated_data = agg_query.all()
+                          
+                    #     modeOfTransport = model.query(RFT_ModeOfTransport).all()
+                    #     incoterms = model.query(RFT_IncoTerms).all()
+                        
+                    #     return render_template(
+                    #         "InitialPO_Updates.html",
+                    #         report_data=aggregated_data,
+                    #         modeOfTransport = modeOfTransport,
+                    #         incoterms = incoterms
+                    #     )
+                    # @bp.route("/createdShipments", methods=["GET", "POST"]) ##################################### ED !!!!!!!!!!!
+                    # @login_required
+                    # def createdShipments():
+                    #     print(func.now())
+                    #     if request.method == 'POST':
+                    #         BIYAN_FOLDER = 'static/Biyan-files'
+                    #         SADDAD_FOLDER = 'static/SADDAD-files'
+                            
+                    #         form_data = request.form.to_dict()
+                    #         updated_shipments = set()
+                    #         not_found_shipments = []
+                            
+                    #         # Extract unique shipment numbers from suffixed field names
+                    #         shipment_numbers = set()
+                    #         for key in form_data:
+                    #             if key.startswith('ShipmentNumber_'):
+                    #                 shipment_number = form_data[key]
+                    #                 shipment_numbers.add(shipment_number)
+                    #                 print(shipment_number)
+                    
+                    #         if not shipment_numbers:
+                    #             flash("No shipments selected.", 'warning')
+                    #             return jsonify({'redirect': url_for('createdShipments')})
+                    
+                    #         for shipment_number in shipment_numbers:
+                    #             shipment = model.query(RFT_Shipment).filter_by(ShipmentNumber=shipment_number).first()
+                    #             if not shipment:
+                    #                 not_found_shipments.append(shipment_number)
+                    #                 continue
+                    
+                    #             updated = False
+                    
+                    #             # Biyan Number
+                    #             biyan_num = form_data.get(f'BiyanNumber_{shipment_number}')
+                    #             if biyan_num:
+                    #                 shipment.BiyanNumber = biyan_num
+                    #                 updated = True
+                    
+                    #             # SADDAD Number
+                    #             saddad_num = form_data.get(f'SADDADNumber_{shipment_number}')
+                    #             if saddad_num:
+                    #                 shipment.SADDADNumber = saddad_num
+                    #                 updated = True
+                    
+                    #             # Status update (optional)
+                    #             status_name = form_data.get(f'Status_{shipment_number}')
+                    #             if status_name:
+                    #                 status_entry = RFT_StatusHistory(
+                    #                     EntityType='Shipment',
+                    #                     EntityID=shipment.ShipmentID,
+                    #                     Status=status_name,
+                    #                     StatusDate=func.now(),
+                    #                     UpdatedBy=session.get('username', 'system'),
+                    #                     Comments='Updated via shipment form'
+                    #                 )
+                    #                 model.add(status_entry)
+                    #                 updated = True
+                    
+                    #             # Biyan PDF
+                    #             biyan_file = request.files.get(f'biyanPDF_file_{shipment_number}')
+                    #             if biyan_file and biyan_file.filename.lower().endswith('.pdf'):
+                    #                 filename = secure_filename(f"{shipment_number}_biyan.pdf")
+                    #                 path = os.path.join(BIYAN_FOLDER, filename)
+                    #                 os.makedirs(BIYAN_FOLDER, exist_ok=True)
+                    #                 biyan_file.save(path)
+                    #                 updated = True
+                    #             elif biyan_file and not biyan_file.filename.lower().endswith('.pdf'):
+                    #                 flash(f"Invalid Biyan file type for {shipment_number}. Only PDFs allowed.")
+                    #                 return jsonify({'redirect': url_for('createdShipments')})
+                    
+                    #             # SADDAD PDF
+                    #             saddad_file = request.files.get(f'saddadPDF_file_{shipment_number}')
+                    #             if saddad_file and saddad_file.filename.lower().endswith('.pdf'):
+                    #                 filename = secure_filename(f"{shipment_number}_saddad.pdf")
+                    #                 path = os.path.join(SADDAD_FOLDER, filename)
+                    #                 os.makedirs(SADDAD_FOLDER, exist_ok=True)
+                    #                 saddad_file.save(path)
+                    #                 updated = True
+                    #             elif saddad_file and not saddad_file.filename.lower().endswith('.pdf'):
+                    #                 flash(f"Invalid SADDAD file type for {shipment_number}. Only PDFs allowed.")
+                    #                 return jsonify({'redirect': url_for('createdShipments')})
+                    
+                    #             # If anything was updated
+                    #             if updated:
+                    #                 shipment.LastUpdated = func.now()
+                    #                 shipment.LastUpdatedBy = session.get('username', 'system')
+                    #                 updated_shipments.add(shipment_number)
+                    
+                    #         # Commit all changes once
+                    #         model.commit()
+                    
+                    #         if updated_shipments:
+                    #             # from flask import get_flashed_messages
+                    #             flash(f"✅ Updated shipments: {', '.join(updated_shipments)}", 'success')
+                    #             # print("Flashed messages:", get_flashed_messages(with_categories=True))
+                    #         else:
+                    #             flash("No updates were applied.", 'info')
+                            
+                    #         if not_found_shipments:
+                    #             flash(f"❌ Not found: {', '.join(not_found_shipments)}", 'danger')
+                    
+                    #         return jsonify({'redirect': url_for('createdShipments')})
+                            
+                    #     # List existing Biyan files
+                    #     biyan_folder = os.path.join(bp.static_folder, 'Biyan-files')
+                    #     existing_biyan_files = set(os.listdir(biyan_folder)) if os.path.exists(biyan_folder) else set()
+                    
+                    #     # List existing saddad files
+                    #     saddad_folder = os.path.join(bp.static_folder, 'SADDAD-files')
+                    #     existing_saddad_files = set(os.listdir(saddad_folder)) if os.path.exists(saddad_folder) else set()
+                        
+                    #     report_data = (
+                    #         model.query(
+                    #             RFT_Shipment.ShipmentNumber,
+                    #             func.max(RFT_Shipment.ShipmentID).label("ShipmentID"),
+                    #             func.max(RFT_Shipment.BiyanNumber).label("BiyanNumber"),
+                    #             func.max(RFT_Shipment.SADDADNumber).label("SADDADNumber"),
+                    #             func.max(RFT_Shipment.ShipmentLevelStatus).label("ShipmentLevelStatus")
+                    #         )
+                    #         .filter(RFT_Shipment.ShipmentID != None)
+                    #         .group_by(RFT_Shipment.ShipmentNumber)
+                    #     )
+                        
+                        
+                    #     shipmentstatuses = model.query(RFT_StatusManagement).filter(RFT_StatusManagement.Level == 'Shipment Level').all()
+                        
+                    #     return render_template(
+                    #         "createdShipments.html",
+                    #         report_data=report_data,
+                    #         shipmentstatuses = shipmentstatuses,
+                    #         existing_biyan_files = existing_biyan_files,
+                    #         existing_saddad_files = existing_saddad_files
+                    #     )
+                                        

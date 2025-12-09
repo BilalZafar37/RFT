@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="apple-touch-icon" sizes="76x76" href="/static/img/apple-icon.png">
+  <link rel="icon" type="image/png" href="/static/img/favicon.png">
+  <title>
+    RFT System</title>
+  <link rel="stylesheet" href="/static/css/index.css">
+  <!-- Fonts and icons -->
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900|Roboto+Slab:400,700" />
+  <link href="/static/css/nucleo-icons.css" rel="stylesheet" />
+  <link href="/static/css/nucleo-svg.css" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js" crossorigin="anonymous"></script>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  <link id="pagestyle" href="/static/css/material-dashboard.css?v=3.1.0" rel="stylesheet" />
+
+  <!-- FOR SELECT 2 -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+</head>
+
+<style>
+  /*  */
+    input[type="file"] {
+      position: relative;
+    }
+  
+    input[type="file"]::file-selector-button {
+      width: 136px;
+      color: transparent;
+    }
+  
+    /* Faked label styles and icon */
+    input[type="file"]::before {
+      position: absolute;
+      pointer-events: none;
+      top: 10px;
+      left: 16px;
+      height: 20px;
+      width: 20px;
+      content: "";
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230964B0'%3E%3Cpath d='M18 15v3H6v-3H4v3c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-3h-2zM7 9l1.41 1.41L11 7.83V16h2V7.83l2.59 2.58L17 9l-5-5-5 5z'/%3E%3C/svg%3E");
+  
+    }
+  
+    input[type="file"]::after {
+      position: absolute;
+      pointer-events: none;
+      top: 11px;
+      left: 40px;
+      color: #0964b0;
+      content: "Upload File";
+    }
+  
+    /* ------- From Step 1 ------- */
+  
+    /* file upload button */
+    input[type="file"]::file-selector-button {
+      border-radius: 4px;
+      padding: 0 16px;
+      height: 40px;
+      cursor: pointer;
+      background-color: white;
+      border: 1px solid rgba(0, 0, 0, 0.16);
+      box-shadow: 0px 1px 0px rgba(0, 0, 0, 0.05);
+      margin-right: 16px;
+      transition: background-color 200ms;
+    }
+  
+    /* file upload button hover state */
+    input[type="file"]::file-selector-button:hover {
+      background-color: #f3f4f6;
+    }
+  
+    /* file upload button active state */
+    input[type="file"]::file-selector-button:active {
+      background-color: #e5e7eb;
+    }
+              /* end of file upload button styling */
+    /* ------------------------ */
+  /* Make the table full‑width and give cells some breathing room */
+  .styled-form {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;     /* evenly divide column widths */
+  }
+  .styled-form td {
+    padding: 8px;
+    vertical-align: middle;
+  }
+
+  /* Force each column to be the same proportion of the row */
+  .styled-form colgroup col {
+    width: 25%;              /* four columns per row → 25% each */
+  }
+
+  /* Label styling */
+  .styled-form label {
+    display: block;          /* label on its own line */
+    margin-bottom: 4px;
+    font-weight: bold;
+    font-size: 0.9rem;
+  }
+
+  /* Make every select & input fill its cell */
+  .styled-form input,
+  .styled-form select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 6px 8px;
+    font-size: 0.9rem;
+  }
+
+  /* Optional: give all inputs the same min‑height */
+  .styled-form input,
+  .styled-form select {
+    min-height: 2.2em;
+  }
+
+  .section-title {
+    /* background-color:  */
+    color: white;
+    padding: 5px;
+    margin-top: 20px;
+    border: 1px solid #ccc;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1em;
+  }
+  table, th, td {
+    border: 1px solid #ddd;
+  }
+  th, td {
+    padding: 6px;
+    text-align: left;
+  }
+
+  .tooltip {
+    z-index: 999999; /* Higher than default Bootstrap elements */
+  }
+
+  .po-cell {
+      max-width: calc(8ch + 4px); /* Adjust for padding/margins or slight variations */
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      cursor: pointer;
+      display: inline-block; /* Ensures consistent behavior for text-overflow */
+  }
+
+  .po-cell.expanded {
+      max-width: none; /* Show full content when expanded */
+      white-space: normal; /* Allow multi-line text if needed */
+  }
+
+  .bg-gradient-primary {
+    background-image: linear-gradient(195deg, #4054ec 0%, #D81B60 100%);
+  }
+  .dropdown-container {
+    display: block;
+    padding-left: 8px;
+  }
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  .dropdown-btn {
+    padding: 6px 8px 6px 16px;
+    text-decoration: none;
+    font-size: 20px;
+    color: #818181;
+    display: block;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    outline: none;
+  }
+  .hov:hover {
+    display: flex;
+    width: 169px;
+    border: none;
+    border-radius: 5px;
+    background-image: linear-gradient(195deg, #4054ec 0%, #D81B60 100%);
+  }
+  .numbadge {
+    --bs-badge-padding-x: 0.5em;
+    --bs-badge-padding-y: 0.5em;
+    --bs-badge-font-size: 0.75em;
+    --bs-badge-font-weight: 700;
+    --bs-badge-color: #fff;
+    --bs-badge-border-radius: 10rem;
+    display: inline-block;
+    padding: var(--bs-badge-padding-y) var(--bs-badge-padding-x);
+    font-size: var(--bs-badge-font-size);
+    font-weight: var(--bs-badge-font-weight);
+    line-height: 1;
+    color: var(--bs-badge-color);
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: var(--bs-badge-border-radius);
+  }
+  .border2 {
+    border: 2px solid #000 !important;
+  }
+  .input-custom {
+    background-color: #f8f9fa;
+    border: none;
+    border-bottom: 2px solid #ced4da;
+    padding: 10px;
+    border-radius: 0;
+    outline: none;
+  }
+
+  .input-custom:focus {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #4054ec;
+    box-shadow: none;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  label {
+    font-weight: bold;
+  }
+
+  .btn-primary {
+    background-color: #4054ec;
+    border-color: #4054ec;
+  }
+
+  .btn-primary:hover {
+    background-color: #3547d3;
+    border-color: #3547d3;
+  }
+  .instructions {
+      /* font-size: 5px; */
+      color: #51d94f; /* Bootstrap danger color */
+      background-color: #fbfe12; /* Bootstrap danger background */
+      border: 1px solid #ebccd1; /* Bootstrap danger border */
+      padding: 5px;
+      border-radius: 4px;
+      margin-bottom: 15px;
+      font-weight: 500;
+  }
+  .filter-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding-left: 19px;
+  }
+
+  .filter-container select,
+  .filter-container input {
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+  .form-99{
+    padding: 25px;
+    color: #000 !important;
+  }
+  label{
+    color: #000 !important;
+  }
+</style>
+
+<body class="g-sidenav-show bg-gray-200">
+  <!-- SERCHABLE DROPDOWNS -->
+  <!-- Include jQuery and Select2 JS -->
+  
+  {% include 'sidebar.html' %}  
+  <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg">
+    <!-- Navbar -->
+    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur" data-scroll="true">
+      <div class="container-fluid py-1 px-3">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
+            <li class="breadcrumb-item text-sm"><a class="opacity-5 text-dark" href="javascript:;">Home</a></li>
+            <li class="breadcrumb-item text-sm text-dark active" aria-current="page">Freights</li>
+          </ol>
+            <h6 class="font-weight-bolder mb-0">Shipments</h6>
+        </nav>
+        <ul class="navbar-nav justify-content-end">
+          <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
+            <a href="javascript:;" class="nav-link text-body p-0" id="iconNavbarSidenav">
+              <div class="sidenav-toggler-inner">
+                <i class="sidenav-toggler-line"></i>
+                <i class="sidenav-toggler-line"></i>
+                <i class="sidenav-toggler-line"></i>
+              </div>
+            </a>
+          </li>
+          <li>
+            <img id="robote" src="static/img/robot.gif" style="position: absolute; z-index: 9; right: 500px; display: none;">
+          </li>
+          <li class="nav-item d-flex align-items-center">
+            <a href="#" class="nav-link text-body font-weight-bold px-0">
+              <i class="fa fa-user me-sm-1" style="font-size: 1.275rem;"></i>
+              <span class="d-sm-inline d-none" style="font-size: 1.275rem;">{{session['username']}}</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <!-- End Navbar -->
+    <div class="container-fluid py-4">
+      <div class="row">
+        <div class="col-12">
+          <div class="card my-4">
+            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+              <div class="bg-gradient-dark shadow-primary border-radius-lg pt-4 pb-3">
+                <h6 class="btn-outline-primary bg-gradient-primary text-white text-capitalize ps-3" style="width: 300px; cursor: pointer; border-top-right-radius: 5px; border-bottom-right-radius: 5px;">
+                  Update Shipment # {{ shipment_number.ShipmentNumber }}
+                </h6>
+              </div>
+            </div>
+            <div class="card-body px-0 pb-0" style="padding: 2px;">
+              {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                  {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert" style="color: white;">
+                      {{ message }}
+                      <button type="button" class="btn-close" style="color: white;" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                  {% endfor %}
+                {% endif %}
+              {% endwith %}
+              <form method="POST" class="form-99" action="{{ url_for('main.updateShipments', shipment_id =  report_data.ShipmentID ) }}"  enctype="multipart/form-data">
+                <!-- Shipment Details -->
+                <div class="section-title bg-gradient-faded-info">Shipment Details</div>
+                <table class="styled-form">
+                  <tr>
+                    <td><label>BL#: </label><input type="text" name="bl_number" value="{{ report_data.BLNumber or '' }}" /></td>
+                    <td>
+                      <label>Origin Country: 
+                        <select id="origin_country" name="origin_country">
+                          <option value="" selected>Origin Country</option>
+                          {% for c in countries %}
+                            <option value="{{c.name}}" {% if report_data.OriginCountry == c.name %}selected{% endif %}>{{ c.name }}</option>
+                          {% endfor %}
+                        </select>
+                      </label>
+                    </td>
+                    <td>
+                      <label>Destination Country: 
+                        <select id="destination_country" name="destination_country">
+                          {% if not report_data.DestinationCountry %}
+                            <option value="Saudi Arabia" selected >Saudi Arabia</option>
+                          {% endif %}
+                          {% for c in countries %}
+                            <option value="{{c.name}}" {% if report_data.DestinationCountry == c.name %}selected{% endif %}>{{c.name}}</option>
+                          {% endfor %}
+                        </select>
+                      </label>
+                    </td>
+                    <td>
+                      <label for="CCAgent">CC-Agent:</label>
+                      <select name="cc_agent" id="CCAgent" >
+                        <option value="" disabled {% if not  report_data.CCAgent %}selected{% endif %}>Custom Agent</option>
+                        {% for agent in custom_agents %}
+                          <option value="{{ agent.agent_name }}" {% if report_data.CCAgent == agent.agent_name %}selected{% endif %}>
+                            {{ agent.agent_name }}
+                          </option>
+                        {% endfor %}
+                      </select>
+                    </td>
+                    <td>
+                      <label>ECC Date: 
+                        <input type="date" name="ecc_date" value="{{ report_data.ECCDate.strftime('%Y-%m-%d') if report_data.ECCDate else '' }}" />
+                      </label>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>
+                      <label>Shipping Line: 
+                        <select name="shipping_line">
+                          {% for item in shipping_lines %}
+                          <option value="{{item.ShipingLineName}}" {% if report_data.ShippingLine == item.ShippingLineName %}selected{% endif %}>{{item.ShipingLineName}}</option>
+                          {% endfor %}
+                        </select>
+                      </label>
+                    </td>
+                    
+                    <td>
+                      <label for="OriginPort">Origin Port:</label>
+                      <select name="OriginPort" id="OriginPort">
+                        <option value="" disabled {% if not report_data.OriginPort %}selected{% endif %}>
+                          Select Origin Port
+                        </option>
+                        {% for port in origin_ports %}
+                          <option value="{{ port.port_name }}"
+                            {% if report_data.OriginPort == port.port_name %}selected{% endif %}>
+                            {{ port.port_name }}
+                          </option>
+                        {% endfor %}
+                      </select>
+                    </td>
+                    
+                    <td>
+                      <label for="DestinationPort">Destination Port:</label>
+                      <select name="DestinationPort" id="DestinationPort">
+                        <option value="" disabled {% if not report_data.DestinationPort %}selected{% endif %}>
+                          Select Destination Port
+                        </option>
+                        {% for dport in destination_ports %}
+                          <option value="{{ dport.port_name }}"
+                            {% if report_data.POD == dport.port_name %}selected{% endif %}>
+                            {{ dport.port_name }}
+                          </option>
+                        {% endfor %}
+                      </select>
+                    </td>
+                    <td><label>LC-Number: <input type="text" name="lc_number" value="{{ report_data.LCNumber or 'No' }}" {{'disabled' if not report_data.LCNumber}}/></label></td>
+                    <td>
+                      <label>ETD-Origin: 
+                        <input  type="date" 
+                                name="etd_origin" 
+                                value="{{ report_data.ETDOrigin.strftime('%Y-%m-%d') if report_data.ETDOrigin else '' }}" 
+                        />
+                      </label>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>
+                      <label>ETA-Origin (Loading time): 
+                        <input  type="date" 
+                                name="eta_origin" 
+                                value="{{ report_data.ETAOrigin.strftime('%Y-%m-%d') if report_data.ETAOrigin else '' }}" 
+                        />
+                      </label>
+                    </td>
+
+                    <td>
+                      <label>ETA-Dest. Port:
+                        <input type="date" name="eta_destination" value="{{ report_data.ETADestination.strftime('%Y-%m-%d') if report_data.ETADestination else '' }}" />
+                      </label>
+                    </td>
+
+                    <td>
+                      <label>ETD-Dest. Port:
+                        <input type="date" name="etd_destination" value="{{ report_data.ETDDestination.strftime('%Y-%m-%d') if report_data.ETDDestination else '' }}" />
+                      </label>
+                    </td>
+                    
+                    <td>
+                      <label>ETA-WH: 
+                        <input type="date" name="eta_wh" value="{{ report_data.ETAWH.strftime('%Y-%m-%d') if report_data.ETAWH else '' }}" />
+                      </label>
+                    </td>
+                    
+                    
+                  </tr>
+                </table>
+          
+                <!-- Cargo Details -->
+                <div class="section-title bg-gradient-faded-info">Available Cargo</div>
+                <table class="styled-form">
+                  <thead>
+                    <tr>
+                      <th class="col-1">Sr.</th>
+                      <th>Supplier/ExFactory</th>
+                      <th>Purchase Order</th>
+                      <th>SAP line ID</th>
+                      <th>Article</th>
+                      <th>Pending/Total Qty</th>  
+                      <th>Value (USD)</th>
+                    </tr>
+                  </thead>
+                  <tbody id="cargoTableBody">
+                    <!-- Row 0 -->
+                    {% for pol in report_data.po_lines %}
+                      <tr data-spoid="{{ pol.ShipmentPOLineID }}">
+                        <td>{{loop.index}}</td>
+                        {# PurchaseOrderLine is pol.po_line; its parent PurchaseOrder is pol.po_line.purchase_order #}
+                        <td>{{ pol.po_line.purchase_order.Supplier }}</td>
+                        <td>{{ pol.po_line.purchase_order.PONumber }}</td>
+
+                        <td>{{ pol.po_line.SapItemLine }}</td>
+
+                        {# The Article comes from the PO-line #}
+                        <td>{{ pol.po_line.Article }}</td>
+
+                        {# The shipped quantity #}
+                        <td class="shipped" data-total="{{ pol.QtyShipped }}">{{ pol.QtyShipped }}</td>
+
+                        {# The original value on the PO-line #}
+                        <td>{{ "{:,.2f}".format(pol.po_line.TotalValue/pol.po_line.Qty *pol.QtyShipped)  }} USD</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <td colspan="7">
+                        Add Non-Po items 
+                        <i id="add-cargo-row" class="fa fa-plus-circle fa-3x"  style="color: #0ba644;"></i>
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
+
+                <!-- Container Details -->
+                <div class="section-title bg-gradient-faded-info">Containers</div>
+                <table class="styled-form">
+                  <thead>
+                    <tr>
+                      <th class="text-center">Action </th>
+                      <th>Container #</th>
+                      <th>Type</th>
+                      <th>Cargo (Items Selected)</th>
+                      <th>Status</th>
+                      <th>ATA Origin Port</th>
+                      <th>ATD Origin Port</th>
+                      <th>ATA Dest. Port</th>
+                      <th>Actual CC Date</th>
+                      <th>ATD Dest. Port</th>
+                      <th>ATA WH / DTC</th>
+                      <th>Yard-IN</th>
+                      <th>Yard-OUT</th>
+                      <th>Remarks</th>
+                    </tr>
+                  </thead>
+                  <tbody id="containerTableBody">
+                    {% for cid in unique_cids %}
+                      {# 1) collect all container objects matching this cid #}
+                      {% set matches = report_data.containers 
+                            | selectattr("ContainerID","equalto",cid) 
+                            | list 
+                      %}
+                      {# 2) only render if we actually found one #}
+                      {% if matches %}
+                        {% set cont = matches[0] %}
+                        <tr>
+                          <td>
+                            <div class="text-center">
+                              <i class="add-row fa fa-plus-circle fa-3x" style="color: #0ba644;"></i>
+                            </div>
+                          </td>
+                          <td>
+                            <input
+                              type="text"
+                              name="containers[{{ loop.index0 }}][container_number]"
+                              value="{{ cont.ContainerNumber or '' }}"
+                            />
+                          </td>
+                          <td>
+                            <select name="containers[{{ loop.index0 }}][container_type]">
+                              <option value="40ft" {% if cont.ContainerType == '40ft' %}selected{% endif %}>40ft</option>
+                              <option value="20ft" {% if cont.ContainerType == '20ft' %}selected{% endif %}>20ft</option>
+                            </select>
+                          </td>
+                          <td>
+                            <button
+                              type="button"
+                              class="add-items-btn btn btn-success"
+                              data-container-id="{{ loop.index0 }}"
+                            >Add Items</button>
+                            <div hidden class="selected-items" id="selected-items-{{ loop.index0 }}"></div>
+                            <input
+                              type="hidden"
+                              name="containers[{{ loop.index0 }}][items]"
+                              id="container_items_{{ loop.index0 }}"
+                              value=""
+                            />
+                          </td>
+                          <td>
+                            <!-- PLANED -->
+                            <select name="containers[{{ loop.index0 }}][planed_status]" class="form-select-lg">
+                              <option selected disabled></option>
+                              {% for status in containerstatuses if 'Planed' in status.StatusName %}
+                                <option value="{{status.StatusName}}" {% if status.StatusName == cont.planned_status  %}selected{% endif %}>{{status.StatusName}}</option>
+                              {% endfor %}
+                            </select>
+
+                            <hr class="dark gradient-animation">
+                            <!-- ACTUAL -->
+                            <select name="containers[{{ loop.index0 }}][current_status]" class="form-select-lg">
+                              <option selected disabled></option>
+                              {% if containerstatuses == []  %}
+                                <option selected disabled>Not Allowed</option>
+                              {% endif %}
+                              {% for status in containerstatuses if 'Planed' not in status.StatusName %}
+                                <option value="{{status.StatusName}}" {% if status.StatusName == cont.current_status  %}selected{% endif %}>{{status.StatusName}}</option>
+                              {% endfor %}
+                            </select>
+                          </td>
+                          <td>
+                            <input
+                              type="date"
+                              name="containers[{{ loop.index0 }}][ata_op]"
+                              value="{{ cont.ATAOrigin  and cont.ATAOrigin.strftime('%Y-%m-%d') }}"
+                            />
+                          </td>
+                          <td>
+                            <input
+                              type="date"
+                              name="containers[{{ loop.index0 }}][atd_op]"
+                              value="{{ cont.ATDOrigin  and cont.ATDOrigin.strftime('%Y-%m-%d') }}"
+                            />
+                          </td>
+                          <td>
+                            <input
+                              type="date"
+                              name="containers[{{ loop.index0 }}][ata_dp]"
+                              value="{{ cont.ATADP     and cont.ATADP.strftime('%Y-%m-%d') }}"
+                            />
+                          </td>
+                          <td>
+                            <input
+                              type="date"
+                              name="containers[{{ loop.index0 }}][ccdate]"
+                              value="{{ cont.CCDate    and cont.CCDate.strftime('%Y-%m-%d') }}"
+                            />
+                          </td>
+                          <td>
+                            <input
+                              type="date"
+                              name="containers[{{ loop.index0 }}][atd_dp]"
+                              value="{{ cont.ATDDPort and cont.ATDDPort.strftime('%Y-%m-%d') }}"
+                            />
+                          </td>
+                          <td>
+                            <input
+                              type="date"
+                              name="containers[{{ loop.index0 }}][ata_wh]"
+                              value="{{ cont.ATAWH    and cont.ATAWH.strftime('%Y-%m-%d') }}"
+                            />
+                          </td>
+                          <td>
+                            <input
+                              type="date"
+                              name="containers[{{ loop.index0 }}][yard_in_date]"
+                              value="{{ cont.YardInDate  and cont.YardInDate.strftime('%Y-%m-%d') }}"
+                            />
+                          </td>
+                          <td>
+                            <input
+                              type="date"
+                              name="containers[{{ loop.index0 }}][yard_out_date]"
+                              value="{{ cont.YardOutDate and cont.YardOutDate.strftime('%Y-%m-%d') }}"
+                            />
+                          </td>
+                          <td>
+                            <input
+                              type="text"
+                              name="containers[{{ loop.index0 }}][container_remarks]"
+                              value="{{ cont.ContainerRemarks or '' }}"
+                            />
+                          </td>
+                        </tr>
+                      {% endif %}
+                    {% else %}
+                      <tr>
+                        <td>
+                          <div class="text-center">
+                            <i class="add-row fa fa-plus-circle fa-3x" style="color: #0ba644;"></i>
+                          </div>
+                        </td>
+                        <td><input type="text" name="containers[0][container_number]" value="" /></td>
+                        <td>
+                          <select name="containers[0][container_type]">
+                            <option value="40ft" >40ft</option>
+                            <option value="20ft" >20ft</option>
+                          </select>
+                        </td>
+                        <td>
+                          <!-- The button to open the modal. Data attribute "data-container-id" identifies this container row (here, "0") -->
+                          <button type="button" class="add-items-btn btn btn-success" data-container-id="0">
+                            Add Items
+                          </button>
+                          <!-- Display a summary of items added for this container -->
+                          <div hidden class="selected-items" id="selected-items-0"></div>
+                          
+                          <!-- Hidden input to store the JSON for container items -->
+                          <input type="hidden" name="containers[0][items]" id="container_items_0" value="">
+                        </td>
+                        <!-- STATUS -->
+                        <td>
+                          <select name="containers[0][planed_status]">
+                              <option selected disabled></option>
+                            {% if containerstatuses == []  %}
+                              <option selected disabled>Not Allowed</option>
+                            {% endif %}
+                            {% for status in containerstatuses if 'Planed' in status.StatusName %}
+                              <option value="{{status.StatusName}}" >{{status.StatusName}}</option>
+                            {% endfor %}
+                          </select>
+                          <select name="containers[0][current_status]">
+                            <option selected disabled></option>
+                            {% if containerstatuses == []  %}
+                              <option selected disabled>Not Allowed</option>
+                            {% endif %}
+                            {% for status in containerstatuses if 'Planed' not in status.StatusName %}
+                              <option value="{{status.StatusName}}" >{{status.StatusName}}</option>
+                            {% endfor %}
+                          </select>
+                        </td>
+                        
+                        <td><input type="date" name="containers[0][atd_op]"             value="" /></td>
+                        <td><input type="date" name="containers[0][ata_op]"             value="" /></td>
+                        <td><input type="date" name="containers[0][ata_dp]"             value="" /></td>
+                        <td><input type="date" name="containers[0][ccdate]"             value="" /></td>
+                        <td><input type="date" name="containers[0][atd_dp]"             value="" /></td>
+                        <td><input type="date" name="containers[0][ata_wh]"             value="" /></td>
+                        <td><input type="date" name="containers[0][yard_in_date]"       value="" /></td>
+                        <td><input type="date" name="containers[0][yard_out_date]"      value="" /></td>
+                        <td><input type="text" name="containers[0][container_remarks]"  value="" /></td>
+                      </tr> 
+                    {% endfor %}
+                    
+                  </tbody>
+                </table>
+
+                <!-- Invoice Data -->
+                <div class="section-title bg-gradient-faded-info">
+                  Supplier Invoices -- Total: $
+                  <span id="invoice-total" style="color: greenyellow; font-weight: bold;">
+                    0.00
+                  </span>
+                </div>
+                <table class="styled-form" id="invoice-table">
+                  <thead>
+                    <tr>
+                      <th>Invoice Number</th>
+                      <th>Invoice Value</th>
+                      <th>Document</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="invoice-body">
+                    {% if invoices %}
+                      {% for inv in invoices %}
+                      <tr>
+                        <td><input type="text" name="invoice_numbers" value="{{ inv.InvoiceNumber }}"></td>
+                        <td><input type="number" name="invoice_values" step="0.01" value="{{ inv.InvoiceValue }}"></td>
+                        <td>
+                          {% if inv.DocumentPath %}
+                            <a href="{{ url_for('static', filename=inv.DocumentPath) }}" target="_blank">
+                              (View)
+                            </a>
+                          {% else %}
+                            <input type="file"  name="invoice_files_{{ loop.index0 }}">
+                          {% endif %}
+                        </td>
+                        <td><button type="button" class="remove-row btn btn-sm btn-danger">Remove</button></td>
+                      </tr>
+                      {% endfor %}
+                    {% endif %}
+                    <!-- one empty row  -->
+                    {% set idx = invoices|length if invoices else 0%}
+                    <tr>
+                      <td><input type="text" name="invoice_numbers"></td>
+                      <td><input type="number" name="invoice_values" step="0.01"></td>
+                      <td><input type="file" name="invoice_files_{{ idx }}"></td>
+                      <td>
+                        <!-- <button class="remove-row btn btn-sm btn-danger" type="button">Remove</button> -->
+                        <button class="btn btn-sm btn-success" type="button" id="add-invoice">Add new row</button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                
+                <!-- Cost Data -->
+                <div class="section-title bg-gradient-faded-info">Costs(includes VAT.) -- Expense % <span id="expense_percent" style="color: greenyellow; font-weight: bold;">0.0</span>
+                </div>
+                <table class="styled-form">
+                  <tr>
+                    <!-- <td><label>Invoice Value: <input type="number" name="invoice_value" step="0.01"></label></td> -->
+                    <td><label>Custom Duties: <input class="expense-input" type="number" name="custom_duties_fob"                   value="{{ report_data.CustomDuties if report_data.CustomDuties else '' }}"></label></td>
+                    <td><label>Value Declared by Customs: <input type="number" name="value_declared_customs"                        value="{{ report_data.ValueDecByCC if report_data.ValueDecByCC else '' }}"></label></td>
+                    <td><label>Clearance/Transportation: <input class="expense-input" type="number" name="clearance_transport"      value="{{ report_data.ClearanceTransportCharges if report_data.ClearanceTransportCharges else '' }}"></label></td>
+                    <td><label>Saber Charges: <input class="expense-input" type="number" name="saber_saddad"                        value="{{ report_data.SaberSADDAD if report_data.SaberSADDAD else '' }}"></label></td>
+                  </tr>
+                  <tr>
+                    <td><label>DO Charges/Port Charges: <input class="expense-input" type="number" name="do_charges"  value="{{ report_data.DO_Port_Charges if report_data.DO_Port_Charges else '' }}"></label></td>
+                    <td><label>Freight Cost: <input class="expense-input" type="number" name="freight_cost"           value="{{ report_data.FreightCost if report_data.FreightCost else '' }}"></label></td>
+                    <td><label>Penalties: <input class="expense-input" type="number" name="penalties"                 value="{{ report_data.Penalties if report_data.Penalties else '' }}"></label></td>
+                    <td><label>Demurrage Charges: <input class="expense-input" type="number" name="demurrage_charges" value="{{ report_data.DemurrageCharges if report_data.DemurrageCharges else '' }}"></label></td>
+                  </tr>
+                  <tr>
+                    <td><label>Yard Charges: <input class="expense-input" type="number" name="yard_charges"             value="{{ report_data.YardCharges if report_data.YardCharges else '' }}"></label></td>
+                    <td><label>Others: <input class="expense-input" type="number" name="other_charges"                  value="{{ report_data.OtherCharges if report_data.OtherCharges else '' }}"></label></td>
+                    <td><label>MAWANI Charges: <input class="expense-input" type="number" name="mawani_charges"         value="{{ report_data.MAWANICharges if report_data.MAWANICharges else '' }}"></label></td>
+                    <td><label>Inspection Charges: <input class="expense-input" type="number" name="inspection_charges" value="{{ report_data.InspectionCharges if report_data.InspectionCharges else '' }}"></label></td>
+                  </tr>
+                  <tr>
+                    <td><label>CC-Agent Invoice: <input type="text" name="cc_agent_invoice"   value="{{ report_data.CcAgentInvoice if report_data.CcAgentInvoice else '' }}"></label></td>
+                    <td><label>Remarks: <input type="text" name="cost_remarks"                value="{{ report_data.CostRemarks if report_data.CostRemarks else '' }}"></label></td>
+                  </tr>
+                  <tr>
+                    <td colspan="4">
+                      <label>Total Expense:</label>
+                      <input id="total_expense" type="number" name="total_expense" style="width: auto;" disabled>
+                    </td>
+                  </tr>
+                </table>
+                
+                <!-- FORM SAVE BUTTON -->
+                <div style="margin-top: 15px;">
+                  <button type="submit" class="btn btn-info">Confirm/Save</button>
+                </div>
+
+                <!-- Container Items Modal (for selecting articles per container) -->
+                <div class="modal fade" id="containerItemsModal" tabindex="-1" role="dialog" aria-labelledby="containerItemsModalLabel" aria-hidden="true">
+                  <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="containerItemsModalLabel">Add Items for Container</h5>
+                            <button type="button" class="close bg-gradient-danger btn btn-sm close" id="dismiss-modal1" aria-label="Close">
+                                X
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- Hidden field to store current container id -->
+                            <input type="hidden" id="modal-container-id" value="">
+                            <table class="table table-responsive" style="color: black;" id="modalItemsTable">
+                              <thead>
+                                <tr>
+                                  <th>Article</th>
+                                  <th>Available Qty</th>
+                                  <th>Selected Qty</th>
+                                  <th>Actions</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <!-- Rows will be added dynamically -->
+                              </tbody>
+                            </table>
+                            <button id="add-modal-row" type="button" class="btn btn-sm btn-primary">Add Row</button>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" id="add-all-modal-row" class="btn btn-sm btn-primary">
+                            Add All Items
+                          </button>
+                            <button type="button" id="save-modal-items" class="btn btn-success">Confirm</button>
+                            <button type="button" class="btn btn-secondary" id="dismiss-modal">Cancel</button>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Bootstrap JS and dependencies -->
+                <!-- <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script> -->
+                <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+                <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+                
+                <!-- MODEL SCRIPT FOR ADD ITEMS -->
+                <script>
+                  const reportData = {{ report_data_json | tojson | safe }};
+                  let containerItems = {};
+                  let modalContainerId = null;
+                
+                  // 1) containerItems map keyed by the same index
+                  reportData.forEach(r => {
+                    const idx = r.container_index;             // ← loop.index0
+                    containerItems[idx] = containerItems[idx]||[];
+                    containerItems[idx].push({
+                      poline_id:    r.ShipmentPOLineID,
+                      po_number:    r.PONumber,
+                      article:      r.Article,
+                      available_qty:r.Qty,
+                      selected_qty: r.QtyInContainer||0
+                    });
+                  });
+                  
+
+                  Object.entries(containerItems).forEach(([idx, items]) => {
+                    // drop any items with selected_qty===0
+                    const nonZero = items.filter(i => i.selected_qty > 0);
+                  
+                    // build the summary only from those
+                    const txt = nonZero
+                      .map(i => `${i.po_number}–${i.article}:${i.selected_qty}`)
+                      .join(", ");
+                  
+                    // render (will be empty string if everything was 0)
+                    $(`#selected-items-${idx}`).text(txt);
+                    $(`#container_items_${idx}`).val(JSON.stringify(nonZero));
+                  });                  
+                  
+                    
+                  // helper: how much is left of this POLine
+                  function getAdjustedAvailableQty(polineId, currentRow=null) {
+                    const original = $(`option[value="${polineId}"]`).data('available') || 0;
+                    let usedElsewhere = 0;
+                    for (let cid in containerItems) {
+                      if (cid !== modalContainerId) {
+                        containerItems[cid].forEach(it => {
+                          if (it.poline_id === polineId) usedElsewhere += it.selected_qty;
+                        });
+                      }
+                    }
+                    let usedInModal = 0;
+                    $('#modalItemsTable tbody tr').each(function() {
+                      const pid = +$(this).find('.modal-article').val();
+                      const qty = +$(this).find('.modal-selected-qty').val()||0;
+                      if (pid===polineId && this!==currentRow) usedInModal += qty;
+                    });
+                    return Math.max(0, original - usedElsewhere - usedInModal);
+                  }
+                
+                  // open modal and prefill existing rows (or a blank if none)
+                  $(document).on('click','.add-items-btn',function(){
+                    modalContainerId = $(this).data('container-id');
+                    $('#modal-container-id').val(modalContainerId);
+                    $('#modalItemsTable tbody').empty();
+                    const existing = containerItems[modalContainerId];
+                    (existing && existing.length
+                      ? existing
+                      : [{ poline_id:null, available_qty:0, selected_qty:0 }]
+                    ).forEach(it=> addModalItemRow(it.poline_id, it.selected_qty));
+                    $('#containerItemsModal').modal('show');
+                  });
+                
+                  // add blank row
+                  $('#add-modal-row').click(function(){
+                    let ok=true;
+                    $('#modalItemsTable tbody tr').each(function(){
+                      if ((+$(this).find('.modal-selected-qty').val()||0)===0) ok=false;
+                    });
+                    if(!ok){ return alert("Fill all quantities first."); }
+                    addModalItemRow(null,0);
+                  });
+
+                  // Add all items button
+                  $('#add-all-modal-row').click(function() {
+                    // clear whatever rows are already in the modal
+                    $('#modalItemsTable tbody').empty();
+                
+                    // for each item in reportData, add a row with its full available quantity
+                    reportData.forEach(r => {
+                      addModalItemRow(r.ShipmentPOLineID, r.Qty);
+                    });
+                  });
+                
+                  function addModalItemRow(selPoline, selQty){
+                    const row = $('<tr>');
+                    const sel = $('<select style="color: black;" class="modal-article form-select-lg">');
+                
+                    // figure out which POLineIDs are already picked here
+                    const picked = new Set();
+                    $('#modalItemsTable tbody tr').each(function(){
+                      const v = +$(this).find('.modal-article').val();
+                      if(v) picked.add(v);
+                    });
+                
+                    // populate from your back-end data array
+                    reportData.forEach(r=>{
+                      const opt = $('<option>')
+                        .val(r.ShipmentPOLineID)
+                        .text(`${r.PONumber} -${r.SapItemLine}- ${r.Article}`)
+                        .attr('data-available', r.Qty)
+                        .attr('data-po',        r.PONumber)
+                        .attr('data-article',   r.Article)
+                        // **disable** if already used (unless it’s this row’s own value)
+                      if (picked.has(r.ShipmentPOLineID) && r.ShipmentPOLineID!==selPoline) {
+                        opt.prop('disabled',true).text(opt.text()+' (Already)');
+                      }
+                      sel.append(opt);
+                    });
+                
+                    const availTd = $('<td class="availQty">');
+                    const qtyIn   = $(`<input style="color: black;" type="number" class="modal-selected-qty form-control" min="0" value="${selQty||0}">`);
+                    const qtyTd   = $('<td>').append(qtyIn);
+                    const rmBtn   = $('<button type="button" class="remove-modal-row btn btn-sm btn-danger">Remove</button>');
+                    const actTd   = $('<td>').append(rmBtn);
+                
+                    row.append($('<td>').append(sel), availTd, qtyTd, actTd);
+                    $('#modalItemsTable tbody').append(row);
+
+                    // **Initialize Select2 on this new <select>**
+                      sel.select2({
+                      dropdownParent: $('#containerItemsModal'),
+                      placeholder: 'Select an article',
+                      width: '100%' 
+                    });
+                
+                    function refresh() {
+                      const pid = +sel.val();
+                      const max = getAdjustedAvailableQty(pid, row[0]);
+                      availTd.text(max);
+                      qtyIn.attr('max',max).prop('readonly', max===0);
+                    }
+                
+                    // wire up
+                    sel.on('change', refresh);
+                    qtyIn.on('input',function(){
+                      const m = +$(this).attr('max')||0, v=+this.value||0;
+                      if(v>m) this.value=m;
+                    });
+                    rmBtn.click(()=>{
+                      row.remove();
+                      saveToContainerItems();
+                      // re-refresh all remaining rows
+                      $('#modalItemsTable tbody tr').each((_,r)=>$(r).find('.modal-article').trigger('change'));
+                    });
+                
+                    // init select
+                    if(selPoline) sel.val(selPoline);
+                    else           sel.find('option:not(:disabled)').first().prop('selected',true);
+                    sel.trigger('change');               
+                    
+                  }
+                
+                  // snapshot modal back into containerItems
+                  function saveToContainerItems(){
+                    const out=[];
+                    $('#modalItemsTable tbody tr').each(function(){
+                      const opt  = $(this).find('.modal-article option:selected');
+                      const pid  = +opt.val();
+                      const po   = opt.data('po');
+                      const art  = opt.data('article');
+                      const selq = +$(this).find('.modal-selected-qty').val()||0;
+                      const av   = +$(this).find('.availQty').text()||0;
+                      if(pid && selq>0){
+                        out.push({
+                          poline_id:    pid,
+                          po_number:    po,
+                          article:      art,
+                          available_qty:av,
+                          selected_qty: selq
+                        });
+                      }
+                    });
+                    containerItems[modalContainerId]=out;
+                  }
+                
+                  // save & close modal
+                  $('#save-modal-items').click(function(){
+                    saveToContainerItems();
+
+                    const sum = containerItems[modalContainerId];
+                    if(!sum||!sum.length){
+                      return alert("Add at least one item.");
+                    }
+                    const txt = sum.map(i=>`${i.po_number}–${i.article}:${i.selected_qty}`).join(', ');
+                    $(`#selected-items-${modalContainerId}`).text(txt);
+                    $(`#container_items_${modalContainerId}`).val(JSON.stringify(sum));
+                    $('#containerItemsModal').modal('hide');
+
+                    recalcPending();
+                  });
+                
+                  $('#dismiss-modal, #dismiss-modal1').click(function(){
+                    $('#containerItemsModal').modal('hide');
+                  });
+
+                  function recalcPending() {
+                    const allAssigned = Object.values(containerItems).flat();
+                    document
+                      .querySelectorAll('#cargoTableBody tr[data-spoid]')
+                      .forEach(row => {
+                        const spoid   = +row.dataset.spoid;
+                        const total   = +row.querySelector('.shipped').dataset.total; 
+                        // we’ll store the original total on a data-attribute (see below)
+                        const assigned = allAssigned
+                          .filter(it => it.poline_id === spoid)
+                          .reduce((sum, it) => sum + it.selected_qty, 0);
+                        const pending = total - assigned;
+                        const cell    = row.querySelector('.shipped');
+                        cell.textContent = `${pending}/${total}`;
+                        cell.classList.toggle('text-danger', pending > 0);
+                        cell.classList.toggle('text-success', pending === 0);
+                      });
+                  }
+                  
+                  // 1) on page‐load
+                  recalcPending();
+                </script>
+
+              </form> 
+            </div>
+          </div>
+        </div>
+      </div>
+      {% include 'footer_credits.html' %}
+    </div>
+  </main>
+  
+  <!-- Core JS Files -->
+  <script src="/static/js/core/popper.min.js"></script>
+  <script src="/static/js/core/bootstrap.min.js"></script>
+  <script src="/static/js/plugins/perfect-scrollbar.min.js"></script>
+  <script src="/static/js/plugins/smooth-scrollbar.min.js"></script>
+  <script src="/static/js/generalScripts.js"></script>
+  <script src="/static/js/clockAndReminder.js"></script>
+  
+  <!-- For container cloning -->
+  <script>
+    function handleRowDuplicationAndValidation() {
+      document.body.addEventListener('click', function(event) {
+        // Handle click on an element with the class "add-row"
+        if (event.target.classList.contains('add-row')) {
+          // Find the closest table row that contains the clicked element
+          const rowToClone = event.target.closest('tr');
+          if (!rowToClone) return;
+  
+          // Clone the entire row (including all children)
+          const clonedRow = rowToClone.cloneNode(true);
+          
+          // Determine the new row index by counting existing rows in tbody
+          const tbody = rowToClone.parentNode;
+          const newIndex = tbody.querySelectorAll('tr').length;
+
+          // Update each input/select inside the cloned row that uses the "containers" naming scheme.
+          const inputs = clonedRow.querySelectorAll('input, select, textarea');
+          inputs.forEach(function(input) {
+            // The current name attribute is like: "containers[0][atd]"
+            let name = input.getAttribute('name');
+            if (name && name.startsWith("containers[")) {
+              // Replace the index between brackets with the new index.
+              // For example: containers[0][atd] becomes containers[newIndex][atd]
+              name = name.replace(/^containers\[\d+\]/, `containers[${newIndex}]`);
+              input.setAttribute('name', name);
+            }
+          });
+
+          // / 1. Update data-container-id
+          const modalButton = clonedRow.querySelector('.add-items-btn');
+          if (modalButton) {
+            modalButton.setAttribute('data-container-id', newIndex);
+          }
+
+          // 2. Update summary display div ID
+          const summaryDiv = clonedRow.querySelector('.selected-items');
+          if (summaryDiv) {
+            summaryDiv.setAttribute('id', `selected-items-${newIndex}`);
+            summaryDiv.textContent = '';
+          }
+
+          // 3. Update hidden input name + ID for container items JSON
+          const hiddenInput = clonedRow.querySelector('input[type="hidden"][name*="[items]"]');
+          if (hiddenInput) {
+            hiddenInput.setAttribute('name', `containers[${newIndex}][items]`);
+            hiddenInput.setAttribute('id', `container_items_${newIndex}`);
+          }
+
+          // Optionally: Clear input values in the cloned row
+          // const inputs = clonedRow.querySelectorAll('input');
+          inputs.forEach(function(input) {
+            input.value = '';
+          });
+  
+          // In the cloned row, change the icon from plus to minus and update its style
+          let oldIcon = clonedRow.querySelector('.add-row');
+          if (oldIcon) {
+            const newIcon = document.createElement('i');
+            newIcon.className = 'remove-row fa fa-minus-circle fa-3x text-danger';
+            newIcon.setAttribute('title','Remove this container');
+            // replace it in the DOM
+            oldIcon.parentNode.replaceChild(newIcon, oldIcon);
+          }
+  
+          // Insert the cloned row immediately after the original row
+          rowToClone.parentNode.insertBefore(clonedRow, rowToClone.nextSibling);
+        }
+        
+        // If a remove-row element is clicked, call the removeRow function
+        if (event.target.classList.contains('remove-row')) {
+          removeRow(event.target);
+        }
+      });
+      
+      // Function to remove a row
+      function removeRow(button) {
+        const row = button.closest('tr');
+        if (!row) return;
+        
+        // Optionally, prevent removing the last row.
+        const tbody = row.parentNode;
+        if (tbody.rows.length > 1) {
+          row.parentNode.removeChild(row);
+        } else {
+          alert("At least one row must remain.");
+        }
+      }
+    }
+  
+    // Initialize the script
+    handleRowDuplicationAndValidation();
+  </script>
+  
+
+  <!-- JS T0 DUPLICATE INVOICE ROW and calculate totals -->
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const invoiceBody       = document.getElementById('invoice-body');
+    const addInvoiceBtn     = document.getElementById('add-invoice');
+    const invoiceTotalSpan  = document.getElementById('invoice-total');
+  
+    const expenseInputs     = document.querySelectorAll('.expense-input');
+    const expenseInputTotal = document.getElementById('total_expense');
+    const expensePctSpan    = document.getElementById('expense_percent');
+    // 1) seed the counter from how many invoice rows you already rendered:
+    let invoiceIdx = JSON.parse('{{ invoices|length }}') + 1;  
+  
+    // 1) Sum all invoice values
+    function updateInvoiceTotal() {
+      let sum = 0;
+      document.querySelectorAll('input[name="invoice_values"]').forEach(i => {
+        const v = parseFloat(i.value);
+        if (!isNaN(v)) sum += v;
+      });
+      invoiceTotalSpan.textContent = sum.toFixed(2);
+      updateExpensePercent();
+    }
+  
+    // 2) Sum all expense inputs into total_expense
+    function updateExpenseTotal() {
+      let sum = 0;
+      expenseInputs.forEach(i => {
+        const v = parseFloat(i.value);
+        if (!isNaN(v)) sum += v;
+      });
+      expenseInputTotal.value = sum.toFixed(2);
+      updateExpensePercent();
+    }
+  
+    // 3) Calculate expense percentage
+    function updateExpensePercent() {
+      const expense     = parseFloat(expenseInputTotal.value) || 0;
+      const invoicesTot = parseFloat(invoiceTotalSpan.textContent) || 0;
+      const pct = invoicesTot > 0 ? (expense / invoicesTot) * 100 : 0;
+      expensePctSpan.textContent = pct.toFixed(1) + ' %';
+    }
+  
+    // wire up removal of invoice rows
+    invoiceBody.addEventListener('click', e => {
+      if (e.target.matches('.remove-row')) {
+        e.target.closest('tr').remove();
+        updateInvoiceTotal();
+      }
+    });
+  
+    // wire up invoice_value changes
+    invoiceBody.addEventListener('input', e => {
+      if (e.target.matches('input[name="invoice_values"]')) {
+        updateInvoiceTotal();
+      }
+    });
+  
+    // wire up add‑invoice
+    addInvoiceBtn.addEventListener('click', () => {
+      const idx = invoiceIdx++;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><input type="text" name="invoice_numbers"></td>
+        <td><input type="number" name="invoice_values" step="0.01"></td>  
+        <td><input type="file" name="invoice_files_${idx}"></td>
+        <td><button type="button" class="remove-row btn btn-sm btn-danger">Remove</button></td>
+      `;
+      invoiceBody.appendChild(tr);
+      updateInvoiceTotal();
+    });
+  
+    // wire up *all* expense inputs
+    expenseInputs.forEach(i => {
+      i.addEventListener('input', updateExpenseTotal);
+    });
+  
+    // initial calculation
+    updateInvoiceTotal();
+    updateExpenseTotal();
+  });
+  </script>
+  
+  <!-- For non po items row adding -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function(){
+      const tfoot = document.querySelector('#cargoTableBody').parentElement.querySelector('tfoot');
+      tfoot.addEventListener('click', function(e){
+        // if they clicked on the FA icon (or its svg child), we still catch it
+        if (e.target.closest('#add-cargo-row')) {
+          // == your existing "add a cargo row" code ==
+          const tbody = document.getElementById('cargoTableBody');
+          const idx   = tbody.querySelectorAll('tr').length;
+          const tr    = document.createElement('tr');
+          tr.classList.add('cargo-row');
+          tr.innerHTML = `
+            <td>${idx+1}</td>
+            <td><input name="cargo[${idx}][supplier]"   class="form-control-sm"></td>
+            <td><input name="cargo[${idx}][po]"         class="form-control-sm"></td>
+            <td><input name="cargo[${idx}][sap]"        class="form-control-sm"></td>
+            <td><input name="cargo[${idx}][article]"    class="form-control-sm"></td>
+            <td><input name="cargo[${idx}][pending_qty]"type="number" min="0" class="form-control-sm"></td>
+            <td><input name="cargo[${idx}][value]"      type="number" step="0.01" class="form-control-sm"></td>
+          `;
+          tbody.appendChild(tr);
+          // and hook up your refreshCargoRows() on each new input…
+          tr.querySelectorAll('input').forEach(inp=>{
+            inp.addEventListener('input', refreshCargoRows);
+          });
+        }
+      });
+    });
+  </script> 
+</body>
+</html>

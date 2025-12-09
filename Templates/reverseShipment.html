@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+
+{% block page_heading_1 %}Shipment{% endblock %} 
+{% block page_heading_2 %}Reverse Shipment{% endblock %} 
+{% block page_heading_3 %}Reverse Shipment{% endblock %} 
+
+{#% block button_submit %}
+<button id="submit" type="submit" style="width: 600px;" form="main_form" class="btn bg-gradient-success">Submit Updates</button>
+{% endblock %#} 
+
+{% block content %}  
+
+<form method="POST" action="/reverse-shipment" onsubmit="return confirm('Are you sure you want to reverse this shipment? This action cannot be undone.')">
+  <div class="card p-3 mb-3">
+    <h5 class="fw-bold">Reverse Shipment</h5>
+
+    <!-- Optional dropdown: hide if you want -->
+    {% if not preselected_shipment_id %}
+        <div class="mb-3" {% if preselected_shipment_id %}style="display:none;"{% endif %}>
+        <label for="shipment_id" class="form-label">Select Shipment</label>
+        <select class="form-select" name="shipment_id" id="shipment_id" required onchange="fetchShipmentDetails(this.value)">
+            <option value="" disabled selected>-- Choose Shipment --</option>
+            {% for shp in shipments %}
+            <option value="{{ shp.ShipmentID }}" {% if shp.ShipmentID == preselected_shipment_id %}selected{% endif %}>{{ shp.ShipmentNumber }}</option>
+            {% endfor %}
+        </select>
+        </div>
+    {% endif %}
+
+    <!-- If you want, show the shipment number text when no dropdown -->
+    {% if preselected_shipment_id %}
+      <input type="hidden" id="shipment_id" name="shipment_id" value="{{ preselected_shipment_id }}">
+      <p><strong>Shipment Number:</strong> {{ shipments|selectattr('ShipmentID', 'equalto', preselected_shipment_id)|map(attribute='ShipmentNumber')|first }}</p>
+    {% endif %}
+
+    <!-- Collapsible Shipment Details -->
+    <div class="accordion" id="shipmentAccordion">
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#shipmentDetailCollapse">
+            Show Shipment Details
+          </button>
+        </h2>
+        <div id="shipmentDetailCollapse" class="accordion-collapse collapse">
+          <div class="accordion-body">
+            <p><strong>PO Numbers:</strong> <span id="detail_pos"></span></p>
+            <div id="poline_details"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Submit button -->
+    <button id="reverseButton" type="submit" class="btn btn-danger mt-3">Reverse Shipment</button>
+  </div>
+</form>
+
+
+
+{% endblock %}   
+
+{% block script_extra %}
+<script>
+  function fetchShipmentDetails(shipmentID) {
+    if (!shipmentID) return;
+
+    fetch(`/api/shipment-info/${shipmentID}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) {
+          alert(data.error);
+          document.getElementById('reverseButton').disabled = true;
+          return;
+        }
+
+        document.getElementById('detail_pos').innerText = data.po_numbers.join(', ');
+        const polineDiv = document.getElementById('poline_details');
+        polineDiv.innerHTML = '';
+
+        data.po_lines.forEach(line => {
+          const lineHTML = `
+            <div class="border p-2 mb-2 rounded ${line.locked ? 'bg-warning-subtle' : ''}">
+              <p><strong>PO Line ID:</strong> ${line.id}</p>
+              <p><strong>Description:</strong> ${line.description}</p>
+              <p><strong>Quantity:</strong> ${line.qty}</p>
+              <p><strong>Status:</strong> ${line.locked ? 'Delivered/Invoiced' : 'Editable'}</p>
+            </div>
+          `;
+          polineDiv.innerHTML += lineHTML;
+        });
+
+        const anyLocked = data.po_lines.some(l => l.locked);
+        document.getElementById('reverseButton').disabled = anyLocked;
+        if (anyLocked) alert("One or more PO lines are invoiced or delivered. Reversal is not allowed.");
+      })
+      .catch(err => {
+        alert("Failed to fetch shipment details.");
+        console.error(err);
+      });
+  }
+
+  // On page load, if shipment preselected, load details
+  document.addEventListener("DOMContentLoaded", function() {
+    const preselected = "{{ preselected_shipment_id }}";
+    if (preselected) {
+      fetchShipmentDetails(preselected);
+    }
+  });
+</script>
+
+
+{% endblock %}

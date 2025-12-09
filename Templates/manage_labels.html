@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block page_heading_1  %}Manage Field Labels{% endblock %}
+{% block page_heading_3  %}Field Labels for headings{% endblock %}
+{% block heading_width %}width: 210px; {% endblock %}
+
+{% block columns_toggle %}{% endblock %}
+{% block filters_toggle %}{% endblock %}
+{% block filters %}{% endblock %}
+
+{% block script_filters %}{% endblock %}
+{% block script_columns_toggle %}{% endblock %}
+{% block script_filters_toggle %}{% endblock %}
+
+{% block content %}
+  <form method="post">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>FieldName</th>
+          <th>Label</th>
+          <th>Delete?</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for lbl in labels %}
+        <tr>
+          <td>{{ lbl.FieldName }}</td>
+          <td>
+            <input type="text"
+                   name="label_{{ lbl.ID }}"
+                   value="{{ lbl.Label }}"
+                   class="form-control-plaintext"
+                   style="width:100%">
+          </td>
+          <td>
+            <button type="submit"
+                    name="delete"
+                    class="btn btn-sm btn-danger"
+                    value="{{ lbl.ID }}"
+                    onclick="return confirm('Remove label for {{lbl.FieldName}}?');">
+              Delete
+            </button>
+          </td>
+        </tr>
+        {% endfor %}
+
+        {# new label row #}
+        <tr class="table-success">
+          <td>
+            <select name="new_FieldName" class="form-select-lg" required>
+              <option value="" disabled selected>Choose column…</option>
+              {% for col in available_fields %}
+                <option value="{{ col }}">{{ col|replace('_',' ')|title }}</option>
+              {% endfor %}
+            </select>
+          </td>
+          <td>
+            <input type="text"
+                   name="new_Label"
+                   class="form-control-lg"
+                   placeholder="Human readable label"
+                   required>
+          </td>
+          <td>
+            <button class="btn btn-sm btn-primary" type="submit">Add Label</button>
+          </td>
+        </tr>        
+      </tbody>
+    </table>
+  </form>
+{% endblock %}

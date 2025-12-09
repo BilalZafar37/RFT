@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+
+{% block page_heading_1 %}Home{% endblock %} 
+{% block page_heading_2 %}containers{% endblock %} 
+{% block page_heading_3 %}containers Update{% endblock %} 
+
+{% block button_submit %}
+<button id="submit" type="submit" style="width: 600px;" form="main_form" class="btn bg-gradient-success">Update Containers</button>
+{% endblock %} 
+
+{% block bulkupdate %}
+<div class="filter-container m-3 rounded-3" style="z-index: 1;background-color: #f5f5f5; border: 1px solid #ddd !important;
+  padding: 10px;
+  margin: 5px;"
+>
+  <div class="filter-control">
+    <label for="bulk-field" style="color: blue;" class="me-2">Bulk update Actual times:</label>
+    <select id="bulk-field" style="width: auto;">
+    <option selected></option>
+    {% for col in columns %}
+      {% if col.name not in ('ShipmentNumber', 'ContainerNumber', 'ContainerType', 'ContainerLevelStatus', 'ContainerRemarks') %}
+      <option value="{{col.name}}">{{col.label}}</option>
+      {% endif %}
+    {% endfor %}
+    <!-- etc… -->
+    </select>
+  </div>
+
+  <div class="filter-control">
+    <input type="date" id="bulk-date" />
+  </div>
+  <button id="apply-bulk" class="btn btn-sm bg-gradient-info">Apply to filtered</button>
+</div>
+
+{% endblock %}
+
+{% block content %}  
+
+<form id="main_form" name="main_form" action="{{ url_for('main.update_containers') }}" method="POST">
+  <table id="myTable" class="table align-items-center mb-0 table-responsive" style="color: black;">
+    <thead>
+      <tr>
+        <th class="text-center">
+          <!-- <input type="hidden" name="containers_count" value="{{rows| length}}"/> -->
+          Sr.<input type="checkbox" id="select-all">
+        </th>
+        <!-- <th data-col="ShipmentNumber">Shipment No.</th> -->
+        {% for col in columns if col.name not in ('ShipmentID', 'ContainerType')%}
+          <th data-col="{{col.name}}">{{col.label}}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+        <tr>
+          <td class="text-center">
+            {{ loop.index }}
+            <input
+              type="checkbox"
+              class="item-checkbox"
+              name="containers[{{loop.index0}}][id]"
+              value="{{ row.ContainerID }}"
+            >
+          </td>
+
+          <!-- <td data-col="ShipmentNumber">{{ row.ShipmentNumber }}</td> -->
+          {% for col in columns if col.name not in ('ShipmentID', 'ContainerType')%}
+            <td class="col-{{col.name}}">
+              {# Special case for your status column #}
+              {% if col.name == "ContainerLevelStatus" %}
+                <select
+                  name="containers[{{ row.ContainerID }}][status]"
+                  class="form-select form-select-sm rounded"
+                >
+                  <option selected disabled></option>
+                  {% for status in col.options if 'Planed' not in status%}
+                    <option
+                      value="{{ status }}"
+                      {% if row.ContainerLevelStatus == status %}selected{% endif %}
+                    >
+                      {{ status }}
+                    </option>
+                  {% endfor %}
+                </select>
+
+              {% elif col.name in ["CCDate","ATAOrigin","ATDOrigin","ATADP","ATDDPort","ATAWH","YardInDate","YardOutDate"] %}
+                <input
+                  type="date"
+                  class="form-control-sm rounded"
+                  name="containers[{{ row.ContainerID }}][{{col.name}}]"
+                  value="{{ row[col.name].strftime('%Y-%m-%d') if row[col.name] else '' }}"
+                >
+              {% elif col.name == 'ContainerRemarks' %}
+                <input
+                  type="text"
+                  class="form-control-sm rounded"
+                  name="containers[{{ row.ContainerID }}][{{col.name}}]"
+                  value="{{ row[col.name] if row[col.name] else '' }}"
+                >
+              {% elif col.name == 'ShipmentNumber' %}
+                <a class="shipment-clickable" href="{{ url_for('main.updateShipments', shipment_id=row['ShipmentID'] ) }}">{{ row[col.name] }}</a>
+              
+              {% else %}
+              {{ row[col.name] }}
+              {% endif %}
+            </td>
+          {% endfor %}
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</form>
+{% endblock %}
+
+{% block script_extra %}
+<!-- Checkbox checked -->
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const selectAll = document.getElementById("select-all");
+  
+    selectAll.addEventListener("change", () => {
+      const checked = selectAll.checked;
+  
+      document.querySelectorAll(".item-checkbox").forEach(cb => {
+        const row = cb.closest("tr");
+        // row.offsetParent === null for display:none rows
+        if (row && row.offsetParent !== null) {
+          cb.checked = checked;
+        }
+      });
+    });
+  });
+</script> 
+
+<!-- Bulk update AT -->
+<script>
+  document.getElementById('apply-bulk').addEventListener('click', () => {
+    const field = document.getElementById('bulk-field').value;   // e.g. “ATAOrigin”
+    const date  = document.getElementById('bulk-date').value;    // e.g. “2025-05-01”
+    // for each *visible* row in the table body…
+    document
+      .querySelectorAll('#myTable tbody tr')
+      .forEach(row => {
+        if (row.offsetParent === null) return;    // skip hidden by filter
+        // find the input whose name ends with “[field]”
+        const input = row.querySelector(`input[name$="[${field}]"]`);
+        if (input) input.value = date;
+      });
+  });
+  
+</script>
+
+
+<!-- Blinking -->
+<script>
+  // keep handles so we can cancel
+  let blinkInterval, blinkTimeout, lastCells = [];
+
+  document.getElementById('bulk-field').addEventListener('change', function(){
+    const table = document.getElementById('myTable');
+    const field = this.value;
+
+    // 1) clear any previous blinking/highlight
+    if (blinkInterval) clearInterval(blinkInterval);
+    if (blinkTimeout) clearTimeout(blinkTimeout);
+    lastCells.forEach(el => el.classList.remove('highlight-col'));
+    lastCells = [];
+
+    if (!field) return;
+
+    // 2) find the <th data-col="…"> and its index
+    const headerTh = table.querySelector(`thead th[data-col="${field}"]`);
+    if (!headerTh) return;
+    const allThs = Array.from(headerTh.parentNode.children);
+    const colIndex = allThs.indexOf(headerTh);
+
+    // 3) collect header + body cells in that column
+    const cells = [ headerTh ];
+    table.querySelectorAll('tbody tr').forEach(tr=>{
+      const td = tr.children[colIndex];
+      if (td) cells.push(td);
+    });
+    lastCells = cells;
+
+    // 4) initial highlight
+    cells.forEach(el => el.classList.add('highlight-col'));
+
+    // 5) blink: toggle highlight every 500ms
+    blinkInterval = setInterval(() => {
+      cells.forEach(el => el.classList.toggle('highlight-col'));
+    }, 500);
+
+    // 6) after 3s, stop blinking and leave steady highlight
+    blinkTimeout = setTimeout(() => {
+      clearInterval(blinkInterval);
+      cells.forEach(el => el.classList.add('highlight-col'));
+    }, 3000);
+  });
+</script>
+
+
+{% endblock %}

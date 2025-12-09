@@ -1,0 +1,2260 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RFT System (DEVELOPMENT)</title>
+  <link rel="stylesheet" href="/static/css/index.css">
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+  crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <style>
+    .dim-zero {
+      color: gray !important;
+      opacity: 0.5;
+    }
+    p {
+      color: white !important;
+      font-weight: 500 !important;
+    }
+    /* make .scrollable scroll vertically, flush against its border */
+    .scrollable {
+      max-height: 230px;
+      overflow-y: auto;
+      /* padding-right: 0;     prevents extra gap on the right */
+    }
+    
+    .filters .Card.card-body{
+      min-height: fit-content !important;
+    }
+
+    .row .card-body{
+      min-height: 302px;
+    }
+    
+    /* —— webkit browsers (Chrome, Safari, Edge) —— */
+    .scrollable::-webkit-scrollbar {
+      width: 8px;           /* thickness of the bar */
+    }
+    
+    /* track (the background) */
+    .scrollable::-webkit-scrollbar-track {
+      background: #000;     /* black track */
+    }
+    
+    /* thumb (the draggable “wheel”) */
+    .scrollable::-webkit-scrollbar-thumb {
+      background-color: #888;  /* gray thumb */
+      border-radius: 4px;
+    }
+    
+    /* optional: hover effect on the thumb */
+    .scrollable::-webkit-scrollbar-thumb:hover {
+      background-color: #aaa;
+    }
+    
+    /* —— Firefox —— */
+    .scrollable {
+      scrollbar-width: thin;
+      scrollbar-color: #888 #000;
+    }
+    
+    .plane-container {
+      position: relative;
+      padding: inherit;
+    }
+
+    .plane-container::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-image: url('{{ url_for("static", filename="img/plain_side.png") }}');
+      background-size: inherit;
+      background-position: center;
+      opacity: 0.5;        /* adjust from 0 (invisible) → 1 (fully opaque) */
+      z-index: 0;
+    }
+    
+    /* make sure your inner content sits on top */
+    .plane-container > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .sea-container {
+      position: relative;
+      padding: inherit;
+    }
+
+    .sea-container::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-image: url('{{ url_for("static", filename="img/ship_top.jpg") }}');
+      background-size: cover;
+      background-position: center;
+      opacity: 0.2;        /* adjust from 0 (invisible) → 1 (fully opaque) */
+      z-index: 0;
+    }
+    
+    /* make sure your inner content sits on top */
+    .sea-container > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .land-container {
+      position: relative;
+      padding: inherit;
+    }
+
+    .land-container::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-image: url('{{ url_for("static", filename="img/truch_side.png") }}');
+      background-size: cover;
+      background-position: center;
+      opacity: 0.2;        /* adjust from 0 (invisible) → 1 (fully opaque) */
+      z-index: 0;
+    }
+    
+    /* make sure your inner content sits on top */
+    .land-container > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* common transition for all three */
+    .plane-container::before,
+    .sea-container::before,
+    .land-container::before {
+      transition: opacity 0.3s ease;
+    }
+
+    /* on hover, make the background more opaque */
+    .plane-container:hover::before {
+      opacity: 0.8;    /* or 1 for fully opaque */
+    }
+    .sea-container:hover::before {
+      opacity: 0.8;    /* adjust as you like */
+    }
+    .land-container:hover::before {
+      opacity: 0.8;
+    }
+
+    /* the “selected” label that shows in the box */
+    .select2-container--default 
+      .select2-selection--single 
+      .select2-selection__rendered {
+      /* make the chosen value (or placeholder) black */
+      color: black !important;
+    }
+
+    /* the dropdown list items */
+    .select2-container--default 
+      .select2-results__option {
+      color: black !important;
+    }
+    .select2-container--default .select2-selection--multiple , .select2-selection__choice {
+      background-color: rgb(23, 23, 23) !important;
+    }
+
+    .select2-container {
+      max-width: 607.321px !important;
+      min-width: 190px !important;
+      width: auto !important;
+    }
+
+    /* Ensure the dropdown itself also follows the same width */
+    .select2-dropdown {
+        max-width: 607.321px !important;
+        min-width: 190px !important;
+        width: auto !important;
+    }
+
+    /* Style the inner text field where the selection appears */
+    .select2-selection {
+        max-width: 607.321px !important;
+        min-width: 190px !important;
+        width: auto !important;
+    }
+
+
+    svg {
+      height: 30px;
+      width: 20px;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      background-color: rgb(23, 23, 23);
+      color: var(--text-clr);
+      display: grid;
+      grid-template-columns: auto 1fr;
+    }
+
+    .Nav {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .para {
+      font-size: 12px;
+    }
+
+    .cards {
+      background-color: rgb(29, 29, 29);
+      color: white;
+    }
+
+    .chart-container {
+      width: 100%;
+      height: 200px;
+      padding: 5px;
+      box-sizing: border-box;
+      background-color: rgb(29, 29, 29);
+      position: relative;
+    }
+
+    .chart-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      background-color: rgb(29, 29, 29);
+    }
+
+    .card-body {
+      background-color: rgb(29, 29, 29);
+    }
+
+    .card-text {
+      border-top: 1px solid white;
+    }
+
+    .card2-text {
+      border-top: 1px solid white;
+      font-size: 13px;
+    }
+
+    .Card {
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+      border: 1px solid var(--line-clr);
+    }
+
+    .d-item,
+    .table {
+      background-color: rgb(29, 29, 29);
+      color: white;
+      font-size: 13px;
+    }
+
+    .nav-button {
+      position: absolute;
+      border: 1px solid #ccc;
+      padding: 8px 12px;
+      cursor: pointer;
+      z-index: 10;
+    }
+
+    .nav-button.right {
+      right: 10px;
+      background-color: rgb(29, 29, 29);
+      color: grey;
+      border-radius: 15px;
+    }
+
+    .nav-button:hover {
+      background-color: grey;
+      color: black;
+    }
+
+    #search {
+      color: #ccc;
+    }
+    .shipment-clickable {
+     display: inline-block;
+     color: #ffffff;          /* base link-blue color */
+     text-decoration: none;
+     position: relative;
+     transition: color 0.2s ease, transform 0.2s ease;
+     cursor: pointer;
+   }
+  
+   .shipment-clickable::after {
+     content: '';
+     position: absolute;
+     left: 0;
+     bottom: -2px;
+     width: 100%;
+     height: 2px;
+     background: #007bff;
+     transform: scaleX(0);
+     transform-origin: left center;
+     transition: transform 0.2s ease;
+   }
+  
+   .shipment-clickable:hover {
+     color: #0056b3;          /* darker blue on hover */
+     transform: translateY(-2px);
+   }
+  
+   .shipment-clickable:hover::after {
+     transform: scaleX(1);
+   }
+  
+   .shipment-clickable:active {
+     color: #003f7f;
+     transform: translateY(0);
+   }
+  </style>
+</head>
+
+<body>
+  {% include 'sidebar2.html' %} 
+
+  <!-- FOR select 2 -->
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+  <script>
+    $(document).ready(function () {
+        $("#created_months, #categories, #brands, #shipment_months").select2({
+            multiple: true,
+            allow_clear:true,
+        });
+    });
+  </script>
+  
+  <main>
+    <nav class="navbar navbar-expand-lg navbar-dark Nav">
+      <div class="div1">
+        <nav aria-label="breadcrumb" class="mx-2 mt-2">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="#" class="page">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+          </ol>
+        </nav>
+      </div>
+      <div class="div2">
+        <div class="d-flex">
+          <form class="form-inline my-lg-0">
+            <input class="form-control mr-sm-2 bg-dark" id="search" type="search" placeholder="Search here"
+              aria-label="Search">
+          </form>
+          <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+            <li class="nav-item">
+              <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+                <li class="nav-item">
+                  <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+                    <li class="nav-item mx-2">
+                      <a href="#" type="button"> <i class="fa-solid fa-wrench" style="color: white;"></i> </a>
+                    </li>
+                    <li class="nav-item mx-2">
+                      <a href="#" type="button"><i class="fa-solid fa-user" style="color:white;"></i> </a>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </nav>
+    <div class="p-3">
+      <div class="container-fluid">
+        <h3>Analytics</h3>
+      </div>
+      <div class="container-fluid mt-3">
+        <div class="filters">
+          <div class="card ">
+            <div class="card-body">
+              <h4 class="card-title">
+                <button class="btn btn-primary" type="submit" form="main-form">Apply</button>
+              </h4>
+              
+              <form name="main-form" id="main-form" method="post" action="{{url_for('dashboard.dashboard')}}">
+                <!-- ################################# -->
+                <!-- FILTERS  -->
+                <!-- ################################# -->
+                <div class=" row">
+                  <!-- F1 BRANDS-->
+                  <div class="dropdown col-md-2">
+                    <label class="fw-bold">Brands:</label>
+                    <select style="width: 190px;" id="brands" name="brands[]" multiple>
+                      <option value="All" {% if not sel_brands or 'All' in sel_brands %}selected{% endif %}>All</option>
+                      <option value="ALL HAP" {% if 'ALL HAP' in sel_brands %}selected{% endif %}>ALL HAP</option>
+                      {% for brand in all_brands %}
+                        {% if brand in session['user_brand_access'] or session['role'] == 'admin' %}
+                          <option value="{{ brand }}" {% if brand in sel_brands  %}selected{% endif %}>{{ brand }}</option>
+                        {% endif %}
+                      {% endfor %}
+                    </select>
+                  </div>
+
+                  <!-- F2 MONTHS PO-Date-->
+                  <div class="dropdown col-md-2">
+                    <label class="fw-bold">PO-Date:</label>
+                    <select style="width: 190px;" name="created_months[]" id="created_months" multiple> 
+                      <option value="All" {% if not sel_months or 'All' in sel_months %}selected{% endif %}>All months</option>
+                      {% for month in all_created_months %}
+                        <option value="{{ month }}" {% if month in sel_months %}selected{% endif %}>{{ month | format_month }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+
+                  <!-- F3 SHIPMENT MONTHS-->
+                  <div class="dropdown col-md-2">
+                    <label class="fw-bold">Ship-Date:</label>
+                    <select style="width: 190px;" name="shp_created_months[]" id="shipment_months" multiple> 
+                      <option value="All" {% if not sel_shp_months or 'All' in sel_shp_months %}selected{% endif %}>All months</option>
+                      {% for month in all_shp_months %}
+                        <option value="{{ month }}" {% if month in sel_shp_months %}selected{% endif %}>{{ month | format_month }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+
+                  <!-- F4 CATS-->
+                  <div class="dropdown col-md-2">
+                    <label class="fw-bold">Categories:</label>
+                    <select name="categories[]" id="categories" multiple>
+                      <option value="All" selected disabled>All</option>
+                      <option value="ALL HAP">ALL HAP</option>
+                      {% for cats in all_categories %}
+                        <option value="{{ cats }}" {% if cats in sel_categories %}selected{% endif %}>{{ cats }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+
+                  <!-- F5 SHIPment-->
+                  <div class="dropdown col-md-2">
+                    <label class="fw-bold">Shipment #</label>
+                    <input name="filter_shipment" class="rounded-1 h-50" style="background: rgb(23, 23, 23); color: white; border: 1px solid white;" value="{{ filter_shipment or '' }}">
+                  </div>
+
+                  <!-- F6 PO-->
+                  <div class="dropdown col-md-2">
+                    <label class="fw-bold">Purchase Order #</label>
+                    <input name="filter_po" class="rounded-1 h-50" style="background: rgb(23, 23, 23); color: white; border: 1px solid white;" value="{{ selected_po }}">
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ################################# -->
+      <!-- SEA Shipments  -->
+      <!-- ################################# -->
+      {% if shipment_status_report_sea %}
+        <div class="container-fluid mt-4 sea-container">
+          <span class="badge bg-success rounded-0">Sea Shipments</span>
+          <div class="row g-4">
+            <!-- DTC CONTAINERS -->
+            <!-- WAREHOUSE CONATINERS-->
+            <div class="col-5">
+              <div class="card ">
+                <div class="card-body table-responsive">
+                  <h5 class="card-title">Containers Status</h5>
+                  <table class="table">
+                    <thead>
+                        <tr>
+                          <th>Status</th>
+                          <th>Total</th>
+                          {# one column per dynamic plan_group (RDC, XYZ, etc.)  Including DTC#}
+                          {% for grp in wh_plan_groups_sea %}
+                            <th title="{{ grp.plan_status }}">
+                              <span style="display: inline-flex; align-items: center;">
+                                {{ grp.label }}
+                                <i class="fa-solid fa-circle-info text-success ms-1" style="font-size: 14px; vertical-align: middle; cursor: help;" title="{{ grp.plan_status }}"></i>
+                              </span>
+                            </th>
+                          {% endfor %}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for r in wh_rows_sea %}
+                          <tr>
+                            <td>{{ r.stage }}</td>
+                            <!-- <td>{{ r.total }}</td> -->
+                            <td>
+                              <a class="shipment-clickable" href="{{ url_for('main.containers_status', status=r.stage, sel_entity='Planed-All', mot='Sea')}}">
+                                {{ r.total }}
+                              </a>
+                            </td>
+                            {% for grp in wh_plan_groups_sea %}
+                              {% set found = r.plan_statuses | selectattr("plan_status", "equalto", grp.plan_status) | list %}
+                              <td>
+                                {% if found and found[0].count > 0 %}
+                                  <a class="shipment-clickable"
+                                    href="{{ url_for('main.containers_status', status=r.stage, sel_entity=grp.plan_status, mot='Sea')}}">
+                                    {{ found[0].count }}
+                                  </a>
+                                {% else %}
+                                  0
+                                {% endif %}
+                              </td>
+                            {% endfor %}
+                          </tr>
+                        {% endfor %}
+                      </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Shipment Statuses -->
+            <div class="col-md-3">
+              <div class="card ">
+                <div class="card-body scrollable">
+                  <h5 class="card-title">Shipment statuses</h5>
+                  <table class="table">
+                    <tbody>
+                      {% for rec in shipment_status_report_sea %}
+                        <tr>
+                          <td {% if rec.status in ('Under Booking', 'Stocks not ready')  %} style="color:orange;"{% endif %} >{{ rec.status }}</td>
+                          <!-- <td>{{ rec.count }}</td> -->
+                          <td>
+                            <a class="shipment-clickable" href="{{ url_for('main.shipments_status', status=rec.status, mot='Sea') }}">
+                              {{ rec.count }}
+                            </a>
+                          </td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Upcomming ETAs  -->
+            <div class="col-md-4">
+              <div class="card ">
+                <div class="card-body scrollable">
+                  <h5 class="card-title">Upcoming ETAs</h5>
+                  <table class="table">
+                    <thead>
+                      {% if upcoming_eta_sea %}
+                      <tr>
+                        <th>Brand</th>
+                        <th>
+                          <span style="display: inline-flex; align-items: center;">
+                            Shipment #
+                            <i class="fa-solid fa-circle-info text-success ms-1" style="font-size: 14px; vertical-align: middle; cursor: help;" title="Copy BL# by clicking on RFT-num below"></i>
+                          </span>
+                        </th>
+                        <th>Containers #</th>
+                        <!-- <th>Origin Port</th> -->
+                        <th>Destination Port</th>
+                        <th>ETA Dest.</th> 
+                      </tr>
+                      {% endif %}
+                    </thead>
+                    <tbody>
+                      {% if not upcoming_eta_sea %}
+                        <tr><td colspan="4" class="text-center">No arrivals in the next week</td></tr>
+                      {% else %}
+                        {% for rec in upcoming_eta_sea %}
+                          <tr>
+                            <td>{{ rec.Brand }}</td>
+                            <td title="{{ rec.BL }}" style="cursor:help;" onclick="navigator.clipboard.writeText('{{ rec.BL }}'); showtost(event);">{{ rec.shipment }}</td>
+                            <td>{{ rec.containers_num }}</td>
+                            <!-- <td>{{ rec.origin_port }}</td> -->
+                            <td>{{ rec.dest_country }}</td>
+                            <td>{{ rec.eta.strftime("%Y-%m-%d") }}</td>
+                          </tr>
+                        {% endfor %}
+                      {% endif %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- ################################# -->
+      <!-- Land Shipments  -->
+      <!-- ################################# -->
+      {% if shipment_status_report_land %}
+        <div class="container-fluid mt-4 land-container" >
+          <span class="badge bg-success rounded-0">Land Shipments</span>
+          <div class="row g-4">
+            <!-- DTC CONTAINERS -->
+            <!-- WAREHOUSE CONATINERS-->
+            <div class="col-5">
+              <div class="card ">
+                <div class="card-body table-responsive">
+                  <h5 class="card-title">Cargo Status</h5>
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>Status</th>
+                        <th>Total</th>
+                        {# one column per dynamic plan_group (RDC, XYZ, etc.) #}
+                        {% for grp in wh_plan_groups_land %}
+                          <th title="{{ grp.plan_status }}">
+                            <span style="display: inline-flex; align-items: center;">
+                              {{ grp.label }}
+                              <i class="fa-solid fa-circle-info text-success ms-1" style="font-size: 14px; vertical-align: middle; cursor: help;" title="{{ grp.plan_status }}"></i>
+                            </span>
+                          </th>
+                        {% endfor %}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for r in wh_rows_land %}
+                        <tr>
+                          <td>{{ r.stage }}</td>
+                          <td>
+                            <a class="shipment-clickable" href="{{ url_for('main.containers_status', status=r.stage, sel_entity='Planed-All', mot='Land')}}">
+                              {{ r.total }}
+                            </a>
+                          </td>
+                          {% for grp in wh_plan_groups_land %}
+                            {% set found2 = r.plan_statuses | selectattr("plan_status", "equalto", grp.plan_status) | list %}
+                            <td>
+                              {% if found2 and found2[0].count > 0 %}
+                                <a class="shipment-clickable"
+                                  href="{{ url_for('main.containers_status', status=r.stage, sel_entity=grp.plan_status, mot='Land')}}">
+                                  {{ found2[0].count }}
+                                </a>
+                              {% else %}
+                                0
+                              {% endif %}
+                            </td>
+                          {% endfor %}
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Shipment Statuses -->
+            <div class="col-md-3" >
+              <div class="card ">
+                <div class="card-body scrollable">
+                  <h5 class="card-title">Shipment statuses</h5>
+                  <table class="table">
+                    <tbody>
+                      {% for rec in shipment_status_report_land %}
+                        <tr>
+                          <td {% if rec.status in ('Under Booking', 'Stocks not ready')  %} style="color:orange;"{% endif %} >{{ rec.status }}</td>
+                          <!-- <td>{{ rec.count }}</td> -->
+                          <td>
+                            <a class="shipment-clickable" href="{{ url_for('main.shipments_status', status=rec.status, mot='Land') }}">
+                              {{ rec.count }}
+                            </a>
+                          </td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Upcomming ETAs  -->
+            <div class="col-md-4" >
+              <div class="card ">
+                <div class="card-body scrollable">
+                  <h5 class="card-title">Upcoming ETAs</h5>
+                  <table class="table">
+                    <thead>
+                      {% if upcoming_eta_land %}
+                      <tr>
+                        <th>Brand</th>
+                        <th>
+                          <span style="display: inline-flex; align-items: center;">
+                            Shipment #
+                            <i class="fa-solid fa-circle-info text-success ms-1" style="font-size: 14px; vertical-align: middle; cursor: help;" title="Copy BL# by clicking on RFT-num below"></i>
+                          </span>
+                        </th>
+                        <th>Containers #</th>
+                        <!-- <th>Origin Port</th> -->
+                        <th>Destination Port</th>
+                        <th>ETA Dest.</th> 
+                      </tr>
+                      {% endif %}
+                    </thead>
+                    <tbody>
+                      {% if not upcoming_eta_land %}
+                        <tr><td colspan="4" class="text-center">No arrivals in the next week</td></tr>
+                      {% else %}
+                        {% for rec in upcoming_eta_land %}
+                          <tr>
+                            <td>{{ rec.Brand }}</td>
+                            <td title="{{ rec.BL }}" style="cursor:help;" onclick="navigator.clipboard.writeText('{{ rec.BL }}'); showtost(event);">{{ rec.shipment }}</td>
+                            <td>{{ rec.containers_num }}</td>
+                            <!-- <td>{{ rec.origin_port }}</td> -->
+                            <td>{{ rec.dest_country }}</td>
+                            <td>{{ rec.eta.strftime("%Y-%m-%d") }}</td>
+                          </tr>
+                        {% endfor %}
+                      {% endif %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- ################################# -->
+      <!-- AIR Shipments -->
+      <!-- ################################# -->
+      {% if shipment_status_report_air %}
+      <div class="container-fluid mt-4 plane-container" >
+        <div class="airplane"></div>
+        <span class="badge bg-success rounded-0">Air Shipments</span>
+        <div class="row g-4">
+          <!-- DTC CONTAINERS -->
+          <!-- WAREHOUSE CONATINERS-->
+          <div class="col-5">
+            <div class="card ">
+              <div class="card-body table-responsive">
+                <h5 class="card-title">Cargo Status</h5>
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Status</th>
+                      <th>Total</th>
+                      {# one column per dynamic plan_group (RDC, XYZ, etc.) #}
+                      {% for grp in wh_plan_groups_air %}
+                        <th title="{{ grp.plan_status }}">
+                          <span style="display: inline-flex; align-items: center;">
+                            {{ grp.label }}
+                            <i class="fa-solid fa-circle-info text-success ms-1" style="font-size: 14px; vertical-align: middle; cursor: help;" title="{{ grp.plan_status }}"></i>
+                          </span>
+                        </th>
+                      {% endfor %}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for r in wh_rows_air %}
+                      <tr>
+                        <td>{{ r.stage }}</td>
+                        <td>
+                          <a class="shipment-clickable" href="{{ url_for('main.containers_status', status=r.stage, sel_entity='Planed-All', mot='Air')}}">
+                            {{ r.total }}
+                          </a>
+                        </td>
+                        {% for grp in wh_plan_groups_air %}
+                          {% set found2 = r.plan_statuses | selectattr("plan_status", "equalto", grp.plan_status) | list %}
+                          <td>
+                            {% if found2 and found2[0].count > 0 %}
+                              <a class="shipment-clickable"
+                                href="{{ url_for('main.containers_status', status=r.stage, sel_entity=grp.plan_status, mot='Air')}}">
+                                {{ found2[0].count }}
+                              </a>
+                            {% else %}
+                              0
+                            {% endif %}
+                          </td>
+                        {% endfor %}
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Shipment Statuses -->
+          <div class="col-md-3">
+            <div class="card ">
+              <div class="card-body scrollable">
+                <h5 class="card-title">Shipment statuses</h5>
+                <table class="table">
+                  <tbody>
+                    {% for rec in shipment_status_report_air %}
+                      <tr>
+                        <td {% if rec.status in ('Under Booking', 'Stocks not ready')  %} style="color:orange;"{% endif %} >{{ rec.status }}</td>
+                        <!-- <td>{{ rec.count }}</td> -->
+                        <td>
+                          <a class="shipment-clickable" href="{{ url_for('main.shipments_status', status=rec.status, mot='Air') }}">
+                            {{ rec.count }}
+                          </a>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Upcomming ETAs  -->
+          <div class="col-md-4">
+            <div class="card ">
+              <div class="card-body scrollable">
+                <h5 class="card-title">Upcoming ETAs</h5>
+                <table class="table">
+                  <thead>
+                    {% if upcoming_eta_air %}
+                    <tr>
+                      <th>Brand</th>
+                      <th>
+                        <span style="display: inline-flex; align-items: center;">
+                          Shipment #
+                          <i class="fa-solid fa-circle-info text-success ms-1" style="font-size: 14px; vertical-align: middle; cursor: help;" title="Copy BL# by clicking on RFT-num below"></i>
+                        </span>
+                      </th>
+                      <th>Containers #</th>
+                      <!-- <th>Origin Port</th> -->
+                      <th>Destination Port</th>
+                      <th>ETA Dest.</th> 
+                    </tr>
+                    {% endif %}
+                  </thead>
+                  <tbody>
+                    {% if not upcoming_eta_air %}
+                      <tr><td colspan="4" class="text-center">No arrivals in the next week</td></tr>
+                    {% else %}
+                      {% for rec in upcoming_eta_air %}
+                        <tr>
+                          <td>{{ rec.Brand }}</td>
+                          <td title="{{ rec.BL }}" style="cursor:help;" onclick="navigator.clipboard.writeText('{{ rec.BL }}'); showtost(event);">{{ rec.shipment }}</td>
+                          <td>{{ rec.containers_num }}</td>
+                          <!-- <td>{{ rec.origin_port }}</td> -->
+                          <td>{{ rec.dest_country }}</td>
+                          <td>{{ rec.eta.strftime("%Y-%m-%d") }}</td>
+                        </tr>
+                      {% endfor %}
+                    {% endif %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- R4 -->
+      <div class="container-fluid mt-4 plane-container" >
+        <div class="row g-4">
+          <!-- BRAND x WAREHOUSE pivot -->
+          <div class="col-md-6">
+            <div class="card ">
+              <div class="card-body table-responsive">
+                <h5 class="card-title">Receiving Warehouse</h5>
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Warehouse</th>
+                      {% for brand in brand_cols %}
+                        <th>{{ brand }}</th>
+                      {% endfor %}
+                      <th>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for row in table_data %}
+                      <tr>
+                        <td>{{ row[0] }}</td>  {# Warehouse (plan status) #}
+                        {% for count in row[1:-1] %}  {# Brand counts #}
+                          <td>{{ count }}</td>
+                        {% endfor %}
+                        <td><strong>{{ row[-1] }}</strong></td>  {# Row Total #}
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <th>Total</th>
+                      {% for i in range(1, brand_cols|length + 1) %}
+                        <th>
+                          {{
+                            table_data | map(attribute=i) | list | sum
+                          }}
+                        </th>
+                      {% endfor %}
+                      <th>
+                        {{
+                          table_data | map(attribute=-1) | list | sum
+                        }}
+                      </th>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+          </div>
+          <!-- Chart -->
+          <div class="col-md-6">
+            <div class="card  h-100">
+              <div class="card-body d-flex justify-content-center align-items-center">
+                <canvas id="warehousePieChart" style="width:100%; max-width:500px; height:auto;"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- R5 -->
+      <div class="container-fluid mt-4 plane-container" >
+        <div class="row g-4">
+          <!-- POD x WAREHOUSE pivot -->
+          <div class="col-md-6">
+            <div class="card ">
+              <div class="card-body table-responsive">
+                <h5 class="card-title">Receiving Port</h5>
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Port</th>
+                      {% for brand in brand_cols2 %}
+                        <th>{{ brand }}</th>
+                      {% endfor %}
+                      <th>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for row in table_data2 %}
+                      <tr>
+                        <td>{{ row[0] }}</td>  {# Warehouse (plan status) #}
+                        {% for count in row[1:-1] %}  {# Brand counts #}
+                          <td>{{ count }}</td>
+                        {% endfor %}
+                        <td><strong>{{ row[-1] }}</strong></td>  {# Row Total #}
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <th>Total</th>
+                      {% for i in range(1, brand_cols2|length + 1) %}
+                        <th>
+                          {{
+                            table_data2 | map(attribute=i) | list | sum
+                          }}
+                        </th>
+                      {% endfor %}
+                      <th>
+                        {{
+                          table_data2 | map(attribute=-1) | list | sum
+                        }}
+                      </th>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+          </div>
+          <!-- POD x WH Chart -->
+          <div class="col-md-6">
+            <div class="card  h-100">
+              <div class="card-body d-flex justify-content-center align-items-center">
+                <canvas id="portPieChart" style="width:100%; max-width:500px; height:auto;"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- R6 (ATA-WH x Month) -->
+      <div class="container-fluid mt-4" >
+        <div class="row g-4">
+          <!-- ATA-WH x Month pivot -->
+          <div class="col-md-6">
+            <div class="card ">
+              <div class="card-body table-responsive" style="height:430px;">
+                <h5 class="card-title">Arrival Month</h5>
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Month-Year</th>
+                      {% for brand in brand_cols3 %}
+                        <th>{{ brand }}</th>
+                      {% endfor %}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for row in table_data3 %}
+                      <tr>
+                        {% for count in row%}  {# Sorted month naems  #}
+                          <td>{{ count }}</td>
+                        {% endfor %}
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <!-- POD x WH Chart -->
+          <div class="col-md-6">
+            <div class="card h-100">
+              <div class="card-body d-flex justify-content-center align-items-center">
+                <canvas id="dtcTotalChart" style="width:100%;  height:400px;"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ############################################################# -->
+      <!-- ########################### Charts ########################## -->
+      <!-- ############################################################# -->
+      
+      <!-- LEAD TIME-->
+      <div class="container-fluid mt-4">
+        <div class="row g-4">
+          <div class="col-md-6">
+            <div class="card ">
+              <div class="card-body">
+                <h4 class="card-title">Lead Time Analysis</h4>
+
+                <div class="chart-container" style="height: 500px;">
+                  <canvas id="ltChart" class="chart-canvas" width="400" height="500"></canvas>
+                </div>
+
+                <p id="avgLeadTime" class="card-text">Avg. Lead Time: - days </p>
+                
+                <div style="display: flex; flex-direction: row; justify-content: end;">
+                  <button class="btn btn-secondary" id="resetChart" style="color: white;">Back</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- PIE -->
+          <div class="col-md-6">
+            <div class="card  h-100">
+              <div class="card-body d-flex justify-content-center align-items-center">
+                <canvas id="ltPie" style="width:100%; max-width:500px; height:auto;"></canvas>
+
+                <!-- <p class="card-text"></p> -->
+                <button class="btn btn-secondary" id="resetPieChart" style="color: white;">Back</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Supplier Performance -->
+      <div class="container-fluid mt-4">
+        <div class="row g-4">
+          <div class="col-md-12 mt-5">
+            <div class="card ">
+              <div class="card-body">
+                <h4 class="card-title">Supplier Performance</h4>
+                <div class="chart-container" style="height: 500px;">
+                  <canvas id="performanceChart" class="chart-canvas" height="500"></canvas>
+                </div>
+                <p class="card-text"></p>
+                <div style="display: flex; flex-direction: row; justify-content: space-between;">
+                  <div>
+                    <button id="exportPNG" class="btn btn-success">📷 Export PNG</button>
+                    <button id="exportCSV" class="btn btn-primary">📄 Export CSV</button>
+                  </div>
+                  <button class="btn btn-secondary" id="backBtn" style="color: white;">Back</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fulfillment  -->
+      <div class="container-fluid mt-4">
+        <div class="row g-4">
+          <div class="col-md-12 mt-5">
+            <div class="card ">
+              <div class="card-body">
+                <h4 class="card-title">Fulfillment % <span style="color: green;">(in Million figure)</span></h4>
+                <div class="chart-container" style="height: 500px;">
+                  <canvas id="fulfillBrandChart" class="chart-canvas" height="500"></canvas>
+                  <!-- <button class="nav-button right mt-4" id="resetFulfill" style="color: white;">Back</button> -->
+                </div>
+                <p class="card-text"></p>
+                <div style="display: flex; flex-direction: row; justify-content:end;">
+                  <button class="btn btn-secondary" id="resetFulfill" style="color: white;">Back</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cost analysis -->
+      <div class="container-fluid mt-4">
+        <div class="row g-4">
+          <div class="col-md-12 mt-5">
+            <div class="card ">
+              <div class="card-body">
+                <h4 class="card-title">Cost Analysis</h4>
+                <div class="chart-container" style="height: 400px;">
+                  <canvas id="costChart" class="chart-canvas" height="400px"></canvas>
+                </div>
+
+                <p class="card-text"></p>
+                <div style="display: flex; flex-direction: row; justify-content: space-between;">
+                  <button id="exportCostCSV" class="btn btn-primary">📄 Export CSV</button>
+                  <button class="btn btn-secondary" id="resetCostChart" style="color: white;">Back</button>
+                </div>
+
+                <p class="card-text">
+                  Average Expense:<br>
+                  Per Shipment: {{ "{:,.2f}".format(avg_per_shipment | default(0))}} <svg xmlns="http://www.w3.org/2000/svg" id="Layer_1" data-name="Layer 1" viewBox="0 0 1124.14 1256.39" width="auto" height="10" style="height: 20px;" class="icon" fill="#ffffff"><path d="M699.62 1113.02c-20.06 44.48-33.32 92.75-38.4 143.37l424.51-90.24c20.06-44.47 33.31-92.75 38.4-143.37l-424.51 90.24ZM1085.73 895.8c20.06-44.47 33.32-92.75 38.4-143.37l-330.68 70.33v-135.2l292.27-62.11c20.06-44.47 33.32-92.75 38.4-143.37l-330.68 70.27V66.13c-50.67 28.45-95.67 66.32-132.25 110.99v403.35l-132.25 28.11V0c-50.67 28.44-95.67 66.32-132.25 110.99v525.69l-295.91 62.88c-20.06 44.47-33.33 92.75-38.42 143.37l334.33-71.05v170.26l-358.3 76.14c-20.06 44.47-33.32 92.75-38.4 143.37l375.04-79.7c30.53-6.35 56.77-24.4 73.83-49.24l68.78-101.97v-.02c7.14-10.55 11.3-23.27 11.3-36.97V743.77l132.25-28.11v270.4l424.53-90.28Z" class="cls-1"></path></svg><br>
+                  Per Container: {{ "{:,.2f}".format(avg_per_container | default(0))}} <svg xmlns="http://www.w3.org/2000/svg" id="Layer_1" data-name="Layer 1" viewBox="0 0 1124.14 1256.39" width="auto" height="10" style="height: 20px;" class="icon" fill="#ffffff"><path d="M699.62 1113.02c-20.06 44.48-33.32 92.75-38.4 143.37l424.51-90.24c20.06-44.47 33.31-92.75 38.4-143.37l-424.51 90.24ZM1085.73 895.8c20.06-44.47 33.32-92.75 38.4-143.37l-330.68 70.33v-135.2l292.27-62.11c20.06-44.47 33.32-92.75 38.4-143.37l-330.68 70.27V66.13c-50.67 28.45-95.67 66.32-132.25 110.99v403.35l-132.25 28.11V0c-50.67 28.44-95.67 66.32-132.25 110.99v525.69l-295.91 62.88c-20.06 44.47-33.33 92.75-38.42 143.37l334.33-71.05v170.26l-358.3 76.14c-20.06 44.47-33.32 92.75-38.4 143.37l375.04-79.7c30.53-6.35 56.77-24.4 73.83-49.24l68.78-101.97v-.02c7.14-10.55 11.3-23.27 11.3-36.97V743.77l132.25-28.11v270.4l424.53-90.28Z" class="cls-1"></path></svg><br>
+                  Per Piece: {{ "{:,.2f}".format(avg_per_article | default(0))}}<svg xmlns="http://www.w3.org/2000/svg" id="Layer_1" data-name="Layer 1" viewBox="0 0 1124.14 1256.39" width="auto" height="10" style="height: 20px;" class="icon" fill="#ffffff"><path d="M699.62 1113.02c-20.06 44.48-33.32 92.75-38.4 143.37l424.51-90.24c20.06-44.47 33.31-92.75 38.4-143.37l-424.51 90.24ZM1085.73 895.8c20.06-44.47 33.32-92.75 38.4-143.37l-330.68 70.33v-135.2l292.27-62.11c20.06-44.47 33.32-92.75 38.4-143.37l-330.68 70.27V66.13c-50.67 28.45-95.67 66.32-132.25 110.99v403.35l-132.25 28.11V0c-50.67 28.44-95.67 66.32-132.25 110.99v525.69l-295.91 62.88c-20.06 44.47-33.33 92.75-38.42 143.37l334.33-71.05v170.26l-358.3 76.14c-20.06 44.47-33.32 92.75-38.4 143.37l375.04-79.7c30.53-6.35 56.77-24.4 73.83-49.24l68.78-101.97v-.02c7.14-10.55 11.3-23.27 11.3-36.97V743.77l132.25-28.11v270.4l424.53-90.28Z" class="cls-1"></path></svg>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- TOAST -->
+    <div id="blCopiedToast" style="
+      position: fixed;
+      z-index: 1000;
+      background: #28a745;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 4px;
+      display: none;
+      font-weight: bold;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      pointer-events: none;
+      font-size: 14px;
+    ">✔ Copied BL</div>
+
+  </main>
+
+  <script src="/static/js/index.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+    crossorigin="anonymous">
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+
+  <!-- Show tost for copy bl -->
+  <script>
+    function showtost(evt) {
+      // show toast near mouse
+      const toast = document.getElementById('blCopiedToast');
+      const mouseX = evt.native?.clientX || evt.x;
+      const mouseY = evt.native?.clientY || evt.y;
+
+      toast.style.left = `${mouseX + 10}px`;
+      toast.style.top = `${mouseY - 10}px`;
+      toast.style.display = 'block';
+
+      setTimeout(() => {
+        toast.style.display = 'none';
+      }, 1200);
+    };
+  </script>
+
+  <!-- Dinm zeros -->
+  <script>
+    document.querySelectorAll('td, th, span, div').forEach(el => {
+      if (el.textContent.trim() === "0") {
+        el.classList.add('dim-zero');
+      }
+    });
+  </script>
+
+  <!-- Leadtime chart //////////////////////////////////// Leadtime chart -->
+  <script>
+    const intervals = JSON.parse('{{ lt_intervals_data | tojson }}');
+    //console.log(intervals)
+    const brandData      = JSON.parse('{{ lt_lead_data  | tojson }}');
+    //console.log(brandData)
+
+    let drillBLs = [];
+    let isDrilldown = false;
+
+    const brands = brandData.map(d => d.brand);
+    const palette = ['#ed7d31','#5b9bd5','#70ad00','#ffc000'];
+    
+    function adjustChartHeightLeadTime(length) {
+      const canvas = document.getElementById("ltChart");
+      const canvas2 = document.getElementById("ltPie");
+      const baseHeight = 50;  // height per bar
+      const minHeight = 400;
+      const maxHeight = 1000;
+      const newHeight = Math.min(maxHeight, Math.max(minHeight, length * baseHeight));
+      canvas.parentElement.style.height = `${newHeight}px`;
+      canvas2.parentElement.style.height = `${newHeight}px`;
+    }
+
+    // Helper to build datasets from any data array
+    function buildDatasets(dataArr) {
+      return intervals.map((cfg,i) => ({
+        label: cfg.name,
+        data:  dataArr.map(d => d[cfg.name]||0),
+        backgroundColor: palette[i % palette.length],
+        borderColor:     palette[i % palette.length],
+        borderWidth: 1
+      }));
+    }
+    
+    // compute each brand's total lead time
+    const totals = brandData.map(d => 
+      intervals.reduce((sum, cfg) => sum + (d[cfg.name]||0), 0)
+    );
+    
+    // compute the overall average
+    const avg = totals.length
+      ? totals.reduce((a,b)=>a+b,0) / totals.length
+      : 0;
+    document.getElementById('avgLeadTime').textContent =
+      `Average Lead Time: ${avg.toFixed(1)} days`;
+    
+    // plugin 
+    Chart.register(ChartDataLabels);
+    
+    // text white by default
+    Chart.defaults.color = '#fff';
+    Chart.defaults.borderColor = '#fff';
+    
+    const ctx = document.getElementById('ltChart').getContext('2d');
+    const ltChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels:   brands,
+        datasets: buildDatasets(brandData)
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          tooltip: { 
+            enabled: true,
+            callbacks: {
+              label: function(context) {
+                const label = context.dataset.label || '';
+                const value = context.raw;
+                const index = context.dataIndex;
+                if (isDrilldown && drillBLs?.[index]) {
+                  const bl = drillBLs[index];
+                  return `${label}: ${value} days\nBL: ${bl}`;
+                }
+                
+                return `${label}: ${value} days`; 
+              }
+            }
+          },
+          legend:  { position: 'bottom', labels:{ color:'#fff' } },
+          datalabels: {
+            color:'white',
+            formatter: v => v.toFixed(0),
+            font: { weight:'bold', size:16 },
+            anchor:'center', align:'center', clamp:true, clip:true,
+            display: function(context) {
+              return context.dataset.data[context.dataIndex] != 0;
+            }
+          }
+        },
+        scales: { x:{ stacked:true, beginAtZero:true, ticks:{ color:'#fff' }, grid:{ color:'rgba(255,255,255,0.2)'}},
+                  y:{ stacked:true, ticks:{ color:'#fff' }, grid:{ color:'rgba(255,255,255,0.2)'}}},
+    
+        // Drill‐down on click
+        onClick: (evt, elems) => {
+          if (!elems.length) return;
+          const idx   = elems[0].index;
+
+          if (isDrilldown && drillBLs?.[idx]) {
+            const bl = drillBLs[idx];
+            navigator.clipboard.writeText(bl).then(() => {
+              console.log(`Copied BL to clipboard: ${bl}`);
+          
+              // show toast near mouse
+              const toast = document.getElementById('blCopiedToast');
+              const mouseX = evt.native?.clientX || evt.x;
+              const mouseY = evt.native?.clientY || evt.y;
+          
+              toast.style.left = `${mouseX + 10}px`;
+              toast.style.top = `${mouseY - 10}px`;
+              toast.style.display = 'block';
+          
+              setTimeout(() => {
+                toast.style.display = 'none';
+              }, 1200);
+            }).catch(err => {
+              console.warn('Failed to copy BL', err);
+            });
+            return;
+          }
+
+
+          const brand = ltChart.data.labels[idx];
+    
+          // filters
+          const monthSelect = document.querySelector('select[name="created_months[]"]');
+          const selMonths = monthSelect.value
+            ? [ monthSelect.value ]
+            : [];
+    
+          // const limit  = document.querySelector('input[name="lt_limit"]').value || 10;
+          const limit  = 1000;
+          const shipF  = document.querySelector('input[name="filter_shipment"]').value.trim();
+          const poF    = document.querySelector('input[name="filter_po"]').value.trim();
+          
+          const params = new URLSearchParams();
+          params.set('brand', brand);
+          // selBrands.forEach(b=>params.append('brands', b));
+          selMonths.forEach(m=>params.append('months', m));
+          params.set('lt_limit', limit);
+          if (shipF) params.set('filter_shipment', shipF);
+          if (poF)   params.set('filter_po', poF);
+          console.log(params.toString())
+          // fetch shipment‐level data
+          fetch(`/dashboard/leadtime/drilldown?${params}`)
+            .then(r=>r.json())
+            .then(json => {
+              ltChart.data.labels   = json.labels;
+              ltChart.data.datasets = json.datasets;
+              drillBLs = json.blnumbers || [];
+              isDrilldown = true;
+
+              adjustChartHeightLeadTime(ltChart.data.labels.length);
+
+              ltChart.update();
+              
+              // show button
+              document.getElementById('resetChart').style.display = 'inline-block';
+            })
+            .catch(console.error);
+        }
+      }
+    });
+    
+    // pie chart of total lead time by brand
+    let ltPie;
+
+    function buildInitialPieChart() {
+      if (ltPie) ltPie.destroy();
+    
+      ltPie = new Chart(document.getElementById('ltPie'), {
+        type: 'doughnut',
+        data: {
+          labels: brands,
+          datasets: [{
+            label: 'Total Lead Time by Brand',
+            data: totals,
+            backgroundColor: palette,
+            borderColor: '#fff',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            datalabels: {
+              formatter: (v, ctx) => {
+                const pct = v / totals.reduce((a, b) => a + b, 0) * 100;
+                return `${ctx.chart.data.labels[ctx.dataIndex]}\n${v.toFixed(0)}d\n(${pct.toFixed(1)}%)`;
+              },
+              color: '#fff',
+              font: { size: 11, weight: 'bold' },
+              clip: false,
+              clamp: true
+            }
+            
+          },
+          onClick: (evt, elems) => {
+            if (!elems.length) return;
+            const index = elems[0].index;
+            const brand = brands[index];
+    
+            const breakdown = brandData.find(b => b.brand === brand);
+            if (!breakdown) return;
+    
+            const intervalLabels = intervals.map(i => i.name);
+            const values = intervalLabels.map(label => breakdown[label] || 0);
+    
+            rebuildPieChartForBrand(brand, intervalLabels, values);
+          }
+        },
+        plugins: [ChartDataLabels]
+      });
+
+      // Hide reset button when in brand view
+      document.getElementById('resetPieChart').style.display = 'none';
+
+    }
+    function rebuildPieChartForBrand(brand, intervalLabels, values) {
+      if (ltPie) ltPie.destroy();
+    
+      ltPie = new Chart(document.getElementById('ltPie'), {
+        type: 'doughnut',
+        data: {
+          labels: intervalLabels,
+          datasets: [{
+            label: `Lead Time Breakdown for ${brand}`,
+            data: values,
+            backgroundColor: palette,
+            borderColor: '#fff',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            datalabels: {
+              formatter: (v, ctx) => {
+                const total = values.reduce((a, b) => a + b, 0);
+                const pct = total ? (v / total * 100) : 0;
+                return `${ctx.chart.data.labels[ctx.dataIndex]}: ${v.toFixed(1)}d\n(${pct.toFixed(1)}%)`;
+              },
+              color: '#fff',
+              font: { size: 11, weight: 'bold' }
+            }
+          }
+        },
+        plugins: [ChartDataLabels]
+      });
+
+      // Show reset button
+      document.getElementById('resetPieChart').style.display = 'inline-block';
+    }
+
+    document.getElementById('resetPieChart').addEventListener('click', () => {
+      buildInitialPieChart();
+    });
+    
+    buildInitialPieChart();
+
+    // resets the top‐level view 
+    document.getElementById('resetChart').addEventListener('click', () => {
+      ltChart.data.labels   = brands;
+      ltChart.data.datasets = buildDatasets(brandData);
+      isDrilldown = false;
+
+      adjustChartHeightLeadTime(ltChart.data.labels.length);
+
+      ltChart.update();
+      document.getElementById('resetChart').style.display = 'none';
+    });
+    
+    // Initially hide the back button
+    document.getElementById('resetChart').style.display = 'none';
+
+  </script>
+
+  <!-- Cost chart ///////////////////////////////////// Cost chart and pie chart  -->
+  <script>
+    function adjustChartHeight(length) {
+      const canvas = document.getElementById("costChart");
+      const baseHeight = 50;  // height per bar
+      const minHeight = 400;
+      const maxHeight = 1000;
+      const newHeight = Math.min(maxHeight, Math.max(minHeight, length * baseHeight));
+      canvas.parentElement.style.height = `${newHeight}px`;
+    }
+
+    function getOrCreateTooltip(chart) {
+      let el = chart.canvas.parentNode.querySelector('.external-tooltip');
+      if (!el) {
+        el = document.createElement('div');
+        el.className = 'external-tooltip';
+        el.style.position = 'absolute';
+        el.style.background = '#222';
+        el.style.color = 'white';
+        el.style.padding = '8px 12px';
+        el.style.borderRadius = '6px';
+        el.style.fontSize = '12px';
+        el.style.pointerEvents = 'none';
+        el.style.transition = 'all 0.1s ease';
+        el.style.zIndex = 100;
+        chart.canvas.parentNode.appendChild(el);
+      }
+      return el;
+    }
+
+    // 1) Data from the server
+    const costData    = JSON.parse('{{ cost_data     | tojson }}');
+    const costLabels  = costData.map(d => d.brand);
+    const costMonths  = JSON.parse('{{ all_created_months | tojson }}');
+    const costCats    = JSON.parse('{{ all_categories   | tojson }}');
+    
+    let isShipDrilldown = false;
+
+    // 2) Which fields to plot
+    const costFields  = [
+      "FreightCost","SaberSADDAD","CustomDuties",
+      "DemurrageCharges","Penalties","OtherCharges",
+      "YardCharges","DO_Port_Charges",
+      "ClearanceTransportCharges",
+      "InspectionCharges","MAWANICharges"
+    ];
+    const fieldLabels = costFields.map(f =>
+      f.replace(/_/g,' ').replace(/\b\w/g, c => c.toUpperCase())
+    );
+    
+    // At load, prepare full meta from costData for brand level
+    const brandMeta = {
+      num_containers:   costData.map(d => d.num_containers || 0),
+      cost_per_ctn:     costData.map(d =>
+        d.num_containers ? (d.total_expense / d.num_containers).toFixed(0) : 0
+      )
+    };
+    
+    function buildCostDatasets(dataArr) {
+      return costFields.map((fld,i) => ({
+        label:           fieldLabels[i],
+        data:            dataArr.map(d => d[fld] || 0),
+        backgroundColor: palette[i % palette.length],
+        borderColor:     palette[i % palette.length],
+        borderWidth:     1
+      }));
+    }
+
+    // 5) Register plugins & defaults
+    Chart.register(ChartDataLabels);
+    Chart.defaults.color       = '#fff';
+    Chart.defaults.borderColor = '#fff';
+    
+    // ─── The main (bar) chart ─────────────────────────────
+    const costCtx   = document.getElementById('costChart').getContext('2d');
+    const costChart = new Chart(costCtx, {
+      type: 'bar',
+      data: {
+        labels:   costLabels,
+        datasets: buildCostDatasets(costData)
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: {
+          mode: 'nearest',
+          axis: 'y',
+          intersect: false
+        },
+        elements: {
+          bar: {
+            borderRadius: 4,
+            minBarLength: 4   // ✅ Ensures even tiny values like 420 are visible
+          }
+        },
+        scales: {
+          x: { 
+            stacked: true, 
+            beginAtZero: true,
+            ticks: {
+              color: '#fff',
+              callback: function (value) {
+                if (value >= 1_000_000) return (value / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M';
+                if (value >= 1_000) return (value / 1_000).toFixed(1).replace(/\.0$/, '') + 'K';
+                return value;
+              }
+            },
+            grid: { color: 'rgba(255,255,255,0.2)' }
+          },
+          y: { 
+            stacked: true, 
+            ticks: { color: '#fff' }, 
+            grid: { color: 'rgba(255,255,255,0.2)' }
+          }
+        },
+        plugins: {
+          legend: { position: 'bottom', labels: { color: '#fff' } },
+          datalabels: { 
+            color: 'white', 
+            font: { weight: 'bold', size: 12 }, 
+            display: function(context) {
+              return context.dataset.data[context.dataIndex] != 0;
+            },
+            anchor: 'center',
+            align: 'center',
+            clamp: true,
+            clip: true 
+          },
+          tooltip: {
+            enabled: false,
+            external: function(context) {
+              const chart = context.chart;
+              const tooltip = context.tooltip;
+              const tooltipEl = getOrCreateTooltip(chart);
+              if (!tooltip || !tooltip.dataPoints?.length) {
+                tooltipEl.style.opacity = 0;
+                return;
+              }
+      
+              const index = tooltip.dataPoints[0].dataIndex;
+              const datasets = chart.data.datasets;
+              const meta = costChart.meta || {};
+      
+              const rows = datasets.map(ds => ({
+                label: ds.label,
+                value: ds.rawData?.[index] ?? ds.data[index] ?? 0,
+                color: ds.backgroundColor
+              }))
+              .filter(row => row.value > 0)
+              .sort((a, b) => b.value - a.value);
+      
+              const lines = rows.map(row => `
+                <div style="display:flex;align-items:center;">
+                  <span style="width:10px;height:10px;border-radius:50%;margin-right:6px;background:${row.color}"></span>
+                  <span>${row.label}: ${row.value.toLocaleString()} <svg xmlns="http://www.w3.org/2000/svg" id="Layer_1" data-name="Layer 1" viewBox="0 0 1124.14 1256.39" width="auto" height="5" style="height:15px" class="icon" fill="#ffffff"><path d="M699.62 1113.02c-20.06 44.48-33.32 92.75-38.4 143.37l424.51-90.24c20.06-44.47 33.31-92.75 38.4-143.37l-424.51 90.24ZM1085.73 895.8c20.06-44.47 33.32-92.75 38.4-143.37l-330.68 70.33v-135.2l292.27-62.11c20.06-44.47 33.32-92.75 38.4-143.37l-330.68 70.27V66.13c-50.67 28.45-95.67 66.32-132.25 110.99v403.35l-132.25 28.11V0c-50.67 28.44-95.67 66.32-132.25 110.99v525.69l-295.91 62.88c-20.06 44.47-33.33 92.75-38.42 143.37l334.33-71.05v170.26l-358.3 76.14c-20.06 44.47-33.32 92.75-38.4 143.37l375.04-79.7c30.53-6.35 56.77-24.4 73.83-49.24l68.78-101.97v-.02c7.14-10.55 11.3-23.27 11.3-36.97V743.77l132.25-28.11v270.4l424.53-90.28Z" class="cls-1"></path></svg></span>
+                </div>`);
+      
+              const numCtn = meta.num_containers?.[index] ?? 'N/A';
+              const costCtn = meta.cost_per_ctn?.[index] ?? 'N/A';
+              lines.push(`<div style="margin-top:6px;">Containers: ${numCtn}</div>`);
+              lines.push(`<div>Per Container: ${costCtn.toLocaleString()} <svg xmlns="http://www.w3.org/2000/svg" id="Layer_1" data-name="Layer 1" viewBox="0 0 1124.14 1256.39" width="auto" height="10" style="height:15px" class="icon" fill="#8A20FF"><path d="M699.62 1113.02c-20.06 44.48-33.32 92.75-38.4 143.37l424.51-90.24c20.06-44.47 33.31-92.75 38.4-143.37l-424.51 90.24ZM1085.73 895.8c20.06-44.47 33.32-92.75 38.4-143.37l-330.68 70.33v-135.2l292.27-62.11c20.06-44.47 33.32-92.75 38.4-143.37l-330.68 70.27V66.13c-50.67 28.45-95.67 66.32-132.25 110.99v403.35l-132.25 28.11V0c-50.67 28.44-95.67 66.32-132.25 110.99v525.69l-295.91 62.88c-20.06 44.47-33.33 92.75-38.42 143.37l334.33-71.05v170.26l-358.3 76.14c-20.06 44.47-33.32 92.75-38.4 143.37l375.04-79.7c30.53-6.35 56.77-24.4 73.83-49.24l68.78-101.97v-.02c7.14-10.55 11.3-23.27 11.3-36.97V743.77l132.25-28.11v270.4l424.53-90.28Z" class="cls-1"></path></svg></div>`);
+      
+              tooltipEl.innerHTML = lines.join('');
+              tooltipEl.style.opacity = 1;
+              tooltipEl.style.left = chart.canvas.offsetLeft + tooltip.caretX + 'px';
+              tooltipEl.style.top = chart.canvas.offsetTop + tooltip.caretY + 'px';
+              tooltipEl.style.pointerEvents = 'none';
+            }
+          }
+        },
+        onClick: (evt, elems) => {
+          if (!elems.length) return;
+          const idx = elems[0].index;
+
+          // If clicked the same bar again within 1.5s, copy BL
+          if (isShipDrilldown) {
+            const bl = costChart.meta?.bl_list?.[idx];
+            if (bl) {
+              navigator.clipboard.writeText(bl).then(() => {
+                console.log(`Copied BL to clipboard: ${bl}`);
+                const toast = document.getElementById('blCopiedToast');
+                const mouseX = evt.native?.clientX || evt.x;
+                const mouseY = evt.native?.clientY || evt.y;
+        
+                toast.style.left = `${mouseX + 10}px`;
+                toast.style.top = `${mouseY - 10}px`;
+                toast.style.display = 'block';
+                setTimeout(() => {
+                  toast.style.display = 'none';
+                }, 1200);
+              }).catch(err => console.warn('Failed to copy BL', err));
+            }
+            return;
+          }
+
+          const brand = costChart.data.labels[idx];
+          fetch(`/dashboard/cost/drilldown?brand=${encodeURIComponent(brand)}`)
+            .then(r => r.json())
+            .then(json => {
+              //console.log("FULL JSON:", json); 
+              
+              costChart.data.labels = json.labels;
+              costChart.data.datasets = json.datasets;
+              costChart.meta = json.meta;
+
+              // First click logic: Fetch drilldown
+              isShipDrilldown = true;
+
+              adjustChartHeight(costChart.data.labels.length);
+              costChart.update();
+
+              document.getElementById('resetCostChart').style.display = 'inline-block';
+              //console.log("Chart Labels:", costChart.data.labels);
+              //costChart.data.datasets.forEach((ds, i) => {
+              //  console.log(`Dataset ${i} (${ds.label}):`, ds.data);
+              //});
+            })
+            .catch(console.error);
+        }
+      }
+    });
+    costChart.meta = brandMeta;
+    
+    // ─── Reset button: back to brand view ─────────────────
+    document.getElementById('resetCostChart').addEventListener('click', () => {
+      // reset bar chart
+      costChart.data.labels   = costLabels;
+      costChart.data.datasets = buildCostDatasets(costData);
+      costChart.meta          = brandMeta;  
+
+      adjustChartHeight(costLabels.length);
+
+      costChart.update();
+      // First click logic: Fetch drilldown
+      isShipDrilldown = false;
+
+      document.getElementById('resetCostChart').style.display = 'none';
+    });
+
+    document.getElementById('resetCostChart').style.display = 'none';
+
+    function exportChartToCSV(chart) {
+      const rows = [];
+      const labels = chart.data.labels;
+      const datasets = chart.data.datasets;
+  
+      // Determine if this is brand or shipment level
+      const isBrandLevel = labels.length && chart.meta?.cost_per_ctn !== undefined;
+  
+      // Header row
+      const header = [...(isBrandLevel ? ["Brand"] : ["Brand", "Shipment"])];
+  
+      datasets.forEach(ds => header.push(ds.label));
+      if (isBrandLevel) {
+        header.push("Containers", "Cost/Container");
+      } else {
+        header.push("Containers", "Cost/Container");
+      }
+  
+      rows.push(header);
+  
+      // Loop through each label (row)
+      labels.forEach((label, idx) => {
+        const row = [];
+  
+        if (isBrandLevel) {
+          row.push(label);
+        } else {
+          const brand = chart.meta?.brands?.[idx] || "N/A";
+          row.push(brand, label); // brand, shipment
+        }
+  
+        datasets.forEach(ds => {
+          row.push(ds.data[idx] ?? 0);
+        });
+  
+        // Meta data
+        const containers = chart.meta?.num_containers?.[idx] ?? 0;
+        const costPerCtn = chart.meta?.cost_per_ctn?.[idx] ?? 0;
+        row.push(containers, costPerCtn);
+  
+        rows.push(row);
+      });
+  
+      // Convert to CSV string
+      const csvContent = rows.map(row => row.join(",")).join("\n");
+  
+      // Create blob and download
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+  
+      const fileType = isBrandLevel ? "brand" : "shipment";
+      const now = new Date();
+      const timestamp = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
+      link.download = `CostData_${fileType}_${timestamp}.csv`;
+  
+      link.style.display = "none";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  
+    // Bind to button
+    document.getElementById("exportCostCSV").addEventListener("click", () => {
+      exportChartToCSV(costChart);
+    });
+  </script> 
+
+
+  <!-- Fulfillment chart -->
+  <script>
+    const brandData2 = JSON.parse('{{ brand_data | tojson }}');
+    const brands2     = brandData2.map(d => d.brand);
+    const deliveredB = brandData2.map(d => d.delivered_pct);
+    const intransitB = brandData2.map(d => d.intransit_pct);
+    const openB      = brandData2.map(d => d.open_pct);
+
+    Chart.defaults.color = '#fff';
+    Chart.defaults.borderColor = '#555';  // slight border color for black theme
+    Chart.defaults.font.size = 14;
+
+    const fctx = document.getElementById('fulfillBrandChart').getContext('2d');
+
+    Chart.register(ChartDataLabels);
+
+    const brandChart = new Chart(fctx, {
+      type: 'bar',
+      data: {
+        labels: brands2,
+        datasets: [
+          {
+            label: 'Delivered',
+            data: deliveredB,
+            backgroundColor: '#4CAF50',
+            valueLabels: brandData2.map(d => d.delivered_label)
+          },
+          {
+            label: 'In-Transit',
+            data: intransitB,
+            backgroundColor: '#2196F3',
+            valueLabels: brandData2.map(d => d.intransit_label)
+          },
+          {
+            label: 'Open Qty',
+            data: openB,
+            backgroundColor: '#FF6384',
+            valueLabels: brandData2.map(d => d.open_label)
+          }
+        ]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          datalabels: {
+            color: '#fff',
+            font: { size: 16, weight: 'bold' },
+            formatter: function(value, context) {
+              const chart = context.chart;
+              const datasetIndex = context.datasetIndex;
+              const dataIndex = context.dataIndex;
+            
+              const dataset = chart.data.datasets[datasetIndex];
+              const valueLabels = dataset.valueLabels || [];
+              return valueLabels[dataIndex] || '';
+            },
+            display: function(context) {
+              return context.dataset.data[context.dataIndex] > 0;
+            }
+          },
+          legend: {
+            labels: { color: '#fff', font: { size: 14 } }
+          }
+        },
+        scales: {
+          x: {
+            stacked: true,
+            max: 100,
+            ticks: {
+              callback: v => v + '%',
+              color: '#ccc'
+            },
+            grid: { color: '#444' }
+          },
+          y: {
+            stacked: true,
+            ticks: { color: '#ccc' },
+            grid: { color: '#444' }
+          }
+        },
+        onClick: (evt, elems) => {
+          if (!elems.length) return;
+          const idx   = elems[0].index;
+          const brand = brands[idx];
+          fetch(`/dashboard/fulfillment/drilldown?brand=${encodeURIComponent(brand)}`)
+          .then(r => r.json())
+          .then(json => {
+            brandChart.data.labels = json.labels;
+            brandChart.data.datasets = [
+              {
+                label: 'Delivered',
+                data: json.delivered,
+                backgroundColor: '#00C49A',
+                valueLabels: json.delivered_label
+              },
+              {
+                label: 'In-Transit',
+                data: json.intransit,
+                backgroundColor: '#3399FF',
+                valueLabels: json.intransit_label
+              },
+              {
+                label: 'Open Qty',
+                data: json.open,
+                backgroundColor: '#FF6E6E',
+                valueLabels: json.open_label
+              }
+            ];
+            
+            brandChart.options.plugins.datalabels = {
+              color: '#fff',
+              font: { size: 16, weight: 'bold' },
+              formatter: function(value, context) {
+                const chart = context.chart;
+                const datasetIndex = context.datasetIndex;
+                const dataIndex = context.dataIndex;
+            
+                const dataset = chart.data.datasets[datasetIndex];
+                const valueLabels = dataset.valueLabels || [];
+                return valueLabels[dataIndex] || '';
+              },
+              display: function(context) {
+                return context.dataset.data[context.dataIndex] > 0;
+              }
+            };
+            
+            // Dynamically resize the chart height
+            const canvas = document.getElementById("fulfillBrandChart");
+            const baseHeight = 50;  // height per bar
+            const minHeight = 400;
+            const maxHeight = 1000;
+            const newHeight = Math.min(maxHeight, Math.max(minHeight, brandChart.data.labels.length * baseHeight));
+            canvas.parentElement.style.height = `${newHeight}px`;
+
+            brandChart.update();  
+            document.getElementById('resetFulfill').style.display = 'inline-block';
+          });
+        }
+      }
+    });
+
+    // Reset button logic to go back to brand level
+    document.getElementById('resetFulfill').addEventListener('click', () => {
+      brandChart.data.labels = brands2;
+      brandChart.data.datasets = [
+        {
+          label: 'Delivered',
+          data: deliveredB,
+          backgroundColor: '#00C49A',
+          valueLabels: brandData2.map(d => d.delivered_label)
+        },
+        {
+          label: 'In-Transit',
+          data: intransitB,
+          backgroundColor: '#3399FF',
+          valueLabels: brandData2.map(d => d.intransit_label)
+        },
+        {
+          label: 'Open Qty',
+          data: openB,
+          backgroundColor: '#FF6E6E',
+          valueLabels: brandData2.map(d => d.open_label)
+        }
+      ];
+
+      // Dynamically resize the chart height
+      const canvas = document.getElementById("fulfillBrandChart");
+      const baseHeight = 50;  // height per bar
+      const minHeight = 400;
+      const maxHeight = 1000;
+      const newHeight = Math.min(maxHeight, Math.max(minHeight, brandChart.data.labels.length * baseHeight));
+      canvas.parentElement.style.height = `${newHeight}px`;
+
+      brandChart.update();
+      document.getElementById('resetFulfill').style.display = 'none';
+    });
+    
+
+    // Hide reset button on first load
+    document.getElementById('resetFulfill').style.display = 'none';
+  </script>
+
+  <!-- Supplier Performance -->
+  <script>
+    let currentLevel = "brand";
+    let currentBrand = null;
+    let currentShipment = null;
+    
+    const ctx2 = document.getElementById("performanceChart").getContext("2d");
+    let chart;
+    
+    const fontSize = 14;
+    
+    function renderChart(json) {
+      const isPO = json.level === "po";
+      const labels = json.labels;
+      const values = json.days;
+      const toolDays = json.days;
+      const colors = json.colors;
+    
+      if (chart) chart.destroy();
+
+      // Dynamically resize the chart height
+      const canvas = document.getElementById("performanceChart");
+      const baseHeight = 50;  // height per bar
+      const minHeight = 400;
+      const maxHeight = 1000;
+      const newHeight = Math.min(maxHeight, Math.max(minHeight, labels.length * baseHeight));
+      canvas.parentElement.style.height = `${newHeight}px`;
+    
+      chart = new Chart(ctx2, {
+        type: "bar",
+        data: {
+          labels: labels,
+          datasets: [{
+            label: isPO ? "Fulfillment %" : "Time (Days)",
+            data: values,
+            backgroundColor: colors,
+            borderRadius: 6,
+            borderSkipped: false,
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => {
+                  const i = ctx.dataIndex;
+                  if (json.level === 'po') {
+                    return `${ctx.label}: ${json.percent[i]}%  (${toolDays[i]} days)`;
+                  }
+                  return `${ctx.label}: ${toolDays[i]} days`;
+                }
+              },
+              bodyFont: { size: fontSize + 1 }
+            }
+          },
+          scales: {
+            x: {
+              max: undefined,
+              ticks: {
+                color: "#ccc",
+                font: { size: fontSize },
+                callback: (v) => isPO ? v : v,
+              },
+              grid: { color: "#333" }
+            },
+            y: {
+              ticks: {
+                color: "#ccc",
+                font: { size: fontSize }
+              },
+              grid: { color: "#333" }
+            }
+          },
+          onClick: (evt, elems) => {
+            if (!elems.length) return;
+            const idx = elems[0].index;
+    
+            if (json.level === "brand") {
+              currentBrand = json.labels[idx];
+              fetchData({ brand: currentBrand });
+            } else if (json.level === "shipment") {
+              const shipLabel = json.labels[idx];
+              const shipID = /\((\d+)\)/.exec(shipLabel)?.[1];
+              if (shipID) {
+                currentShipment = shipID;
+                fetchData({ shipment: currentShipment });
+              }
+            }
+          }
+        }
+      });
+    }
+    
+    function fetchData(params = {}) {
+      const url = new URL("/dashboard/supplier/performance", window.location.origin);
+      if (params.brand) url.searchParams.set("brand", params.brand);
+      if (params.shipment) url.searchParams.set("shipment", params.shipment);
+    
+      fetch(url)
+        .then(r => r.json())
+        .then(json => {
+          currentLevel = json.level;
+          renderChart(json);
+        });
+    }
+    
+    // Back logic
+    document.getElementById("backBtn").addEventListener("click", () => {
+      if (currentLevel === "po") {
+        fetchData({ brand: currentBrand });
+        currentShipment = null;
+      } else if (currentLevel === "shipment") {
+        fetchData();
+        currentBrand = null;
+      }
+    });
+    
+    // PNG export
+    document.getElementById("exportPNG").addEventListener("click", () => {
+      const link = document.createElement("a");
+      link.download = `supplier-performance-${currentLevel}.png`;
+      link.href = chart.toBase64Image();
+      link.click();
+    });
+    
+    // CSV export
+    document.getElementById("exportCSV").addEventListener("click", () => {
+      const labels = chart.data.labels;
+      const values = chart.data.datasets[0].data;
+      const rows = [["Label", currentLevel === "po" ? "Fulfillment %" : "Days"]];
+      for (let i = 0; i < labels.length; i++) {
+        rows.push([labels[i], values[i]]);
+      }
+    
+      const csv = rows.map(r => r.join(",")).join("\n");
+      const blob = new Blob([csv], { type: "text/csv" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `supplier-performance-${currentLevel}.csv`;
+      link.click();
+    });
+    
+    // Initial chart load
+    fetchData();
+  </script>
+  
+  <!-- Warehouse x Brands Pie chart -->
+  <script>
+    const pieLabels = JSON.parse('{{ pie_labels | tojson }}');
+    const pieValues = JSON.parse('{{ pie_values | tojson }}');
+  
+    const ctx3 = document.getElementById('warehousePieChart').getContext('2d');
+    const warehousePieChart = new Chart(ctx3, {
+      type: 'pie',
+      data: {
+        labels: pieLabels,
+        datasets: [{
+          data: pieValues,
+          backgroundColor: [
+            '#4e79a7', '#f28e2b', '#e15759', '#76b7b2',
+            '#59a14f', '#edc949', '#af7aa1', '#ff9da7',
+            '#9c755f', '#bab0ab'
+          ],
+          borderColor: '#fff',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'right' },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const val = context.parsed;
+                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                const pct = ((val / total) * 100).toFixed(1);
+                return `${context.label}: ${val} containers (${pct}%)`;
+              }
+            }
+          },
+          datalabels: {
+            color: '#fff',
+            formatter: function(value, context) {
+              const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+              const pct = (value / total) * 100;
+              return pct > 2 ? `${pct.toFixed(1)}%` : '';  // hide labels <2%
+            }
+          }
+        }
+      },
+      plugins: [ChartDataLabels]
+    });
+    
+  </script>
+
+  <!-- PORT x Brands Pie chart -->
+  <script>
+    const pieLabels2 = JSON.parse('{{ pie_labels2 | tojson }}');
+    
+    const pieValues2 = JSON.parse('{{ pie_values2 | tojson }}');
+  
+    const ctx4 = document.getElementById('portPieChart').getContext('2d');
+    const portPieChart = new Chart(ctx4, {
+        type: 'pie',
+        data: {
+          labels: pieLabels2,
+          datasets: [{
+            data: pieValues2,
+            backgroundColor: [
+              '#4e79a7', '#f28e2b', '#e15759', '#76b7b2',
+              '#59a14f', '#edc949', '#af7aa1', '#ff9da7',
+              '#9c755f', '#bab0ab'
+            ],
+            borderColor: '#fff',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'right' },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const val = context.parsed;
+                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                  const pct = ((val / total) * 100).toFixed(1);
+                  return `${context.label}: ${val} containers (${pct}%)`;
+                }
+              }
+            },
+            datalabels: {
+              color: '#fff',
+              formatter: function(value, context) {
+                const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                const pct = (value / total) * 100;
+                return pct > 2 ? `${pct.toFixed(1)}%` : '';  // Hide labels <2%
+              }
+            }
+          }
+        },
+        plugins: [ChartDataLabels]
+      });
+  </script>
+
+  <!-- ATA-WH (months) x Number of containers -->
+  <script>
+    const labels = JSON.parse('{{ brand_cols3 | tojson }}');
+    const tableData = JSON.parse('{{ table_data3 | tojson }}');
+
+    // Extract values
+    const totalData = tableData.find(r => r[0] === "Total (excluding DTC)").slice(1);
+    const dtcData = tableData.find(r => r[0] === "DTC").slice(1);
+
+    new Chart(document.getElementById('dtcTotalChart'), {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Total (excluding DTC)',
+            data: totalData,
+            backgroundColor: 'rgba(54, 162, 235, 0.7)'
+          },
+          {
+            label: 'DTC',
+            data: dtcData,
+            backgroundColor: 'rgba(255, 99, 132, 0.7)'
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: 'top' },
+          tooltip: { mode: 'index', intersect: false }
+        },
+        scales: {
+          x: {
+            stacked: false,
+            title: { display: true, text: 'Month-Year' }
+          },
+          y: {
+            beginAtZero: true,
+            title: { display: true, text: 'Number of Containers' }
+          }
+        }
+      }
+    });
+  </script>
+
+</body>
+
+</html>

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block page_heading_1  %}Finance{% endblock %}
+{% block page_heading_2  %}Reports{% endblock %}
+{% block page_heading_3 %}Article Expense Analysis{% endblock %} 
+
+
+{% block heading_width %}width: 210px; {% endblock %}
+
+{% block content %}  
+<table id="myTable" class="table table-responsive" style="color: black;">
+    <thead>
+    <tr>
+        {% for col in columns %}
+        <th data-col="{{ col.name }}">{{ col.label }}</th>
+        {% endfor %}
+    </tr>
+    </thead>
+    <tbody>
+    {% for row in rows %}
+        <tr>
+        {% for col in columns %}
+            <td class="col-{{ col.name }}">
+                {% set val = row[col.name] %}
+                {% if val is number %}
+                    {{ row.get(col.name)|usd }}
+                {% else %}
+                    {{ val }}
+                {% endif %}
+            </td>
+        {% endfor %}
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}  

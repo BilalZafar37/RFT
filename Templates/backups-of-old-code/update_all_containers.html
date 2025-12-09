@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="apple-touch-icon" sizes="76x76" href="/static/img/apple-icon.png">
+  <link rel="icon" type="image/png" href="/static/img/favicon.png">
+  <title>
+    RFT System</title>
+  <link rel="stylesheet" href="/static/css/index.css">
+  <!-- Fonts and icons -->
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900|Roboto+Slab:400,700" />
+  <link href="/static/css/nucleo-icons.css" rel="stylesheet" />
+  <link href="/static/css/nucleo-svg.css" rel="stylesheet" />
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  <link id="pagestyle" href="/static/css/material-dashboard.css?v=3.1.0" rel="stylesheet" />
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+
+<style>
+  .filter-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding-left: 19px;
+  }
+
+  .filter-container select,
+  .filter-container input {
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+  .bg-gradient-primary {
+    background-image: linear-gradient(195deg, #4054ec 0%, #D81B60 100%);
+  }
+  .dropdown-container {
+    display: block;
+    padding-left: 8px;
+  }
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  .dropdown-btn {
+    padding: 6px 8px 6px 16px;
+    text-decoration: none;
+    font-size: 20px;
+    color: #818181;
+    display: block;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    outline: none;
+  }
+  .hov:hover {
+    display: flex;
+    width: 169px;
+    border: none;
+    border-radius: 5px;
+    background-image: linear-gradient(195deg, #4054ec 0%, #D81B60 100%);
+  }
+  .numbadge {
+    --bs-badge-padding-x: 0.5em;
+    --bs-badge-padding-y: 0.5em;
+    --bs-badge-font-size: 0.75em;
+    --bs-badge-font-weight: 700;
+    --bs-badge-color: #fff;
+    --bs-badge-border-radius: 10rem;
+    display: inline-block;
+    padding: var(--bs-badge-padding-y) var(--bs-badge-padding-x);
+    font-size: var(--bs-badge-font-size);
+    font-weight: var(--bs-badge-font-weight);
+    line-height: 1;
+    color: var(--bs-badge-color);
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: var(--bs-badge-border-radius);
+  }
+  .border2 {
+    border: 2px solid #000 !important;
+  }
+  .input-custom {
+    background-color: #f8f9fa;
+    border: none;
+    border-bottom: 2px solid #ced4da;
+    padding: 10px;
+    border-radius: 0;
+    outline: none;
+  }
+
+  .input-custom:focus {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #4054ec;
+    box-shadow: none;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  label {
+    font-weight: bold;
+  }
+
+  .btn-primary {
+    background-color: #4054ec;
+    border-color: #4054ec;
+  }
+
+  .btn-primary:hover {
+    background-color: #3547d3;
+    border-color: #3547d3;
+  }
+  .instructions {
+      /* font-size: 5px; */
+      color: #51d94f; /* Bootstrap danger color */
+      background-color: #fbfe12; /* Bootstrap danger background */
+      border: 1px solid #ebccd1; /* Bootstrap danger border */
+      padding: 5px;
+      border-radius: 4px;
+      margin-bottom: 15px;
+      font-weight: 500;
+  }
+</style>
+
+<body class="g-sidenav-show bg-gray-200">
+  <!-- SERCHABLE DROPDOWNS -->
+  <!-- Include jQuery and Select2 JS -->
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+  <script>
+    $(document).ready(function () {
+        $("#brandFilter ").select2({
+            multiple: true,
+            allow_clear:true,
+        });
+    });
+  </script>
+  {% include 'sidebar.html' %}  
+  <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg">
+    <!-- Navbar -->
+    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur" data-scroll="true">
+      <div class="container-fluid py-1 px-3">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
+            <li class="breadcrumb-item text-sm"><a class="opacity-5 text-dark" href="javascript:;">Home</a></li>
+            <li class="breadcrumb-item text-sm text-dark active" aria-current="page">Shipments</li>
+          </ol>
+          <h6 class="font-weight-bolder mb-0">Containers</h6>
+        </nav>
+        <ul class="navbar-nav justify-content-end">
+          <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
+            <a href="javascript:;" class="nav-link text-body p-0" id="iconNavbarSidenav">
+              <div class="sidenav-toggler-inner">
+                <i class="sidenav-toggler-line"></i>
+                <i class="sidenav-toggler-line"></i>
+                <i class="sidenav-toggler-line"></i>
+              </div>
+            </a>
+          </li>
+          <li class="nav-item d-flex align-items-center">
+            <a href="#" class="nav-link text-body font-weight-bold px-0">
+              <i class="fa fa-user me-sm-1" style="font-size: 1.275rem;"></i>
+              <span class="d-sm-inline d-none" style="font-size: 1.275rem;">{{session['username']}}</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <!-- End Navbar -->
+    <div class="container-fluid py-4">
+      <div class="row">
+        <div class="col-12">
+          <div class="card my-4">
+            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+              <div class="bg-gradient-dark shadow-primary border-radius-lg pt-4 pb-3">
+                <h6 class="btn-outline-primary bg-gradient-primary text-white text-capitalize ps-3" style="height: fit-content; width: 180px; cursor: pointer; border-top-right-radius: 5px; border-bottom-right-radius: 5px;">Containers Updates</h6>
+              </div>
+            </div>
+            <div class="card-body px-0 pb-2"  style="padding: 2px;">
+              {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                  {% for category, message in messages %}
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+              <!-- TEST FLASH BLOCK -->
+                {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert" style="color: white;">
+                  {{ message }}
+                  <button type="button" class="btn-close" style="color: white;" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+              {% endfor %}
+                {% endif %}
+              {% endwith %}
+                  {% endfor %}
+                {% endif %}
+              {% endwith %}
+              <div class="filter-container " style="
+                z-index: 1; 
+                
+                background-color: #f5f5f5;
+                border: 1px solid #ddd !important;
+                padding: 10px;
+                margin: 5px;
+                /* margin-bottom: 10px; */
+                ">
+                <!-- Brand Name Filter -->
+                <!-- onchange="filterTable('brandFilter', 1)" -->
+                <select id="brandFilter" onchange="filterTable('brandFilter', 1)" multiple>
+                  <option value="" selected disabled>Brand Name</option>
+                  {% for brand in brand_names2 %}
+                  <option value="{{brand}}">{{brand}}</option>
+                  {% endfor %}
+                </select>
+
+                <!-- siteFilter Filter -->
+                <select id="siteFilter" onchange="filterTable('siteFilter', 0)">
+                  <option value="" selected disabled>Filter By Site</option>
+                  {% for site in sites2 %}
+                  <option value="{{site}}">{{site}}</option>
+                  {% endfor %}
+                </select>
+
+                <!-- User selected types Filter -->
+                <select id="deliverystatusFilter" onchange="filterTable('deliverystatusFilter', 1)">
+                  <option value="" selected disabled>Filter by Delivery Status</option>
+                  {% for status in status_list %}
+                  <option value="{{ status }}" >{{ status }}</option>
+                  {% endfor %}
+                </select>
+                
+                <!-- Customer Name Filter -->
+                <input id="customerFilter" placeholder="Filter Customer Name" oninput="filterTable('customerFilter', 2)" />
+                
+                <!-- Delivery Note Filter (Number Input) -->
+                <input type="number" id="deliveryFilter" oninput="filterTable('deliveryFilter', 4)" placeholder="Filter by Delivery Note" />
+
+                <!-- SO Filter (Number Input) -->
+                <input type="number" id="soFilter" oninput="filterTable('soFilter', 3)" placeholder="Filter by Sales Document" />
+
+                <!-- Billing DOC Filter (Number Input) -->
+                <input type="number" id="billingFilter" oninput="filterTable('billingFilter', 5)" placeholder="Filter by Billing Document" />
+
+                <!-- NET VAL Filter (Number Input) -->
+                <input type="number" id="netvalFilter" oninput="filterTable('netvalFilter', 6)" placeholder="Filter by NetValue" />
+
+                <!-- NET VAL Filter (Number Input) -->
+                <input type="month" id="createdOnFilter" oninput="filterTable('createdOnFilter', 6)" placeholder="Created Month e.g Jan,FEB" />
+
+                <button type="submit" class="btn btn-primary">
+                  Update Containers
+                </button>
+
+              </div>
+              <div id="show_submited_data" class="shadow-success border-radius-lg mb-3 ms-3">
+                <div class="container-fluid py-2 backgroundColor text-dark">
+                  <form method="post">
+                    <input
+                      type="hidden"
+                      name="containers_count"
+                      value="{{ containers|length }}"
+                    >
+                  
+                    <table class="table table-striped table-sm">
+                      <thead>
+                        <tr>
+                          <th class="text-center">Sr.<input type="checkbox" id="select-all"></th>
+                          <th>Shipment Number</th>
+                          <th>Container No.</th>
+                          <th>ATD Origin</th>
+                          <th>ATA Port</th>
+                          <th>ATD Port</th>
+                          <th>ATA WH</th>
+                          <th>Yard In</th>
+                          <th>Yard Out</th>
+                          <th>Remarks</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for row in containers %}
+                          <tr>
+                            <td class="text-center">
+                              {{ loop.index}}
+                              <input 
+                                type="checkbox" 
+                                class="item-checkbox"
+                                name="containers[{{ loop.index0 }}][id]" 
+                                value="{{ row.id }}"
+                              >
+                            </td>
+                            <td class="d5">{{ row.ShipmentNumber }}</td>
+                            <td>{{ row.ContainerNumber }}</td>
+                  
+                            <td>
+                              <input
+                                type="date"
+                                class="form-control-sm rounded"
+                                name="containers[{{ loop.index0 }}][atd]"
+                                value="{{ row.ATDOrigin.strftime('%Y-%m-%d') if row.ATDOrigin else '' }}"
+                              >
+                            </td>
+                            <td>
+                              <input
+                                type="date"
+                                class="form-control-sm rounded"
+                                name="containers[{{ loop.index0 }}][ata_port]"
+                                value="{{ row.ATAPort.strftime('%Y-%m-%d') if row.ATAPort else '' }}"
+                              >
+                            </td>
+                            <td>
+                              <input
+                                type="date"
+                                class="form-control-sm rounded"
+                                name="containers[{{ loop.index0 }}][atd_port]"
+                                value="{{ row.ATDDPort.strftime('%Y-%m-%d') if row.ATDDPort else '' }}"
+                              >
+                            </td>
+                            <td>
+                              <input
+                                type="date"
+                                class="form-control-sm rounded"
+                                name="containers[{{ loop.index0 }}][ata_wh]"
+                                value="{{ row.ATAWH.strftime('%Y-%m-%d') if row.ATAWH else '' }}"
+                              >
+                            </td>
+                            <td>
+                              <input
+                                type="date"
+                                class="form-control-sm rounded"
+                                name="containers[{{ loop.index0 }}][yard_in_date]"
+                                value="{{ row.YardInDate.strftime('%Y-%m-%d') if row.YardInDate else '' }}"
+                              >
+                            </td>
+                            <td>
+                              <input
+                                type="date"
+                                class="form-control-sm rounded"
+                                name="containers[{{ loop.index0 }}][yard_out_date]"
+                                value="{{ row.YardOutDate.strftime('%Y-%m-%d') if row.YardOutDate else '' }}"
+                              >
+                            </td>
+                            <td>
+                              <input
+                                type="text"
+                                class="form-control-sm rounded"
+                                name="containers[{{ loop.index0 }}][remarks]"
+                                value="{{ row.Remarks or '' }}"
+                              >
+                            </td>
+                          </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% include 'footer_credits.html' %}
+    </div>
+  </main>
+  
+
+  <!-- Core JS Files -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+  <script src="/static/js/core/popper.min.js"></script>
+  <script src="/static/js/core/bootstrap.min.js"></script>
+  <script src="/static/js/plugins/perfect-scrollbar.min.js"></script>
+  <script src="/static/js/plugins/smooth-scrollbar.min.js"></script>
+  <script src="/static/js/generalScripts.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const checkboxes = document.querySelectorAll(".item-checkbox");
+        const selectAllCheckbox = document.getElementById("select-all");
+        let selectedCountDisplay = document.createElement("div");
+        selectedCountDisplay.id = "selected-count";
+        selectedCountDisplay.style.fontWeight = "bold";
+        selectedCountDisplay.style.marginBottom = "10px";
+        document.querySelector("table").insertAdjacentElement("beforebegin", selectedCountDisplay);
+    
+        function updateSelectedCount() {
+            let selectedCount = document.querySelectorAll(".item-checkbox:checked").length;
+            selectedCountDisplay.textContent = `Selected Rows: ${selectedCount}`;
+        }
+    
+        checkboxes.forEach((checkbox) => {
+            checkbox.addEventListener("change", function () {
+                let deliveryValue = this.closest("tr").querySelector(".d5").textContent.trim();
+                
+                if (this.checked) {
+                    // When checking, select all rows with the same Delivery value
+                    checkboxes.forEach((cb) => {
+                        let cbDeliveryValue = cb.closest("tr").querySelector(".d5").textContent.trim();
+                        if (cbDeliveryValue === deliveryValue) {
+                            cb.checked = true;
+                        }
+                    });
+                } 
+                // Do nothing when unchecked (no bulk unchecking)
+    
+                updateSelectedCount();
+            });
+        });
+    
+        selectAllCheckbox.addEventListener("change", function () {
+            checkboxes.forEach((cb) => {
+                cb.checked = this.checked;
+            });
+            updateSelectedCount();
+        });
+    
+        updateSelectedCount();
+    });
+    </script>
+  
+</body>
+
+</html>

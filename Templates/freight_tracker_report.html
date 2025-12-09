@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block page_heading_1  %}Reports{% endblock %}
+{% block page_heading_2  %}Freight Tracker{% endblock %}
+{% block page_heading_3  %}Freight Tracker Report{% endblock %}
+{% block heading_width   %}width: 250px; {% endblock %}
+
+{% block styles %}
+/* the dropdown list items */
+    .select2-container--default 
+      .select2-results__option {
+      color: black !important;
+    }
+    .select2-container--default .select2-selection--multiple , .select2-selection__choice {
+      background-color: rgb(23, 23, 23) !important;
+    }
+
+    .select2-container {
+      max-width: 607.321px !important;
+      min-width: 190px !important;
+      width: auto !important;
+    }
+
+    /* Ensure the dropdown itself also follows the same width */
+    .select2-dropdown {
+        max-width: 607.321px !important;
+        min-width: 190px !important;
+        width: auto !important;
+    }
+
+    /* Style the inner text field where the selection appears */
+    .select2-selection {
+        max-width: 607.321px !important;
+        min-width: 190px !important;
+        width: auto !important;
+    }
+{% endblock %} 
+
+{% block export_btn_class %} {#shipment list page spacific block#}
+{% endblock %}
+
+{% block export_btn %}
+<div class="dropdown" style="margin-left:auto; margin-right:10px;">
+  <form id="export1" name="export1" action="{{ url_for('main.freight_tracking_report') }}" method="post">
+    <select id="export_brands" name="export_brands" multiple>
+      {% for brand in session["user_brand_access"] %}
+      <option value="{{brand}}">{{brand}}</option>
+      {% endfor %}
+    </select>
+    <button class="btn btn-secondary" type="submit" name="export">
+      Export to excel
+      <i class="fa fa-file-export"></i>
+    </button>
+  </form>
+</div>
+{% endblock %}
+
+{% block content %}  
+<table id="myTable" class="table mb-0 table-responsive table-hover table-bordered">
+    <thead>
+    <tr>
+        <th class="text-center sticky-left-1">Sr.</th>
+        {% for col in columns %}
+        <th data-col="{{ col.name }}"  class="text-center">{{ col.label }}</th>
+        {% endfor %}
+    </tr>
+    </thead>
+    <tbody>
+    {% for row in rows %}
+        <tr>
+          <td class="text-center sticky-left-1">{{loop.index}}</td>
+        {% for col in columns %}
+            <td class="col-{{col.name}} text-center">{{ row[col.name] | pretty_date if col.name not in ('BL Number', 'PO Number', 'Item Line', 'Article', 'Container Number', 'Qty In Container', 'Invoice Numbers') else  row[col.name] }}</td>
+        {% endfor %}
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}    

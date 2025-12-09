@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block page_heading_1  %}Finance{% endblock %}
+{% block page_heading_2  %}Reports{% endblock %}
+{% block page_heading_3  %}PO Cost Analysis Report{% endblock %}
+{% block heading_width %}width: 210px; {% endblock %}
+
+{% block styles %}
+/* ensure your responsive wrapper scrolls vertically */
+.table-responsive {
+  max-height: 700px;    
+  overflow-y: auto;
+}
+
+/* pin the table header */
+.table-responsive thead th {
+  position: sticky;
+  top: 0;
+  background: white;     /* match your table’s background */
+  z-index: 10;           /* keep above the body cells */
+}
+
+{% endblock %} 
+
+{% block export_btn_class %} {#EXPORT page spacific block#}
+{% endblock %}
+
+{% block export_btn %}
+<div class="dropdown" style="margin-left:auto; margin-right:10px;">
+  <form id="export1" name="export1" action="{{ url_for('main.po_report_page') }}" method="post">
+    <button class="btn btn-secondary" type="submit" name="export" form="export1">
+      Export to excel
+      <i class="fa fa-file-export"></i>
+    </button>
+  </form>
+</div>
+{% endblock %}
+
+
+{% block content %}
+  <table id="myTable" style="color: black;" class="table align-items-center mb-0 table-responsive table-hover">
+    <thead>
+      <tr>
+        {% for col in columns %}
+          <th data-col="{{ col.name }}">{{ col.label }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+        <tr>
+            {% for col in columns %}
+              {# 1) grab raw value #}
+              {% set raw = row[col.name] %}
+              {# 2) only convert to float if non‐empty; else leave as None #}
+              {% if raw not in (None, '') %}
+                {% set num = raw|float %}
+              {% else %}
+                {% set num = None %}
+              {% endif %}
+            
+              {# 3) decide green text for FL%==100 #}
+              {% set style = '' %}
+              {% if col.label == 'FL%(PO VS Delivered)' and num == 100 %}
+                {% set style = 'color: green;' %}
+              {% endif %}
+            
+              <td class="col-{{ col.name }}" style="{{ style }}">
+                {% if num is not none %}
+                  {# integer‐style columns #}
+                  {% if col.label in [
+                      'FL%(PO VS Delivered)',
+                      'Overhead Cost %',
+                      'Qty Shipped',
+                      'Delivered Qty',
+                      'Balance Qty'
+                    ] %}
+                    {{ "{:,.0f}".format(num) }}
+            
+                  {# cost columns (two decimals) #}
+                  {% elif col.label.endswith('Cost') or col.label in ('Custom Duties', 'Saber SADDAD', 'Demurrage Charges', 'Penalties', 'Other Charges', 'DO Port Charges', 'Clearance Transport', 'Yard Charges') %}
+                    {{ "{:,.2f}".format(num) }}
+            
+                  {# everything else: show raw or maybe two decimals #}
+                  {% else %}
+                    {{ raw }}
+                  {% endif %}
+            
+                  {# % suffix for percent columns #}
+                  {% if col.label in [
+                      'FL%(PO VS Delivered)',
+                      'Overhead Cost %'
+                    ] %}
+                    %
+                  {% endif %}
+            
+                  {# USD suffix for Total Value #}
+                  {% if col.label == 'PO Value (USD)' %}
+                    USD
+                  {% endif %}
+            
+                {% else %}
+                  {{ raw }}
+                {% endif %}
+              </td>
+            {% endfor %}
+            
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}
+
+{% block script_extra %}
+
+{% endblock %}

@@ -1,0 +1,1701 @@
+{% extends "base.html" %}
+
+
+{% block page_heading_1 %}Shipment{% endblock %} 
+{% block page_heading_2 %}Update Shipment{% endblock %} 
+{% block page_heading_3 %}Update Shipment {{ shipment_number.ShipmentNumber }}{% endblock %}
+
+{% block styles %}
+/*  */
+    input[type="file"] {
+      position: relative;
+    }
+  
+    input[type="file"]::file-selector-button {
+      width: 136px;
+      color: transparent;
+    }
+  
+    /* Faked label styles and icon */
+    input[type="file"]::before {
+      position: absolute;
+      pointer-events: none;
+      top: 10px;
+      left: 16px;
+      height: 20px;
+      width: 20px;
+      content: "";
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230964B0'%3E%3Cpath d='M18 15v3H6v-3H4v3c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-3h-2zM7 9l1.41 1.41L11 7.83V16h2V7.83l2.59 2.58L17 9l-5-5-5 5z'/%3E%3C/svg%3E");
+  
+    }
+  
+    input[type="file"]::after {
+      position: absolute;
+      pointer-events: none;
+      top: 11px;
+      left: 40px;
+      color: #0964b0;
+      content: "Upload File";
+    }
+  
+    /* ------- From Step 1 ------- */
+  
+    /* file upload button */
+    input[type="file"]::file-selector-button {
+      border-radius: 4px;
+      padding: 0 16px;
+      height: 40px;
+      cursor: pointer;
+      background-color: white;
+      border: 1px solid rgba(0, 0, 0, 0.16);
+      box-shadow: 0px 1px 0px rgba(0, 0, 0, 0.05);
+      margin-right: 16px;
+      transition: background-color 200ms;
+    }
+  
+    /* file upload button hover state */
+    input[type="file"]::file-selector-button:hover {
+      background-color: #f3f4f6;
+    }
+  
+    /* file upload button active state */
+    input[type="file"]::file-selector-button:active {
+      background-color: #e5e7eb;
+    }
+              /* end of file upload button styling */
+    /* ------------------------ */
+  /* Make the table full‑width and give cells some breathing room */
+  .styled-form {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;     /* evenly divide column widths */
+  }
+  .styled-form td {
+    padding: 8px;
+    vertical-align: middle;
+  }
+
+  /* Force each column to be the same proportion of the row */
+  .styled-form colgroup col {
+    width: 25%;              /* four columns per row → 25% each */
+  }
+
+  /* Label styling */
+  .styled-form label {
+    display: block;          /* label on its own line */
+    margin-bottom: 4px;
+    font-weight: bold;
+    font-size: 0.9rem;
+  }
+
+  /* Make every select & input fill its cell */
+  .styled-form input,
+  .styled-form select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 6px 8px;
+    font-size: 0.9rem;
+  }
+
+  /* Optional: give all inputs the same min‑height */
+  .styled-form input,
+  .styled-form select {
+    min-height: 2.2em;
+  }
+
+  .section-title {
+    /* background-color:  */
+    color: white;
+    padding: 5px;
+    margin-top: 20px;
+    border: 1px solid #ccc;
+  }
+  table {
+    color: white;
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1em;
+  }
+  table, th, td {
+    border: 1px solid #ddd;
+  }
+  th, td {
+    padding: 6px;
+    text-align: left;
+  }
+  
+  .input-blink {
+    animation: blink-shadow 1s ease-in-out 3;
+  }
+
+  @keyframes blink-shadow {
+    0%, 100% { box-shadow: 0 0 0px transparent; }
+    50%      { box-shadow: 0 0 5px 2px #ff9800; }  /* orange glow */
+  }
+
+  .input-blink-danger {
+    animation: blink-shadow-danger 1s ease-in-out 3;
+  }
+
+  @keyframes blink-shadow-danger {
+    0%, 100% { box-shadow: 0 0 0px transparent; }
+    50%      { box-shadow: 0 0 5px 2px red; }  /* orange glow */
+  }
+
+  .filepond--credits {
+    display: none !important;
+  }
+  .col-narrow {
+    width: 70px;     /* or 5%, or any size you prefer */
+    white-space: nowrap;
+  }
+  /* Shared base: transition applies on both expand and collapse */
+  .yard-col {
+    transition: width 0.3s ease;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .yard-col.collapsed {
+    width: 40px !important;
+    font-size: 0.8rem;
+    text-overflow: ellipsis;
+    cursor: pointer;
+  }
+
+  .yard-col.expanded {
+    width: 120px !important;
+    cursor: default;
+  }
+
+  /* Header styling */
+  .yard-header {
+    transition: all 0.3s ease;
+  }
+
+  .yard-header.collapsed {
+    width: 40px !important;
+    text-align: center;
+    font-size: 0.75rem;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .yard-header.expanded {
+    writing-mode: horizontal-tb;
+    transform: none;
+    width: 120px;
+    font-size: 1rem;
+    text-align: center;
+    cursor: default;
+  }
+  <!-- Cargo table collapse -->
+  /* Wrapper style */
+  #cargoTableWrapper {
+    max-height: 1000px; /* Enough to fit your table */
+    overflow: hidden;
+    transition: max-height 0.4s ease-in-out, padding 0.3s ease-in-out;
+  }
+  
+  /* Collapsed version */
+  #cargoTableWrapper.collapsed {
+    max-height: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  
+{% endblock %} 
+
+
+{% block content %}  
+
+<form id="updateShipmentForm" name="updateShipmentForm" method="POST" class="form-99" action="{{ url_for('main.updateShipments', shipment_id =  report_data.ShipmentID ) }}"  enctype="multipart/form-data">
+  <!-- Shipment Details -->
+  <div class="section-title bg-gradient-faded-info">Shipment Details</div>
+  <table class="styled-form">
+    <tr>
+      <td>
+        <label>BL#: </label>
+        <input type="text" name="bl_number" value="{{ report_data.BLNumber or '' }}" />
+      </td>
+
+      <td>
+        <label>Origin Country: 
+          <select id="origin_country" name="origin_country">
+            <option value="" selected>Origin Country</option>
+            {% for c in countries %}
+              <option value="{{c.name}}" {% if report_data.OriginCountry == c.name %}selected{% endif %}>{{ c.name }}</option>
+            {% endfor %}
+          </select>
+        </label>
+      </td>
+
+      <td>
+        <label>Destination Country: 
+          <select id="destination_country" name="destination_country">
+            {% if not report_data.DestinationCountry %}
+              <option value="Saudi Arabia" selected >Saudi Arabia</option>
+            {% endif %}
+            {% for c in countries %}
+              <option value="{{c.name}}" {% if report_data.DestinationCountry == c.name %}selected{% endif %}>{{c.name}}</option>
+            {% endfor %}
+          </select>
+        </label>
+      </td>
+
+      <td>
+        <label for="CCAgent">CC-Agent:</label>
+        <select name="cc_agent" id="CCAgent" >
+          <option value="" disabled {% if not  report_data.CCAgent %}selected{% endif %}>Custom Agent</option>
+          {% for agent in custom_agents %}
+            <option value="{{ agent.agent_name }}" {% if report_data.CCAgent == agent.agent_name %}selected{% endif %}>
+              {{ agent.agent_name }}
+            </option>
+          {% endfor %}
+        </select>
+      </td>
+
+      <td>
+        <label>Shipping Line:
+          <select name="shipping_line" id="shipping_line">
+            {% for item in shipping_lines %}
+            <option value="{{item.ShipingLineName}}" {% if report_data.ShippingLine == item.ShipingLineName %}selected{% endif %}>{{item.ShipingLineName}}</option>
+            {% endfor %}
+          </select>
+        </label>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <label for="OriginPort">Origin Port:</label>
+        <select name="OriginPort" id="OriginPort">
+          <option value="" disabled {% if not report_data.OriginPort %}selected{% endif %}>
+            Select Origin Port
+          </option>
+          {% for port in origin_ports %}
+            <option value="{{ port.port_name }}"
+              {% if report_data.OriginPort == port.port_name %}selected{% endif %}>
+              {{ port.port_name }}
+            </option>
+          {% endfor %}
+        </select>
+      </td>
+      
+      <td>
+        <label for="DestinationPort">Destination Port:</label>
+        <select name="DestinationPort" id="DestinationPort">
+          <option value="" disabled {% if not report_data.DestinationPort %}selected{% endif %}>
+            Select Destination Port
+          </option>
+          {% for dport in destination_ports %}
+            <option value="{{ dport.port_name }}"
+              {% if report_data.POD == dport.port_name %}selected{% endif %}>
+              {{ dport.port_name }}
+            </option>
+          {% endfor %}
+        </select>
+      </td>
+
+      <td>
+        <label>ECC Date:
+          <input type="date" name="ecc_date" value="{{ report_data.ECCDate.strftime('%Y-%m-%d') if report_data.ECCDate else '' }}" />
+        </label>
+      </td>
+
+      <td>
+        <label>ETA-Origin (Loading time): 
+          <input  type="date" 
+                  name="eta_origin" 
+                  value="{{ report_data.ETAOrigin.strftime('%Y-%m-%d') if report_data.ETAOrigin else '' }}" 
+          />
+        </label>
+      </td>
+
+      <td>
+        <label>ETD-Origin: 
+          <input  type="date" 
+                  name="etd_origin" 
+                  value="{{ report_data.ETDOrigin.strftime('%Y-%m-%d') if report_data.ETDOrigin else '' }}" 
+          />
+        </label>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <label>ETA-Dest. Port:
+          <input type="date" name="eta_destination" value="{{ report_data.ETADestination.strftime('%Y-%m-%d') if report_data.ETADestination else '' }}" />
+        </label>
+      </td>
+
+      <td>
+        <label>ETD-Release- Dport:
+          <input type="date" name="etd_destination" value="{{ report_data.ETDDestination.strftime('%Y-%m-%d') if report_data.ETDDestination else '' }}" />
+        </label>
+      </td>
+      
+      <td>
+        <label>ETA-WH: 
+          <input type="date" name="eta_wh" value="{{ report_data.ETAWH.strftime('%Y-%m-%d') if report_data.ETAWH else '' }}" />
+        </label>
+      </td>
+
+      <td>
+        <label>Container Deadline: 
+          <input type="date" name="container_deadline" value="{{ report_data.ContainerDeadline.strftime('%Y-%m-%d') if report_data.ContainerDeadline else '' }}" />
+        </label>
+      </td>
+
+      <!-- 7. Additional Attachments -->
+      <td style="display: block; max-height:150px; overflow-y:auto">
+        <label for="filepond">Shipment Documents</label>
+        <input type="file" name="filepond" id="filepond" multiple />
+
+        <ul id="uploaded-list">
+          {% for file in uploaded_files %}
+            <li style="display: flex; justify-content:space-between;">
+              <a href="{{ url_for('main.serve_file', filename=file) }}" target="_blank">{{ file }}</a>
+              <button type="button" onclick="deleteFile('{{ file }}')">❌ Delete</button>
+            </li>
+          {% endfor %}
+        </ul>
+      </td>
+      
+    </tr>
+
+  </table>
+
+  <!-- Cargo Details -->
+  <div class="section-title bg-gradient-faded-info">
+    <!-- Available Cargo -->
+    <span>Available Cargo</span>
+    <button type="button" id="toggleCargoTable" class="btn btn-sm btn-danger">Hide</button>
+  </div>
+  <div id="cargoTableWrapper" class="collapsible-table expanded">
+    <table class="styled-form">
+      <thead>
+        <tr>
+          <th class="col-1">Sr.</th>
+          <th>Supplier/ExFactory</th>
+          <th>Purchase Order</th>
+          <th>LC Number</th>
+          <th>Weight KG</th>
+          <th>SAP line ID</th>
+          <th>Article</th>
+          <th>Pending/Total Qty</th>  
+          <th>Value (USD)</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="cargoTableBody">
+        <!-- Row 0 -->
+        {% for pol in report_data.po_lines %}
+          <tr data-spoid="{{ pol.ShipmentPOLineID }}">
+            <td>{{loop.index}}</td>
+            {# PurchaseOrderLine is pol.po_line; its parent PurchaseOrder is pol.po_line.purchase_order #}
+            <td>{{ pol.po_line.purchase_order.Supplier }}</td>
+            <td>{{ pol.po_line.purchase_order.PONumber }}</td>
+            <td>{{ pol.po_line.purchase_order.LCNumber or 'No'}}</td>
+            <td>
+              <input type="number" step="0.1" name="weight[{{ pol.ShipmentPOLineID }}]"  value="{{ pol.po_line.article_weight.WeightKG * pol.QtyShipped if pol.po_line.article_weight.WeightKG else '' }}"  class="form-control-sm"/>
+            </td>
+            <td>{{ pol.po_line.SapItemLine }}</td>
+            {# The Article comes from the PO-line #}
+            <td>{{ pol.po_line.Article }}</td>
+            {# The shipped quantity #}
+            <td class="shipped" data-total="{{ pol.QtyShipped }}">{{ pol.QtyShipped }}</td>
+            {# The original value on the PO-line #}
+            <td>{{ "{:,.2f}".format(pol.po_line.TotalValue/pol.po_line.Qty *pol.QtyShipped)  }} USD</td>
+            <td>
+              <button type="button" class="btn btn-sm btn-danger remove-line" data-spoid="{{ pol.ShipmentPOLineID }}">
+                <i class="fas fa-minus-circle"></i>
+              </button>
+            </td>
+
+          </tr>
+        {% endfor %}
+        {% for items in report_data.non_po_items %}
+          <tr >
+            <td>{{report_data.po_lines| length + (loop.index)}} 
+              <input hidden name="non_po_items" value="{{report_data.po_lines| length + (loop.index)}}"/>
+              <input type="hidden"
+              name="cargo[{{ loop.index }}][id]"
+              value="{{ items.ID }}">
+            </td>
+            <td>
+              <input name="cargo[{{report_data.po_lines| length + (loop.index)}}][supplier]"  value="{{items.Supplier}}"  class="form-control-sm">
+            </td>
+            <td>
+              <input name="cargo[{{report_data.po_lines| length + (loop.index)}}][po]" value="NON_PO" readonly class="form-control-sm">
+            </td>
+            <td>
+              <input value="DEFAULT" readonly class="form-control-sm">
+            </td>
+            <td>
+              <input value="DEFAULT" readonly class="form-control-sm">
+            </td>
+            <td>
+              <input name="cargo[{{report_data.po_lines| length + (loop.index)}}][sap_line]"  value="{{items.SAPItemLine}}" class="form-control-sm"/>
+            </td>
+            <td>
+              <input name="cargo[{{report_data.po_lines| length + (loop.index)}}][article]" value="{{items.Article}}" class="form-control-sm"/>
+            </td>
+            <td>
+              <input name="cargo[{{report_data.po_lines| length + (loop.index)}}][qty]" type="number" min="0" value="{{items.Qty}}"  class="form-control-sm"/>
+            </td>
+            <td>
+              <input name="cargo[{{report_data.po_lines| length + (loop.index)}}][value]" type="number" step="0.01" value="{{items.Value}}" class="form-control-sm"/>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="7">
+            Add Non-Po items 
+            <i id="add-cargo-row" class="fa fa-plus-circle fa-3x"  style="color: #0ba644;"></i>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <!-- Container Details -->
+  <div class="section-title bg-gradient-faded-info">Containers</div>
+  <table class="styled-form">
+    <thead>
+      <tr>
+        <th class="text-center col-narrow">Action</th>
+        <th style="width: 160px;">{{'Container #' if report_data.ModeOfTransport == 'Sea' else 'Pallet' }} </th>
+        <th>Type</th>
+        <th>Cargo (Items Selected)</th>
+        <th style="width: 160px;">Status</th>
+        <th>ATA Origin Port</th>
+        <th>ATD Origin Port</th>
+        <th>ATA Dest. Port</th>
+        <th>Actual CC Date</th>
+        <th>ATD Dest. Port</th>
+        <th>ATA WH / DTC</th>
+        <!-- <th >Yard-IN</th>
+        <th >Yard-OUT</th> -->
+        <th class="yard-header collapsed" id="yard-in-header">Y-IN</th>
+        <th class="yard-header collapsed" id="yard-out-header">Y-OUT</th>
+        <th>Remarks</th>
+      </tr>
+    </thead>
+    <tbody id="containerTableBody">
+      {% for cid in unique_cids %}
+        {# 1) collect all container objects matching this cid #}
+        {% set matches = report_data.containers 
+              | selectattr("ContainerID","equalto",cid) 
+              | list 
+        %}
+        {# 2) only render if we actually found one #}
+        {% if matches %}
+          {% set cont = matches[0] %}
+          <tr>
+            <td class="col-narrow">
+              <div class="text-center">
+                <i class="remove-row fa fa-minus-circle fa-2xl" style="color: red;"></i>
+                <span class="row-number"></span>
+              </div>
+              
+            </td>
+            <td style="width: 150px;">
+              <input type="text" name="containers[{{ loop.index0 }}][container_number]" value="{{ cont.ContainerNumber or '' }}"/>
+            </td>
+            <td>
+              <!-- Cargo types -->
+              <select name="containers[{{ loop.index0 }}][container_type]">
+                <option></option>
+                {% for ctype in cargo_types %}
+                  <option value="{{ctype.Type}}" {% if cont.ContainerType == ctype.Type %}selected{% endif %}>{{ctype.Type}}</option>
+                {% endfor %}
+                <!-- <option value="20ft" {% if cont.ContainerType == '20ft' %}selected{% endif %}>20ft</option> -->
+              </select>
+            </td>
+            <td>
+              <button type="button" class="add-items-btn btn btn-success" data-container-id="{{ loop.index0 }}">Add Items</button>
+              <div hidden class="selected-items" id="selected-items-{{ loop.index0 }}"></div>
+              <input type="hidden" name="containers[{{ loop.index0 }}][items]" id="container_items_{{ loop.index0 }}" value=""/>
+            </td>
+            <td style="width: 160px;">
+              <!-- PLANED -->
+              <select name="containers[{{ loop.index0 }}][planed_status]" class="form-select-lg">
+                <option selected disabled></option>
+                {% for status in containerstatuses if 'Planed' in status.StatusName %}
+                  <option value="{{status.StatusName}}" {% if status.StatusName == cont.planned_status  %}selected{% endif %}>{{status.StatusName}}</option>
+                {% endfor %}
+              </select>
+
+              <hr class="dark gradient-animation">
+
+              <!-- ACTUAL -->
+              <select name="containers[{{ loop.index0 }}][current_status]" class="form-select-lg">
+                <option selected disabled></option>
+                {% if containerstatuses == []  %}
+                  <option selected disabled>Not Allowed</option>
+                {% endif %}
+                {% for status in containerstatuses if 'Planed' not in status.StatusName %}
+                  <option value="{{status.StatusName}}" {% if status.StatusName == cont.current_status  %}selected{% endif %}>{{status.StatusName}}</option>
+                {% endfor %}
+              </select>
+            </td>
+            <td><input type="date" name="containers[{{ loop.index0 }}][ata_op]" value="{{ cont.ATAOrigin and cont.ATAOrigin.strftime('%Y-%m-%d') }}" /></td>
+            <td><input type="date" name="containers[{{ loop.index0 }}][atd_op]" value="{{ cont.ATDOrigin.strftime('%Y-%m-%d') if cont.ATDOrigin else ''}}"/></td>
+            <td><input type="date" name="containers[{{ loop.index0 }}][ata_dp]" value="{{ cont.ATADP    and cont.ATADP.strftime('%Y-%m-%d') }}"/></td>
+            <td><input type="date" name="containers[{{ loop.index0 }}][ccdate]" value="{{ cont.CCDate   and cont.CCDate.strftime('%Y-%m-%d') }}"/></td>
+            <td><input type="date" name="containers[{{ loop.index0 }}][atd_dp]" value="{{ cont.ATDDPort and cont.ATDDPort.strftime('%Y-%m-%d') }}"/></td>
+            <td><input type="date" name="containers[{{ loop.index0 }}][ata_wh]" value="{{ cont.ATAWH    and cont.ATAWH.strftime('%Y-%m-%d') }}"/></td>
+            <td class="yard-col collapsed" ><input type="date" name="containers[{{ loop.index0 }}][yard_in_date]"value="{{ cont.YardInDate  and cont.YardInDate.strftime('%Y-%m-%d') }}"/></td>
+            <td class="yard-col collapsed" ><input type="date" name="containers[{{ loop.index0 }}][yard_out_date]"value="{{ cont.YardOutDate and cont.YardOutDate.strftime('%Y-%m-%d') }}"/></td>
+            <td><input type="text" name="containers[{{ loop.index0 }}][container_remarks]"value="{{ cont.ContainerRemarks or '' }}"/></td>
+          </tr>
+        {% endif %}
+      {% else %}
+        <tr>
+          <td class="col-narrow">
+            <div class="text-center">
+              <i class="remove-row fa fa-minus-circle fa-2xl" style="color: red;"></i>
+              <span class="row-number"></span>
+            </div>
+          </td>
+          <td style="width: 160px;"><input type="text" name="containers[0][container_number]" value="" /></td>
+          <td>
+            <select name="containers[0][container_type]">
+              <option></option>
+              {% for ctype in cargo_types %}
+                  <option value="{{ctype.Type}}">{{ctype.Type}}</option>
+                {% endfor %}
+            </select>
+          </td>
+          <td>
+            <!-- The button to open the modal. Data attribute "data-container-id" identifies this container row (here, "0") -->
+            <button type="button" class="add-items-btn btn btn-success" data-container-id="0">
+              Add Items
+            </button>
+            <!-- Display a summary of items added for this container -->
+            <div hidden class="selected-items" id="selected-items-0"></div>
+            
+            <!-- Hidden input to store the JSON for container items -->
+            <input type="hidden" name="containers[0][items]" id="container_items_0" value="">
+          </td>
+          <!-- STATUS -->
+          <td style="width: 160px;">
+            <select name="containers[0][planed_status]">
+                <option selected disabled></option>
+              {% if containerstatuses == []  %}
+                <option selected disabled>Not Allowed</option>
+              {% endif %}
+              {% for status in containerstatuses if 'Planed' in status.StatusName %}
+                <option value="{{status.StatusName}}" >{{status.StatusName}}</option>
+              {% endfor %}
+            </select>
+            <select name="containers[0][current_status]">
+              <option selected disabled></option>
+              {% if containerstatuses == []  %}
+                <option selected disabled>Not Allowed</option>
+              {% endif %}
+              {% for status in containerstatuses if 'Planed' not in status.StatusName %}
+                <option value="{{status.StatusName}}" >{{status.StatusName}}</option>
+              {% endfor %}
+            </select>
+          </td>
+          
+          <td><input type="date" name="containers[0][ata_op]"             value="" /></td>
+          <td><input type="date" name="containers[0][atd_op]"             value="" /></td>
+          <td><input type="date" name="containers[0][ata_dp]"             value="" /></td>
+          <td><input type="date" name="containers[0][ccdate]"             value="" /></td>
+          <td><input type="date" name="containers[0][atd_dp]"             value="" /></td>
+          <td><input type="date" name="containers[0][ata_wh]"             value="" /></td>
+          <td class="yard-col collapsed" ><input type="date" name="containers[0][yard_in_date]"       value="" /></td>
+          <td class="yard-col collapsed" ><input type="date" name="containers[0][yard_out_date]"      value="" /></td>
+          <td><input type="text" name="containers[0][container_remarks]"  value="" /></td>
+        </tr> 
+      {% endfor %} 
+    </tbody>
+    <tfoot>
+    <tr>
+      <td>
+        <div class="text-center">
+          <i class="add-row fa fa-plus-circle fa-2xl"
+             style="color: #0ba644;"
+             title="Add new container"></i>
+        </div>
+      </td>
+    </tr>
+  </tfoot>
+  </table>
+
+  <!-- Invoice Data -->
+  <div class="section-title bg-gradient-faded-info">
+    Supplier Invoices -- Total: $
+    <span id="invoice-total" style="color: greenyellow; font-weight: bold;">
+      0.00
+    </span>
+  </div>
+  <table class="styled-form" id="invoice-table">
+    <thead>
+      <tr>
+        <th>Invoice Number</th>
+        <th>Invoice Value</th>
+        <th>Document</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="invoice-body">
+      {% if invoices %}
+        {% for inv in invoices %}
+        <tr>
+          <td><input type="text" name="invoice_numbers" value="{{ inv.InvoiceNumber }}"></td>
+          <td><input type="number" name="invoice_values" step="0.01" value="{{ inv.InvoiceValue }}"></td>
+          <td>
+            {% if inv.DocumentPath %}
+              <a href="{{ url_for('static', filename=inv.DocumentPath) }}" target="_blank">
+                (View)
+              </a>
+            {% else %}
+              <input type="file"  name="invoice_files_{{ loop.index0 }}">
+            {% endif %}
+          </td>
+          <td><button type="button" class="remove-row btn btn-sm btn-danger">Remove</button></td>
+        </tr>
+        {% endfor %}
+      {% endif %}
+      <!-- one empty row  -->
+      {% set idx = invoices|length if invoices else 0%}
+      <tr>
+        <td><input type="text" name="invoice_numbers"></td>
+        <td><input type="number" name="invoice_values" step="0.01"></td>
+        <td><input type="file" name="invoice_files_{{ idx }}"></td>
+        <td>
+          <!-- <button class="remove-row btn btn-sm btn-danger" type="button">Remove</button> -->
+          <button class="btn btn-sm btn-success" type="button" id="add-invoice">Add new row</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <!-- Cost Data -->
+  <div class="section-title bg-gradient-faded-info">Costs(includes VAT.) -- Expense % <span id="expense_percent" style="color: greenyellow; font-weight: bold;">0.0</span>
+  </div>
+  <table class="styled-form">
+    <tr>
+      <!-- <td><label>Invoice Value: <input type="number" name="invoice_value" step="0.01"></label></td> -->
+      <td><label>Value Declared by Customs: <input type="number" name="value_declared_customs"                        value="{{ report_data.ValueDecByCC if report_data.ValueDecByCC else '' }}"></label></td>
+      <td><label>Custom Duties: <input class="expense-input" type="number" name="custom_duties_fob"                   value="{{ report_data.CustomDuties if report_data.CustomDuties else '' }}"></label></td>
+      <td><label>Clearance/Transportation: <input class="expense-input" type="number" name="clearance_transport"      value="{{ report_data.ClearanceTransportCharges if report_data.ClearanceTransportCharges else '' }}"></label></td>
+      <td><label>Saber Charges: <input class="expense-input" type="number" name="saber_saddad"                        value="{{ report_data.SaberSADDAD if report_data.SaberSADDAD else '' }}"></label></td>
+    </tr>
+    <tr>
+      <td><label>DO Charges/Port Charges: <input class="expense-input" type="number" name="do_charges"  value="{{ report_data.DO_Port_Charges if report_data.DO_Port_Charges else '' }}"></label></td>
+      <td><label>Freight Cost: <input class="expense-input" type="number" name="freight_cost"           value="{{ report_data.FreightCost if report_data.FreightCost else '' }}"></label></td>
+      <td><label>Penalties: <input class="expense-input" type="number" name="penalties"                 value="{{ report_data.Penalties if report_data.Penalties else '' }}"></label></td>
+      <td><label>Demurrage Charges: <input class="expense-input" type="number" name="demurrage_charges" value="{{ report_data.DemurrageCharges if report_data.DemurrageCharges else '' }}"></label></td>
+    </tr>
+    <tr>
+      <td><label>Yard Charges: <input class="expense-input" type="number" name="yard_charges"             value="{{ report_data.YardCharges if report_data.YardCharges else '' }}"></label></td>
+      <td><label>Others: <input class="expense-input" type="number" name="other_charges"                  value="{{ report_data.OtherCharges if report_data.OtherCharges else '' }}"></label></td>
+      <td><label>MAWANI Charges: <input class="expense-input" type="number" name="mawani_charges"         value="{{ report_data.MAWANICharges if report_data.MAWANICharges else '' }}"></label></td>
+      <td><label>Inspection Charges: <input class="expense-input" type="number" name="inspection_charges" value="{{ report_data.InspectionCharges if report_data.InspectionCharges else '' }}"></label></td>
+    </tr>
+    <tr>
+      <td><label>CC-Agent Invoice: <input type="text" name="cc_agent_invoice"   value="{{ report_data.CcAgentInvoice if report_data.CcAgentInvoice else '' }}"></label></td>
+      <td><label>Remarks: <input type="text" name="cost_remarks"                value="{{ report_data.CostRemarks if report_data.CostRemarks else '' }}"></label></td>
+      
+      <!-- Second FilePond upload -->
+      <td>
+        <input type="file" name="cc_invoices_files" class="filepond" multiple data-max-files="20">
+        <ul id="uploaded-list">
+          {% for file in cc_inv_files %}
+            <li style="display: flex; justify-content:space-between;">
+              <a href="{{ url_for('main.serve_file', filename=file) }}" target="_blank">{{ file }}</a>
+              <button type="button" onclick="deleteFile('{{ file }}')">❌ Delete</button>
+            </li>
+          {% endfor %}
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <label>Total Expense:</label>
+        <input id="total_expense" type="number" name="total_expense" style="width: auto;" disabled>
+      </td>
+    </tr>
+  </table>
+  
+  <!-- FORM SAVE BUTTON -->
+  <div style="margin-top: 15px;">
+    <button type="submit" class="btn btn-success">Confirm/Save</button>
+    <button type="submit" name="action" class="btn btn-info" value="draft">Save Draft</button>
+  </div>
+
+  <!-- Container Items Modal (for selecting articles per container) -->
+  <div class="modal fade" id="containerItemsModal" tabindex="-1" role="dialog" aria-labelledby="containerItemsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="containerItemsModalLabel">Add Items for Container</h5>
+              <button type="button" class="close bg-gradient-danger btn btn-sm close" id="dismiss-modal1" aria-label="Close">
+                  X
+              </button>
+          </div>
+          <div class="modal-body">
+              <!-- Hidden field to store current container id -->
+              <input type="hidden" id="modal-container-id" value="">
+              <table class="table table-responsive" style="color: black;" id="modalItemsTable">
+                <thead>
+                  <tr>
+                    <th>Article</th>
+                    <th>Available Qty</th>
+                    <th>Selected Qty</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Rows will be added dynamically -->
+                </tbody>
+              </table>
+              <button id="add-modal-row" type="button" class="btn btn-sm btn-primary">Add Row</button>
+          </div>
+          <div class="modal-footer">
+            <button type="button" id="add-all-modal-row" class="btn btn-sm btn-primary">
+              Add All Items
+            </button>
+              <button type="button" id="save-modal-items" class="btn btn-success">Confirm</button>
+              <button type="button" class="btn btn-secondary" id="dismiss-modal">Cancel</button>
+          </div>
+      </div>
+    </div>
+  </div>
+
+</form> 
+{% endblock %}
+
+{% block script_extra %}
+<!-- Filepond -->
+<script>
+  const sn = JSON.parse('{{shipment_number.ShipmentNumber | tojson |safe }}')
+
+  FilePond.create(document.querySelector('input[name="filepond"]'), {
+    server: {
+      process: {
+        url: '/upload',
+        method: 'POST',
+        //onload: (response) => {
+        //  const json = JSON.parse(response);
+        //  return json.filename;  // This becomes uniqueFileId
+        //}
+        ondata: (formData) => {
+          formData.append('shipment_number', sn);  // Replace with dynamic value
+          return formData;
+        }
+      },
+      revert: (filename, load, error) => {
+        fetch('/delete_realtime', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ filename: filename })
+        }).then(load).catch(error);
+      }
+    }
+  });
+
+  FilePond.create(document.querySelector('input[name="cc_invoices_files"]'), {
+    server: {
+      process: {
+        url: '/upload_cc_invoice_files',
+        method: 'POST',
+        ondata: (formData) => {
+          formData.append('shipment_number', sn); 
+          return formData;
+        }
+      },
+      revert: (filename, load, error) => {
+        fetch('/delete_realtime', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ filename: filename })
+        }).then(load).catch(error);
+      }
+    }
+  });
+  
+  function deleteFile(filename) {
+    const confirmed = confirm(`Are you sure you want to delete "${filename}"?`);
+    if (!confirmed) return;  // Exit if user cancels
+
+    fetch('/delete', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+      filename: filename,
+      shipment_number: sn
+    })
+    })
+    .then(res => {
+      if (res.ok) {
+        alert(`Deleted: ${filename}`);
+        // Remove the li element containing this button
+        const button = document.querySelector(`button[onclick*="${filename}"]`);
+        if (button) {
+          const li = button.closest('li');
+          if (li) li.remove();
+        }
+      } else {
+        alert('File not found or could not be deleted');
+      }
+    });
+  }
+</script>
+
+<!-- MODEL SCRIPT FOR ADD ITEMS -->
+<script>
+  const reportData = {{ report_data_json | tojson | safe }};
+  let containerItems = {};
+  let modalContainerId = null;
+
+  // at top of your script, after reportData is defined:
+  const uniqueReportData = Object.values(
+    reportData.reduce((map, r) => {
+      // key by ShipmentPOLineID, or by Article if you prefer
+      map[r.ShipmentPOLineID] = r;
+      return map;
+    }, {})
+  );
+
+  //new addition start
+  const containerBody = document.getElementById('containerTableBody'); // or whatever your <tbody> id is
+  const form          = document.getElementById('updateShipmentForm');  // your <form> id
+
+  // helper to extract the idx from a name like "containers[3][container_number]"
+  function parseIdx(name) {
+    const m = name.match(/containers\[(\d+)\]/);
+    return m ? m[1] : null;
+  }
+
+  // helper to check & open modal if needed
+  function ensureCargo(idx, containerNumber) {
+    const hidden = document.getElementById(`container_items_${idx}`);
+    let items = [];
+    try { items = JSON.parse(hidden.value || '[]'); } catch {}
+    if (items.length === 0) {
+      alert(`🚨 You must assign cargo item for container "${containerNumber}".`);
+      // trigger the add-items button for that container
+      const btn = document.querySelector(`.add-items-btn[data-container-id="${idx}"]`);
+      if (btn) btn.click();
+      return false;
+    }
+    return true;
+  }
+
+  // 1) listen for any container-number change
+  containerBody.addEventListener('change', (e) => {
+    if (!e.target.matches('input[name*="[container_number]"]')) return;
+    const idx            = parseIdx(e.target.name);
+    const containerNum   = e.target.value.trim();
+    if (containerNum) {
+      ensureCargo(idx, containerNum);
+    }
+  });
+
+  //new end
+
+
+  // 1) containerItems map keyed by the same index
+  reportData.forEach(r => {
+    const idx = r.container_index;             // ← loop.index0
+    containerItems[idx] = containerItems[idx]||[];
+    containerItems[idx].push({
+      poline_id:    r.ShipmentPOLineID,
+      po_number:    r.PONumber,
+      article:      r.Article,
+      available_qty:r.Qty,
+      selected_qty: r.QtyInContainer||0
+    });
+  });
+  
+
+  Object.entries(containerItems).forEach(([idx, items]) => {
+    // drop any items with selected_qty===0
+    const nonZero = items.filter(i => i.selected_qty > 0);
+  
+    // build the summary only from those
+    const txt = nonZero
+      .map(i => `${i.po_number}–${i.article}:${i.selected_qty}`)
+      .join(", ");
+  
+    // render (will be empty string if everything was 0)
+    $(`#selected-items-${idx}`).text(txt);
+    $(`#container_items_${idx}`).val(JSON.stringify(nonZero));
+  });                  
+  
+    
+  // helper: how much is left of this POLine
+  function getAdjustedAvailableQty(polineId, currentRow=null) {
+    const original = $(`option[value="${polineId}"]`).data('available') || 0;
+    let usedElsewhere = 0;
+    for (let cid in containerItems) {
+      if (cid !== modalContainerId) {
+        containerItems[cid].forEach(it => {
+          if (it.poline_id === polineId) usedElsewhere += it.selected_qty;
+        });
+      }
+    }
+    let usedInModal = 0;
+    $('#modalItemsTable tbody tr').each(function() {
+      const pid = +$(this).find('.modal-article').val();
+      const qty = +$(this).find('.modal-selected-qty').val()||0;
+      if (pid===polineId && this!==currentRow) usedInModal += qty;
+    });
+    return Math.max(0, original - usedElsewhere - usedInModal);
+  }
+
+  // open modal and prefill existing rows (or a blank if none)
+  $(document).on('click','.add-items-btn',function(){
+    modalContainerId = $(this).data('container-id');
+    $('#modal-container-id').val(modalContainerId);
+    $('#modalItemsTable tbody').empty();
+    const existing = containerItems[modalContainerId];
+    (existing && existing.length
+      ? existing
+      : [{ poline_id:null, available_qty:0, selected_qty:0 }]
+    ).forEach(it=> addModalItemRow(it.poline_id, it.selected_qty));
+    $('#containerItemsModal').modal('show');
+    console.log("adding row");
+  });
+
+  // add blank row
+  $('#add-modal-row').click(function(){
+    let ok=true;
+    $('#modalItemsTable tbody tr').each(function(){
+      if ((+$(this).find('.modal-selected-qty').val()||0)===0) ok=false;
+    });
+    if(!ok){ return alert("Fill all quantities first."); }
+    addModalItemRow(null,0);
+  });
+
+  // Add all items button
+  $('#add-all-modal-row').click(function() {
+    // clear whatever rows are already in the modal
+    $('#modalItemsTable tbody').empty();
+
+    // for each item in reportData, add a row with its full available quantity
+    reportData.forEach(r => {
+      addModalItemRow(r.ShipmentPOLineID, r.Qty);
+    });
+  });
+
+  function addModalItemRow(selPoline, selQty){
+    const row = $('<tr>');
+    const sel = $('<select style="color: black;" class="modal-article form-select-lg">');
+
+    // figure out which POLineIDs are already picked here
+    const picked = new Set();
+    $('#modalItemsTable tbody tr').each(function(){
+      const v = +$(this).find('.modal-article').val();
+      if(v) picked.add(v);
+    });
+
+    // populate from your back-end data array
+    uniqueReportData.forEach(r=>{
+      const opt = $('<option>')
+        .val(r.ShipmentPOLineID)
+        .text(`${r.PONumber} -${r.SapItemLine}- ${r.Article}`)
+        .attr('data-available', r.Qty)
+        .attr('data-po',        r.PONumber)
+        .attr('data-article',   r.Article)
+        // **disable** if already used (unless it’s this row’s own value)
+      if (picked.has(r.ShipmentPOLineID) && r.ShipmentPOLineID!==selPoline) {
+        opt.prop('disabled',true).text(opt.text()+' (Already)');
+      }
+      sel.append(opt);
+    });
+
+    const availTd = $('<td class="availQty">');
+    const qtyIn   = $(`<input style="color: black;" type="number" class="modal-selected-qty form-control" min="0" value="${selQty||0}">`);
+    const qtyTd   = $('<td>').append(qtyIn);
+    const rmBtn   = $('<button type="button" class="remove-modal-row btn btn-sm btn-danger">Remove</button>');
+    const actTd   = $('<td>').append(rmBtn);
+
+    row.append($('<td>').append(sel), availTd, qtyTd, actTd);
+    $('#modalItemsTable tbody').append(row);
+
+    // **Initialize Select2 on this new <select>**
+      sel.select2({
+      dropdownParent: $('#modalItemsTable'),
+      placeholder: 'Select an article',
+      width: '100%' 
+    });
+
+    function refresh() {
+      const pid = +sel.val();
+      const max = getAdjustedAvailableQty(pid, row[0]);
+      availTd.text(max);
+      qtyIn.attr('max',max).prop('readonly', max===0);
+    }
+
+    // wire up
+    sel.on('change', refresh);
+    qtyIn.on('input',function(){
+      const m = +$(this).attr('max')||0, v=+this.value||0;
+      if(v>m) this.value=m;
+    });
+    rmBtn.click(()=>{
+      row.remove();
+      saveToContainerItems();
+      // re-refresh all remaining rows
+      $('#modalItemsTable tbody tr').each((_,r)=>$(r).find('.modal-article').trigger('change'));
+    });
+
+    // init select
+    if(selPoline) sel.val(selPoline);
+    else           sel.find('option:not(:disabled)').first().prop('selected',true);
+    sel.trigger('change');               
+    
+  }
+
+  // snapshot modal back into containerItems
+  function saveToContainerItems(){
+    const out=[];
+    $('#modalItemsTable tbody tr').each(function(){
+      const opt  = $(this).find('.modal-article option:selected');
+      const pid  = +opt.val();
+      const po   = opt.data('po');
+      const art  = opt.data('article');
+      const selq = +$(this).find('.modal-selected-qty').val()||0;
+      const av   = +$(this).find('.availQty').text()||0;
+      if(pid && selq>0){
+        out.push({
+          poline_id:    pid,
+          po_number:    po,
+          article:      art,
+          available_qty:av,
+          selected_qty: selq
+        });
+      }
+    });
+    containerItems[modalContainerId]=out;
+  }
+
+  // save & close modal
+  $('#save-modal-items').click(function(){
+    saveToContainerItems();
+
+    const sum = containerItems[modalContainerId];
+    if(!sum||!sum.length){
+      return alert("Add at least one item.");
+    }
+    const txt = sum.map(i=>`${i.po_number}–${i.article}:${i.selected_qty}`).join(', ');
+    $(`#selected-items-${modalContainerId}`).text(txt);
+    $(`#container_items_${modalContainerId}`).val(JSON.stringify(sum));
+    $('#containerItemsModal').modal('hide');
+
+    recalcPending();
+  });
+
+  $('#dismiss-modal, #dismiss-modal1').click(function(){
+    $('#containerItemsModal').modal('hide');
+  });
+
+  function recalcPending() {
+    const allAssigned = Object.values(containerItems).flat();
+    document
+      .querySelectorAll('#cargoTableBody tr[data-spoid]')
+      .forEach(row => {
+        const spoid   = +row.dataset.spoid;
+        const total   = +row.querySelector('.shipped').dataset.total; 
+        // we’ll store the original total on a data-attribute (see below)
+        const assigned = allAssigned
+          .filter(it => it.poline_id === spoid)
+          .reduce((sum, it) => sum + it.selected_qty, 0);
+        const pending = total - assigned;
+        const cell    = row.querySelector('.shipped');
+        cell.textContent = `${pending}/${total}`;
+        cell.classList.toggle('text-danger', pending > 0);
+        cell.classList.toggle('text-success', pending === 0);
+      });
+  }
+  // 1) on page‐load
+  recalcPending();
+
+  let clickedButton = null;
+  
+  document.querySelectorAll('#updateShipmentForm button[type="submit"]').forEach(btn => {
+    btn.addEventListener("click", function () {
+      clickedButton = this;
+    });
+  });
+
+  form.addEventListener('submit', (e) => {
+    let ok = true;
+
+    // ✅ If user clicked "Save Draft", skip validation
+    if (clickedButton && clickedButton.value === "draft") {
+      return; // allow submission as-is
+    }
+  
+    // 1) per-container “must have at least one item”
+    containerBody.querySelectorAll('input[name*="[container_number]"]').forEach(input => {
+      const val = input.value.trim();
+      if (val && ok) {
+        const idx = parseIdx(input.name);
+        if (!ensureCargo(idx, val)) {
+          ok = false;
+        }
+      }
+    });
+  
+    if (!ok) { e.preventDefault(); return; }
+  
+    // 2) recalc all pending counts & look for any > 0
+    recalcPending(); 
+  
+    // any cell with class .text-danger means pending > 0
+    const bad = document.querySelectorAll('#cargoTableBody td.shipped.text-danger');
+    if (bad.length) {
+      alert("🚨 You must assign *all* items.  Some lines still have pending quantities.");
+      e.preventDefault();
+      return;
+    }
+  
+    // else everything’s good, allow submit
+  });
+
+  
+</script>
+
+
+<!-- Cargo table hide -->
+<script>
+  document.getElementById("toggleCargoTable").addEventListener("click", function () {
+    const wrapper = document.getElementById("cargoTableWrapper");
+
+    const isCollapsed = wrapper.classList.toggle("collapsed");
+
+    this.textContent = isCollapsed ? "Show" : "Hide";
+  });
+</script>
+
+<!-- for dates to always be forward -->
+<script>
+  function setupDateValidationForRow(row) {
+    const dateFields = [
+      "ata_op", "atd_op", "ata_dp", "ccdate",
+      "atd_dp", "yard_in_date", "ata_wh", "yard_out_date"
+    ];
+
+    const dateInputs = dateFields.map(field =>
+      row.querySelector(`input[name*="[${field}]"]`)
+    );
+
+    dateInputs.forEach((input, idx) => {
+      if (!input) return;
+
+      input.addEventListener("change", () => {
+        const currentVal = input.value;
+        let isValid = true;
+
+        // Reset style
+        input.style.border = "";
+
+        // Check if this date is >= previous
+        if (idx > 0 && dateInputs[idx - 1] && dateInputs[idx - 1].value) {
+          const prevVal = dateInputs[idx - 1].value;
+          if (currentVal < prevVal) {
+            input.classList.add('input-blink-danger');
+            input.title = "Date must be later than previous";
+            isValid = false;
+          }
+        }
+
+        // Apply min constraint on the next inputs
+        for (let i = idx + 1; i < dateInputs.length; i++) {
+          if (dateInputs[i]) {
+            dateInputs[i].setAttribute("min", currentVal);
+          }
+        }
+      });
+    });
+  }
+
+  // Run on existing rows
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll("#containerTableBody tr").forEach(setupDateValidationForRow);
+  });
+</script>
+
+<!-- expand yard-in/ out columns-->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    function toggleYardColumns() {
+      // Toggle classes
+      document.querySelectorAll(".yard-col").forEach(col => {
+        col.classList.toggle("expanded");
+        col.classList.toggle("collapsed");
+      });
+
+      // Toggle headers and update their text
+      document.querySelectorAll(".yard-header").forEach(header => {
+        const isExpanded = header.classList.contains("expanded");
+        header.classList.toggle("expanded");
+        header.classList.toggle("collapsed");
+
+        // Update label
+        if (header.id === "yard-in-header") {
+          header.textContent = header.classList.contains("expanded") ? "Yard-IN" : "Y-IN";
+        } else if (header.id === "yard-out-header") {
+          header.textContent = header.classList.contains("expanded") ? "Yard-OUT" : "Y-OUT";
+        }
+      });
+    }
+
+    // Bind toggle on both headers
+    document.getElementById("yard-in-header").addEventListener("click", toggleYardColumns);
+    document.getElementById("yard-out-header").addEventListener("click", toggleYardColumns);
+  });
+</script>
+
+
+
+<!-- Container row cloneing -->
+<script>
+  const excludedFields = [];
+  
+  function syncDateAcrossRows(input) {
+    const name = input.name.match(/\[([^\[\]]+)\]$/)?.[1];  // e.g. "yard_in_date"
+    console.log("Full input name:", input.name);
+    console.log("Extracted name:", name);
+    console.log("Selector used:", `input[name$="[${name}]"]`);
+
+    // ⛔ Skip synchronization for excluded fields
+    if (excludedFields.includes(name)) return;
+
+    const value = input.value;
+
+    if (!value) return;
+
+    const matchingInputs = document.querySelectorAll(`#containerTableBody input[name$="[${name}]"]`);
+    console.log("Matching inputs found:", matchingInputs.length);
+    console.log(matchingInputs);
+
+    document.querySelectorAll(`#containerTableBody input[name$="[${name}]"]`).forEach(el => {
+      if (el !== input) {
+        el.value = value;
+        el.classList.add('input-blink');
+        setTimeout(() => el.classList.remove('input-blink'), 3000);
+      }
+    });
+  }
+  
+  function validateStatusLogic(row) {
+    const statusSel = row.querySelector('select[name$="[current_status]"]');
+    const yardInDate = row.querySelector('input[name$="[yard_in_date]"]');
+    const yardOutDate = row.querySelector('input[name$="[yard_out_date]"]');
+
+    if (statusSel && yardInDate && yardOutDate) {
+      statusSel.addEventListener('change', () => {
+        const selected = statusSel.value;
+
+        if (selected === 'In Yard' && !yardInDate.value) {
+          alert("Please provide Yard In Date for 'Yard In' status.");
+          statusSel.value = '';
+        }
+
+        const prevStatus = row.dataset.prevStatus;
+        if (prevStatus === 'In Yard' && selected !== 'In Yard' && !yardOutDate.value) {
+          alert("Provide Yard Out Date before changing status from 'In Yard'.");
+          statusSel.value = prevStatus;
+        }
+
+        row.dataset.prevStatus = selected;
+      });
+
+      row.dataset.prevStatus = statusSel.value || '';
+    }
+  }
+
+  document.querySelectorAll('#containerTableBody tr').forEach(row => {
+    row.querySelectorAll('input[type="date"]').forEach(input => {
+      input.addEventListener('input', () => syncDateAcrossRows(input));
+    });
+    validateStatusLogic(row);
+  });
+
+  let lastUid = 0;
+  document.querySelectorAll('#containerTableBody tr').forEach(row => {
+    const uid = parseInt(row.dataset.uid,10) || ++lastUid;
+    row.dataset.uid = uid;
+    lastUid = Math.max(lastUid, uid);
+  });
+  updateVisibleRowNumbers();
+
+  document.addEventListener('click', e => {
+    if (e.target.matches('.add-row')) {
+      const template = document.querySelector('#containerTableBody tr');
+      const clone    = template.cloneNode(true);
+      const newUid   = ++lastUid;
+
+      clone.querySelectorAll('[name]').forEach(el => {
+        const nameMatch = el.name.match(/containers\[\d+\]\[(.+?)\]/);
+        if (nameMatch && el.type === 'date') {
+          const nameSuffix = nameMatch[1];
+          const original = template.querySelector(`[name$="[${nameSuffix}]"]`);
+          el.value = original?.value || '';
+        } else {
+          el.value = '';
+        }
+      });
+
+      // assign the new UID everywhere
+      clone.dataset.uid = newUid;
+      clone.querySelector('.remove-row').dataset.uid = newUid;
+      clone.querySelectorAll('[name]').forEach(el => {
+        el.name = el.name.replace(/containers\[\d+\]/, `containers[${newUid}]`);
+      });
+      clone.querySelector('[id^="selected-items-"]').id = `selected-items-${newUid}`;
+      clone.querySelector('[id^="container_items_"]').id = `container_items_${newUid}`;
+      clone.querySelector('.add-items-btn').dataset.containerId = newUid;
+
+      document.getElementById('containerTableBody').appendChild(clone);
+      updateVisibleRowNumbers();
+      setupDateValidationForRow(clone);
+    }
+
+    if (e.target.matches('.remove-row')) {
+      const row = e.target.closest('tr');
+      const uid = row.dataset.uid;
+      if (confirm('Remove this container and free its qty?')) {
+        delete containerItems[uid];
+        row.remove();
+        updateVisibleRowNumbers();
+        recalcPending(); 
+      }
+    }
+  });
+
+  function updateVisibleRowNumbers() {
+    document.querySelectorAll('#containerTableBody tr .row-number')
+            .forEach((span,i) => span.textContent = (i+1) + '.');
+  }
+</script>
+
+<!-- Js to remove cargo item from shipment -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".remove-line").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        if (!confirm("Are you sure you want to remove this line?")) return;
+
+        const spoid = btn.dataset.spoid;
+        const row = btn.closest("tr");
+
+        fetch(`/shipment/{{ shipment_id }}/remove-line/${spoid}`, {
+          method: "POST",
+
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.status === "success") {
+            location.reload();
+          }
+          showToast(data.message, data.status); // dynamic toast by type
+        })
+        .catch(err => {
+          showToast("Error occurred: " + err.message, "error");
+        });
+      });
+    });
+
+    function showToast(msg, type = "info") {
+      const colorClass = {
+        success: "alert-success",
+        error: "alert-danger",
+        warning: "alert-warning",
+        info: "alert-info"
+      }[type] || "alert-info";
+
+      const messagesDiv = document.getElementById("messages");
+
+      const alert = document.createElement("div");
+      alert.className = `alert ${colorClass} alert-dismissible fade show`;
+      alert.setAttribute("role", "alert");
+      alert.innerHTML = `
+        ${msg}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      `;
+
+      messagesDiv.prepend(alert); // Add to top of the div
+
+      // Optional: auto-remove after 5 sec
+      setTimeout(() => {
+        if (alert.parentElement) alert.remove();
+      }, 5000);
+    }
+
+  });
+</script>
+
+
+<!-- JS T0 DUPLICATE INVOICE ROW and calculate totals -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const invoiceBody       = document.getElementById('invoice-body');
+  const addInvoiceBtn     = document.getElementById('add-invoice');
+  const invoiceTotalSpan  = document.getElementById('invoice-total');
+
+  const expenseInputs     = document.querySelectorAll('.expense-input');
+  const expenseInputTotal = document.getElementById('total_expense');
+  const expensePctSpan    = document.getElementById('expense_percent');
+  // 1) seed the counter from how many invoice rows you already rendered:
+  let invoiceIdx = JSON.parse('{{ invoices|length }}') + 1;  
+
+  // 1) Sum all invoice values
+  function updateInvoiceTotal() {
+    let sum = 0;
+    document.querySelectorAll('input[name="invoice_values"]').forEach(i => {
+      const v = parseFloat(i.value);
+      if (!isNaN(v)) sum += v;
+    });
+    invoiceTotalSpan.textContent = sum.toFixed(2);
+    updateExpensePercent();
+  }
+
+  // 2) Sum all expense inputs into total_expense
+  function updateExpenseTotal() {
+    let sum = 0;
+    expenseInputs.forEach(i => {
+      const v = parseFloat(i.value);
+      if (!isNaN(v)) sum += v;
+    });
+    expenseInputTotal.value = sum.toFixed(2);
+    updateExpensePercent();
+  }
+
+  // 3) Calculate expense percentage
+  function updateExpensePercent() {
+    const expense     = parseFloat(expenseInputTotal.value) || 0;
+    const invoicesTot = parseFloat(invoiceTotalSpan.textContent) || 0;
+    const pct = invoicesTot > 0 ? (expense / invoicesTot) * 100 : 0;
+    expensePctSpan.textContent = pct.toFixed(1) + ' %';
+  }
+
+  // wire up removal of invoice rows
+  invoiceBody.addEventListener('click', e => {
+    if (e.target.matches('.remove-row')) {
+      e.target.closest('tr').remove();
+      updateInvoiceTotal();
+    }
+  });
+
+  // wire up invoice_value changes
+  invoiceBody.addEventListener('input', e => {
+    if (e.target.matches('input[name="invoice_values"]')) {
+      updateInvoiceTotal();
+    }
+  });
+
+  // wire up add‑invoice
+  addInvoiceBtn.addEventListener('click', () => {
+    const idx = invoiceIdx++;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input type="text" name="invoice_numbers"></td>
+      <td><input type="number" name="invoice_values" step="0.01"></td>  
+      <td><input type="file" name="invoice_files_${idx}"></td>
+      <td><button type="button" class="remove-row btn btn-sm btn-danger">Remove</button></td>
+    `;
+    invoiceBody.appendChild(tr);
+    updateInvoiceTotal();
+  });
+
+  // wire up *all* expense inputs
+  expenseInputs.forEach(i => {
+    i.addEventListener('input', updateExpenseTotal);
+  });
+
+  // initial calculation
+  updateInvoiceTotal();
+  updateExpenseTotal();
+});
+</script>
+
+<!-- For non po items row adding -->
+<script>
+  document.addEventListener('DOMContentLoaded', function(){
+    const tfoot = document.querySelector('#cargoTableBody').parentElement.querySelector('tfoot');
+    tfoot.addEventListener('click', function(e){
+      // if they clicked on the FA icon (or its svg child), we still catch it
+      if (e.target.closest('#add-cargo-row')) {
+        // == your existing "add a cargo row" code ==
+        const tbody = document.getElementById('cargoTableBody');
+        const idx   = tbody.querySelectorAll('tr').length;
+        //const idx   = JSON.parse('{{(report_data.po_lines| length |safe) + (report_data.non_po_items | length | safe)}}')
+        const tr    = document.createElement('tr');
+        tr.classList.add('cargo-row');
+        tr.innerHTML = `
+          <td>${idx+1} 
+            <input hidden name="non_po_items" value="${idx+1}"/>
+            <input type="hidden"
+             name="cargo[${idx+1}][id]"
+             value="${idx+1}">
+          </td>
+          <td><input name="cargo[${idx+1}][supplier]"                     class="form-control-sm"></td>
+          <td><input name="cargo[${idx+1}][po]" value="NON_PO" readonly   class="form-control-sm"></td>
+          <td><input name="cargo[${idx+1}][LC]" value="DEFAULT" readonly   class="form-control-sm"></td>
+          <td><input name="cargo[${idx+1}][weight]" value="DEFAULT" readonly   class="form-control-sm"></td>
+          <td><input name="cargo[${idx+1}][sap_line]"                     class="form-control-sm"></td>
+          <td><input name="cargo[${idx+1}][article]"                      class="form-control-sm"></td>
+          <td><input name="cargo[${idx+1}][qty]"   type="number" min="0"  class="form-control-sm"></td>
+          <td><input name="cargo[${idx+1}][value]" type="number" step="0.01" class="form-control-sm"></td>
+        `;
+        tbody.appendChild(tr);
+        // and hook up your refreshCargoRows() on each new input…
+        tr.querySelectorAll('input').forEach(inp=>{
+          inp.addEventListener('input', refreshCargoRows);
+        });
+      }
+    });
+  });
+</script> 
+
+<!-- For planed status must exist -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('updateShipmentForm'); // your <form> id
+    const tbody = document.getElementById('containerTableBody'); // your <tbody> id
+
+    // helper: given an index, return the two elements
+    function getRowFields(idx) {
+      const numInput = tbody.querySelector(`[name="containers[${idx}][container_number]"]`);
+      const planSel  = tbody.querySelector(`[name="containers[${idx}][planed_status]"]`);
+      return { numInput, planSel };
+    }
+
+    // whenever container number changes, toggle required on planned_status
+    tbody.addEventListener('input', e => {
+      const m = e.target.name.match(/^containers\[(\d+)\]\[container_number\]$/);
+      if (!m) return;
+      const idx = m[1];
+      const { numInput, planSel } = getRowFields(idx);
+      if (!planSel) return;
+      if (numInput.value.trim()) {
+        planSel.required = true;
+        planSel.parentElement.classList.add('is-required');
+      } else {
+        planSel.required = false;
+        planSel.parentElement.classList.remove('is-required');
+      }
+    });
+
+    // on form‐submit, check every row
+    form.addEventListener('submit', e => {
+      let ok = true;
+      
+      // 1) Check for duplicate container numbers
+      const seen = new Set();
+      tbody.querySelectorAll('input[name$="[container_number]"]').forEach(input => {
+        const val = input.value.trim();
+        if (!val || !ok) return;
+        if (seen.has(val)) {
+          alert(`🚨 Duplicate container number "${val}" detected. Each container must be unique.`);
+          input.focus();
+          ok = false;
+        } else {
+          seen.add(val);
+        }
+      });
+
+      if (!ok) {
+        e.preventDefault();
+        return;
+      }
+
+
+      // Existing planned-status check
+      tbody.querySelectorAll('input[name$="[container_number]"]').forEach(input => {
+        const m = input.name.match(/^containers\[(\d+)\]\[container_number\]$/);
+        if (!m) return;
+        const idx = m[1];
+        const { numInput, planSel } = getRowFields(idx);
+        if (numInput.value.trim() && (!planSel.value || planSel.value.trim()==="")) {
+          alert(`🚨 You entered Container #${numInput.value} but did not select a Planned Status.`);
+          planSel.focus();
+          ok = false;
+          return;
+        }
+      });
+      if (!ok) e.preventDefault();
+    });
+  });
+</script>
+
+<!-- Dont leave unsaved -->
+<script>
+  (function() {
+    let isDirty = false;
+    const form = document.getElementById('updateShipmentForm');
+    if (!form) {
+      console.warn('⚠️ no #updateShipmentForm found');
+      return;
+    }
+
+    // 1) Mark dirty on any user edit
+    document.addEventListener('input',  () => { isDirty = true; });
+    document.addEventListener('change', () => { isDirty = true; });
+
+    // 2) Clear dirty on real form submit
+    form.addEventListener('submit', () => { isDirty = false; });
+
+    // 3) Warn on browser-level navigation (refresh, tab close, back/forward)
+    window.addEventListener('beforeunload', (e) => {
+      if (!isDirty) return;
+      e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+      return e.returnValue;
+    });
+
+    // 4) Intercept in-page <a> clicks
+    document.querySelectorAll('a[href]').forEach(link => {
+      link.addEventListener('click', e => {
+        if (!isDirty) return;
+        // let downloads, anchors on same page, or JS-only links through
+        const href = link.getAttribute('href');
+        if (href.startsWith('#') || href === '' || href === 'javascript:void(0)') {
+          return;
+        }
+        if (!confirm('You have unsaved changes. Leave without saving?')) {
+          e.preventDefault();
+        }
+      });
+    });
+  })();
+</script>
+
+
+{% endblock %}
+
+{% block columns_toggle %}
+{% endblock %}
+
+{% block filters_toggle %}
+{% endblock %}
+
+{% block script_filters_toggle %}
+{% endblock %}
+
+{% block script_columns_toggle %}
+{% endblock %}
+
+{% block script_filters %}
+{% endblock %}
+
+{% block filters %}
+{% endblock %}

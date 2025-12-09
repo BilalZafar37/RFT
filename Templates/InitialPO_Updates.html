@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+
+{% block page_heading_1 %}Home{% endblock %} 
+{% block page_heading_2 %}Purchase Orders{% endblock %} 
+{% block page_heading_3 %}Initail PO Updates{% endblock %} 
+
+{% block button_submit %}
+<button id="submit" type="submit" style="width: 600px;" form="main_form" class="btn bg-gradient-success">Submit Updates</button>
+{% endblock %} 
+
+{% block content %}  
+<form id="main_form" action="{{ url_for('main.initialPO_Updates') }}" method="POST">
+  <!-- PO UPDATE TABLE -->
+  <table id="myTable" style="color: white;" class="table table-responsive table-hover">
+    <thead>
+      <tr>
+        <th>sr.</th>
+        {% for col in columns %}
+          <th data-col="{{ col.name }}">{{ col.label }}</th>
+        {% endfor %}
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        {# POID_<poid> hidden so your POST logic picks it up #}
+        <td class="text-center">
+          <input type="hidden" name="POID_{{ row.POID }}" value="{{ row.POID }}">
+          {{loop.index}}
+        </td>
+
+        {# now the real cells… #}
+        <td class="col-{{columns[0].name}}">{{ row.PONumber }}</td>
+        <td class="col-{{columns[1].name}}">{{ row.Supplier }}</td>
+        <td class="col-{{columns[2].name}}">{{ row.Brand }}</td>
+        <td class="col-{{columns[3].name}}">{{ row.PODate }}</td>
+
+        <td class="col-{{columns[4].name}}">
+          <select name="LCStatus_{{ row.POID }}"
+                  id="LCStatus_{{ row.POID }}"
+                  class="form-select-sm rounded"
+                  onchange="trackChange(this,'{{ row.POID }}')">
+            <option value=""   {{ ''    if row.LCStatus in ('Yes','No') else 'selected' }}></option>
+            <option value="Yes"{{ 'selected' if row.LCStatus=='Yes' else '' }}>Yes</option>
+            <option value="No" {{ 'selected' if row.LCStatus=='No'  else '' }}>No</option>
+          </select>
+        </td>
+        <td class="col-{{columns[5].name}}">
+          <input type="text"
+                name="LCNumber_{{ row.POID }}"
+                id="LCNumber_{{ row.POID }}"
+                class="form-control-sm rounded"
+                value="{{ row.LCNumber or '' }}"
+                oninput="trackChange(this,'{{ row.POID }}')"
+                {% if row.LCStatus!='Yes' %}disabled{% endif %}>
+        </td>
+        <td class="col-{{columns[6].name}}">
+          <input type="date"
+                name="LCDate_{{ row.POID }}"
+                id="LCDate_{{ row.POID }}"
+                class="form-control-sm rounded"
+                value="{{ row.FLCDate or '' }}"
+                oninput="trackChange(this,'{{ row.POID }}')"
+                {% if row.LCStatus!='Yes' %}disabled{% endif %}>
+        </td>
+
+        {#<td class="col-{{columns[7].name}}">
+          <select name="ModeOfTransport_{{ row.POID }}" class="form-control-sm rounded" onchange="//trackChange(this,'{{ row.POID }}')">   
+            <option selected disabled></option>
+            {% for mot in modeOfTransport %}
+              <option value="{{mot.mode}}"
+                      {{ 'selected' if row.ModeOfTransport==mot.mode else '' }}>
+                {{ mot.mode }}
+              </option>
+            {% endfor %}
+          </select>
+        </td> #}
+
+        <td class="col-{{columns[7].name}}">
+          <select name="INCOTerms_{{ row.POID }}" class="form-control-sm rounded" onchange="trackChange(this,'{{ row.POID }}')">
+            <option selected></option>
+            {% for terms in incoterms %}
+              {% set full = terms.code ~ ' - ' ~ terms.description %}
+              <option value="{{ full }}"
+                      {{ 'selected' if row.INCOTerms==full else '' }}>
+                {{ full }}
+              </option>
+            {% endfor %}
+          </select>
+        </td>
+
+        <td class="col-{{columns[8].name}}">{{ row.TotalArticles }}</td>
+        <td class="col-{{columns[9].name}}">{{ row.TotalQty }}</td>
+        <td class="col-{{columns[10].name}}">{{ "{:,.2f}".format(row.TotalValue or 0) }} USD</td>
+        
+        {% if session['role'] == 'admin' %}
+          <td class="text-center">
+            <a href="{{ url_for('main.delete_po', po_id=row.POID) }}"
+               class="btn btn-link p-0"
+               title="Delete PO"
+               onclick="return confirm('Are you sure you wish to delete this Purchase Order ?');">
+              <i class="material-icons opacity-10" style="color: red;">delete</i>
+            </a>
+          </td>
+        {% endif %}
+        
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</form>
+{% endblock %}   
+
+{% block script_extra %}
+
+  <!-- submiting changed elements -->
+  <script>
+    let changedElements = {};
+
+    // Function to track changes in select elements
+    function trackChange(element, recordId) {
+      const name = element.name;
+      const value = element.value;
+
+      changedElements[name] = value;
+
+      // Also include the POID to ensure it's submitted
+      changedElements[`POID_${recordId}`] = recordId;
+    }
+
+    // Function to submit only changed elements
+    document.getElementById('main_form').addEventListener('submit', function(event) {
+      event.preventDefault(); // Prevent default form submission
+
+      // Create a new form to submit only the changed elements
+      const newForm = document.createElement('form');
+      newForm.method = 'POST';
+      newForm.action = '{{ url_for("main.initialPO_Updates") }}';
+
+      // Append only the changed elements to the form
+      for (let name in changedElements) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = name;
+        input.value = changedElements[name];
+        newForm.appendChild(input);
+      }
+
+      // Append the new form to the body and submit
+      document.body.appendChild(newForm);
+      newForm.submit();
+    });
+  </script>
+
+  <!-- LCStatus select -->
+  <script>
+    // Attach to every LCStatus select on the page
+    document.querySelectorAll('select[id^="LCStatus_"]').forEach(select => {
+      const poid = select.id.split('_')[1];
+      const numInput  = document.getElementById(`LCNumber_${poid}`);
+      const dateInput = document.getElementById(`LCDate_${poid}`);
+
+      function updateInputs() {
+        if (select.value === 'Yes') {
+          numInput.disabled  = false;
+          dateInput.disabled = false;
+        } else {
+          // clear & disable on No or empty
+          numInput.value  = '';
+          dateInput.value = '';
+          numInput.disabled  = true;
+          dateInput.disabled = true;
+        }
+      }
+
+      select.addEventListener('change', updateInputs);
+      // initialize on page load
+      updateInputs();
+    });
+  </script>
+{% endblock %}

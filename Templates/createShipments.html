@@ -1,0 +1,329 @@
+{% extends "base.html" %}
+
+
+{% block page_heading_1 %}Home{% endblock %} 
+{% block page_heading_2 %}Create Shipments{% endblock %} 
+{% block page_heading_3 %}Create New Shipment{% endblock %} 
+
+{% block styles %}
+/* red glow around the offending input */
+.highlight-error {
+  outline: 2px solid #e3342f;
+  animation: blink 0.5s ease-in-out 4;
+}
+@keyframes blink {
+  0%,100% { box-shadow: 0 0 0 red; }
+  50%   { box-shadow: 0 0 8px red; }
+}
+{% endblock %} 
+
+{% block button_submit %}
+<button id="submit" type="submit" style="width: 600px;" form="main_form" class="btn bg-gradient-success" data-action="{{ url_for('main.createShipments') }}">Create Shipment</button>
+
+<input type="text" name="shipment_num" id="shipment_num" placeholder="RFT.."/>
+<button form="main_form"  type="submit" class="btn bg-gradient-info" data-action="{{ url_for('main.add_shipment_line') }}">Update Shipment</button>
+
+{% endblock %} 
+
+{% block content %}   
+<form id="main_form"  method="POST">
+  <!-- PO UPDATE TABLE -->
+  <table id="myTable" style="color: black;" class="table table-responsive table-hover">
+    <thead>
+      <tr>
+        <th>Sr.<input style="width: 30% !important;" type="checkbox" id="select-all"></th>
+
+        <th data-col="PONumber">PO Number</th>
+        <th data-col="Supplier">Supplier</th>
+        <th data-col="Brand">Brand</th>
+        <th data-col="CatName">Category</th>
+        <th data-col="SapItemLine">Sap Item Line</th>
+        <th data-col="Article">Article</th>
+        <th data-col="Site">Site</th>
+        <th>Qty to ship</th>       {#  <input> column #}
+        <th data-col="BalanceQty">Total Qty</th>
+        <th>Balance Qty</th> 
+        <th data-col="TotalValue">Total Value</th>
+        <th>Balance Value </th> {# js‐computed #}
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in rows %}
+      <tr>
+        <td class="text-center">
+          <!-- <input type="hidden" name="poline_id" value="{{ r.POLineID }}"> -->
+          {{ loop.index }}.
+        </td>
+          
+        <td class="col-PONumber">{{ r.PONumber }}</td>
+        <td class="col-Supplier">{{ r.Supplier }}</td>
+        <td class="col-Brand">{{ r.Brand }}</td>
+        <td class="col-CatName">
+          {{ r.CatName }}/
+          <!-- <td> -->
+            {{ r.CATDesc }}
+            {% if r.SubCat == 'SDA'%}/ 
+              <select name="sda" id="sda">
+                {% for option in sda_options %} 
+                  <option>{{option.SDANames}}</option>
+                {% endfor %}
+              </select>
+            {% endif %}
+          <!-- </td> -->
+        
+        </td>
+        
+        <td class="col-SapItemLine">{{ r.SapItemLine }}</td>
+        <td class="col-Article">{{ r.Article }}</td>
+        <td class="col-Site">{{ r.Site }}</td>
+
+        {#  Qty‐to‐ship input  #}
+        <td>
+          <input
+            type="checkbox" name="POID" class="item-checkbox form-check-inline" style="accent-color: red !important;" value="{{ r.POLineID }}"/>
+          <input
+            type="number" name="selected_qty_{{ r.POLineID }}"
+            class="selected-qty form-control-sm rounded w-70"
+            value="0" min="0" max="{{ r.BalanceQty }}" step="1"/>
+        </td>
+
+        <td class="orig-balance col-BalanceQty">{{ r.BalanceQty }}</td>
+        <td class="new-balance">0</td>
+
+        <td class="total-value col-TotalValue">{{ "{:,.2f}".format(r.TotalValue) }}</td>
+        <td class="value-balance">0</td>
+
+        <!-- DELEET BUTTON -->
+        {% if session['role'] == 'admin' %}
+          <td class="text-center">
+            <a href="{{ url_for('main.delete_po_line', poline_id=r.POLineID) }}"
+                class="btn btn-link p-0"
+                title="Delete Po line"
+                onclick="return confirm('Are you sure you wish to delete this Purchase Order ?');"
+              >
+              <i class="material-icons opacity-10" style="color: red;">delete</i>
+            </a>
+          </td>
+        {% endif %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</form>
+{% endblock %}   
+
+{% block script_extra %}
+<!-- Submiting the form to main.add_shipment_line -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    let clickedButton = null;
+
+    // Capture the clicked button
+    document.querySelectorAll('button[type=submit][data-action]').forEach(btn => {
+      btn.addEventListener("click", function (e) {
+
+        clickedButton = this;
+      });
+    });
+
+    // On form submit, use the captured button's action
+    document.getElementById("main_form").addEventListener("submit", function (e) {
+      const form = this;
+      
+      // Get value from the outside input
+      const shipmentNum = document.getElementById("shipment_num").value;
+
+      // Check if hidden input already exists
+      let hiddenInput = form.querySelector('input[name="shipment_num"]');
+      if (!hiddenInput) {
+        hiddenInput = document.createElement("input");
+        hiddenInput.type = "hidden";
+        hiddenInput.name = "shipment_num";
+        form.appendChild(hiddenInput);
+      }
+      hiddenInput.value = shipmentNum;
+
+      if (clickedButton && clickedButton.dataset.action) {
+        form.action = clickedButton.dataset.action;
+      }
+    });
+  });
+</script>
+
+
+
+<!-- Blink on empty submit -->
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const form = document.querySelector("form");              // or #main_form
+    const checkboxes = form.querySelectorAll(".item-checkbox");
+  
+    form.addEventListener("submit", e => {
+      let firstBad = null;
+  
+      checkboxes.forEach(cb => {
+        if (!cb.checked) return;
+        const pid = cb.value;
+        const qtyInput = form.querySelector(`input[name="selected_qty_${pid}"]`);
+        if (!qtyInput) return;
+  
+        // clear any old highlight
+        qtyInput.classList.remove("highlight-error");
+  
+        if (parseInt(qtyInput.value, 10) === 0) {
+          firstBad = firstBad || qtyInput;
+        }
+      });
+  
+      if (firstBad) {
+        e.preventDefault();
+        alert("You checked an item but left its quantity at 0. Please enter a positive number.");
+        // highlight + scroll
+        firstBad.classList.add("highlight-error");
+        firstBad.scrollIntoView({ behavior: "smooth", block: "center" });
+        firstBad.focus();
+      }
+    });
+  });
+</script>
+  
+
+<!-- QTY management calculations -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.selected-qty').forEach(input => {
+      input.addEventListener('input', () => {
+        const row = input.closest('tr');
+
+        const origBalance = parseNumber(
+          row.querySelector('.orig-balance').textContent
+        );
+        const totalValue = parseNumber(
+          row.querySelector('.total-value').textContent
+        );
+        const selectedQty = parseNumber(input.value);
+
+        // 1) new balance qty
+        const newBalance = origBalance - selectedQty;
+        row.querySelector('.new-balance').textContent =
+          newBalance < 0 ? 0 : newBalance;
+
+        // 2) compute unit value from totalValue / origBalance
+        const unitValue = origBalance > 0
+          ? totalValue / origBalance
+          : 0;
+
+        // 3) value of remaining balance
+        const valueBalance = newBalance > 0
+          ? (unitValue * newBalance).toFixed(2)
+          : '0.00';
+
+        row.querySelector('.value-balance').textContent = valueBalance;
+      });
+
+      // fire once on load
+      input.dispatchEvent(new Event('input'));
+    });
+  });
+
+  // helper
+  function parseNumber(str) {
+    const cleaned = String(str).replace(/[^\d\.\-]/g, '');
+    return parseFloat(cleaned) || 0;
+  }
+</script>
+
+
+<!-- Checkbox checked -->
+<!-- Multibrand lock and checkbox  -->
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const selectAll = document.getElementById("select-all");
+    const checkboxes = Array.from(document.querySelectorAll(".item-checkbox"));
+
+    // Helper: get brand string for a checkbox
+    function getBrand(cb) {
+      return cb.closest("tr")
+              .querySelector(".col-Brand")
+              .textContent.trim();
+    }
+
+    // Helper: update disabled‐state of all boxes based on currentBrand
+    function applyBrandFilter(currentBrand) {
+      checkboxes.forEach(cb => {
+        const b = getBrand(cb);
+        if (currentBrand) {
+          cb.disabled = (b !== currentBrand);
+        } else {
+          cb.disabled = false;
+        }
+      });
+    }
+
+    // Called whenever any single checkbox changes
+    function onRowCheckboxChange(e) {
+      const cb = e.target;
+      const checkedBoxes = checkboxes.filter(c => c.checked);
+      if (checkedBoxes.length === 0) {
+        // no selection → clear filter
+        applyBrandFilter(null);
+        selectAll.checked = false;
+        return;
+      }
+
+      // figure out all the brands currently checked
+      const brands = new Set(checkedBoxes.map(getBrand));
+      if (brands.size > 1) {
+        // user tried to mix brands → revert and alert
+        cb.checked = false;
+        alert("🚫 You cannot mix multiple brands in one shipment.");
+        return;
+      }
+
+      // exactly one brand in use → disable all others
+      const [currentBrand] = brands;
+      applyBrandFilter(currentBrand);
+
+      // if selectAll is checked, ensure only same-brand rows are checked
+      if (selectAll.checked) {
+        checkboxes.forEach(c => {
+          if (!c.disabled) c.checked = true;
+        });
+      }
+    }
+
+    // wire up each row checkbox
+    checkboxes.forEach(cb => {
+      cb.addEventListener("change", onRowCheckboxChange);
+    });
+
+    // enhance select-all: only toggle same-brand rows
+    selectAll.addEventListener("change", () => {
+      const checked = selectAll.checked;
+      // if checking-all and we have no brand yet, pick the first visible row’s brand
+      let currentBrand = null;
+      if (checked) {
+        const first = checkboxes.find(c => c.closest("tr").offsetParent !== null);
+        if (first) {
+          currentBrand = getBrand(first);
+          applyBrandFilter(currentBrand);
+        }
+      } else {
+        // unchecking "all" → clear filter
+        applyBrandFilter(null);
+      }
+
+      // now check/uncheck all non-disabled boxes
+      checkboxes.forEach(cb => {
+        if (cb.disabled) return;
+        cb.checked = checked;
+      });
+    });
+  });
+</script>
+
+{% endblock %}
+
+{% block vertical_hover_script %}
+{% endblock %}

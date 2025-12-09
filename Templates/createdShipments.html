@@ -1,0 +1,338 @@
+{% extends "base.html" %}
+
+
+{% block page_heading_1 %}All Shipments{% endblock %} 
+{% block page_heading_2 %}Shipments List{% endblock %} 
+
+{% block page_heading_3 %}Shipments List{% endblock %} 
+
+{% block styles %}
+{% endblock %} 
+
+
+{% block button_submit %}
+<button id="submit" type="submit" style="width: 600px;" form="main_form" class="btn bg-gradient-success">Update Shipment</button>
+{% endblock %} 
+
+{% block export_btn_class %} {#shipment list page spacific block#}
+{% endblock %}
+
+{% block export_btn %}
+<div class="dropdown" style="margin-left:auto; margin-right:10px;">
+  <!-- <form id="export1" name="export1" action="{{ url_for('main.createdShipments') }}" method="post"> -->
+    <button id="export-btn" class="btn btn-secondary" type="submit" name="export" form="main_form">
+      Export to excel
+      <i class="fa fa-file-export"></i>
+    </button>
+  <!-- </form> -->
+</div>
+{% endblock %}
+
+
+{% block content %}  
+<form id="main_form" name="main_form" action="{{ url_for('main.createdShipments') }}" method="POST" enctype="multipart/form-data">
+  <table id="myTable" class="table align-items-center mb-0 table-responsive" style="color: black;">
+    <thead>
+      <tr>
+        <th>Sr.</th>
+        <th data-col="Brand">Brand</th>
+        <th data-col="ShipmentNumber">Shipment #</th>
+        <th hidden data-col="BLNumber"></th>
+        <th data-col="ModeOfTransport">Mode T.</th>
+        <th data-col="Status">Shipment Status</th>
+        <th data-col="BiyanNumber">Biyan #</th>
+        <th data-col="biyanPDF">Biyan PDF</th>
+        <th data-col="SADDADNumber">Saddad #</th>
+        <th data-col="saddadPDF">Saddad PDF</th>
+        <!-- <th data-col="saddadPDF">payment Status</th> -->
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% set total = rows|length %}
+      {% for shp in rows %}
+        {% set sn = shp.ShipmentNumber %}
+        <tr>
+          <td class="text-center">
+            {{ total - loop.index0 }}. 
+            <input type="checkbox" name="Shipment_to_export" value="{{ shp.ShipmentID }}" onchange="trackChange(this, '{{ shp.ShipmentID }}')"/>
+          </td>
+          <td >{{shp.Brand}}</td>
+          <!-- 1. ShipmentNumber (text cell for filtering) -->
+          <td style="display: flex; flex-direction: column;">
+            <input type="hidden" name="ShipmentNumber_{{ sn }}" value="{{ sn }}"/>
+            {% if shp.has_null or shp.is_qty_balanced or not shp.ContainerDeadline%}
+              <span class="badge bg-danger border px-2 py-1 rounded-pill small" style="width: fit-content;">{{'No Cont. Deadline' if not shp.ContainerDeadline}}{{' | Pending cargo' if not shp.is_qty_balanced}}</span>
+            {% endif %}
+
+            <div style="display: flex; align-items: center; gap: 5px;">
+              <a class="shipment-clickable" href="{{ url_for('main.updateShipments', shipment_id=shp.ShipmentID) }}">{{ sn }}</a>
+              <i class="fas fa-copy copy-btn" title="Copy" style="cursor:pointer;" onclick="navigator.clipboard.writeText('{{ sn }}')"></i>
+            </div>
+            <div style="display: flex; align-items: center; gap: 5px;">
+              <a class="shipment-clickable" href="{{ url_for('main.updateShipments', shipment_id=shp.ShipmentID) }}">BL# {{ shp.BLNumber or '--' }}</a>
+              <i class="fas fa-copy copy-btn" title="Copy" style="cursor:pointer;" onclick="navigator.clipboard.writeText('{{ shp.BLNumber }}')"></i>
+            </div>
+          </td>
+
+          <td hidden>{{ shp.BLNumber or '' }}</td>
+
+          <td data-col="ModeOfTransport">
+            <select name="ModeOfTransport_{{ sn }}" class="form-control-sm rounded" onchange="trackChange(this, '{{ sn }}')">
+              {% if not modeOfTransport %}   
+                <option selected disabled></option>
+              {% endif %}
+              {% for mot in modeOfTransport %}
+                <option value="{{mot.mode}}"{{ 'selected' if shp.ModeOfTransport == mot.mode else '' }}>
+                  {{ mot.mode }}
+                </option>
+              {% endfor %}
+            </select>
+          </td>
+
+          <!-- 2. Status -->
+          <td>
+            {#{shp.ShipmentLevelStatus}#}
+            <select name="Status_{{ sn }}" class="form-select-lg" data-col="Status" onchange="trackChange(this, '{{ sn }}')">
+              {% if request.endpoint == 'main.completedShipments' %}
+                {% for s in shipmentstatuses if s in DELIVERED_STATUSES or session['role'] == 'admin' %}
+                  <option value="{{ s }}" {% if shp.ShipmentLevelStatus == s %}selected{% endif %}>
+                    {{ s }}
+                  </option>
+                {% endfor %}
+              {% endif %}
+              {% if request.endpoint == 'main.createdShipments' %}
+                <option value="" {% if not shp.ShipmentLevelStatus %}selected{% endif %}>&mdash;</option>
+                {% for s in shipmentstatuses if s not in DELIVERED_STATUSES or session['role'] == 'admin' %}
+                  <option value="{{ s }}" {% if shp.ShipmentLevelStatus == s %}selected{% endif %}>
+                    {{ s }}
+                  </option>
+                {% endfor %}
+              {% endif %}
+            </select>
+          </td>
+
+          <!-- 3. BiyanNumber -->
+          <td>
+            <input
+              type="text"
+              name="BiyanNumber_{{ sn }}"
+              value="{{ shp.BiyanNumber or '' }}"
+              class="form-control-lg"
+              data-col="BiyanNumber"
+              oninput="trackChange(this, '{{ sn }}')"
+            />
+          </td>
+
+          <!-- 4. Biyan PDF (we filter on filename if you want) -->
+          <td>
+            <input
+              type="file"
+              name="biyanPDF_file_{{ sn }}"
+              accept="*/*"
+              class="form-control-sm"
+              data-col="biyanPDF"
+              oninput="trackChange(this, '{{ sn }}')"
+            />
+            {# Find the first file that starts with sn + "_biyanPDF" #}
+            {% set bfile = find_file(existing_biyan_files, sn, 'biyanPDF') %}
+
+            {% if bfile %}
+              <a href="{{ url_for('static', filename='uploads/Biyan-files/' ~ bfile) }}" target="_blank" class="small">(view)</a>
+            {% endif %}
+          </td>
+
+          <!-- 5. SADDADNumber -->
+          <td>
+            <input
+              type="text"
+              name="SADDADNumber_{{ sn }}"
+              value="{{ shp.SADDADNumber or '' }}"
+              class="form-control-sm"
+              data-col="SADDADNumber"
+              oninput="trackChange(this, '{{ sn }}')"
+            />
+          </td>
+
+          <!-- 6. Saddad PDF -->
+          <td>
+            <input
+              type="file"
+              name="saddadPDF_file_{{ sn }}"
+              accept="*/*"
+              class="form-control form-control-sm"
+              data-col="saddadPDF"
+              oninput="trackChange(this, '{{ sn }}')"
+            />
+            {% set sfile = find_file(existing_saddad_files, sn, 'saddadPDF') %}
+
+            {% if sfile %}
+              <a href="{{ url_for('static', filename='uploads/SADDAD-files/' ~ sfile) }}" target="_blank" class="small">(view)</a>
+            {% endif %}
+          </td>
+          
+          <!-- DELEET BUTTON -->
+          {% if session['role'] == 'admin' %}
+            <td class="text-center">
+              <a href="{{ url_for('main.reverse_shipment', shipment_id=shp.ShipmentID) }}"
+                 class="btn btn-link p-0"
+                 title="Delete Shipment"
+                 onclick="return confirm('Are you sure you wish to delete this Shipment ?');"
+                >
+                <i class="material-icons opacity-10" style="color: red;">delete</i>
+              </a>
+            </td>
+          {% endif %}
+          
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</form>
+{% endblock %}
+
+{% block script_extra %}
+<!-- <script>
+  let changedElements = {};
+
+  // Function to track changes in select elements
+  function trackChange(element, recordId) {
+    const name = element.name;
+    const value = element.value;
+
+    changedElements[name] = value;
+
+    // Also include the POID to ensure it's submitted
+    changedElements[`ShipmentNumber_${recordId}`] = recordId;
+  }
+
+  document.getElementById('main_form').addEventListener('submit', function(event) {
+    event.preventDefault(); // Stop default form submit
+
+    const originalForm = document.getElementById('main_form');
+    const formData = new FormData();
+
+    // Add only changed inputs
+    for (let name in changedElements) {
+      const input = originalForm.elements[name];
+      if (input && input.type === 'file') {
+        if (input.files.length > 0) {
+          formData.append(name, input.files[0]);
+        }
+      } else {
+        formData.append(name, changedElements[name]);
+      }
+    }
+
+    fetch('{{ url_for("main.createdShipments") }}', {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => {
+      if (!response.ok) throw new Error("Network response was not OK");
+      const redirectUrl = response.headers.get('X-Redirect-URL');
+      // once that's kicked off, do your redirect
+      if (redirectUrl) window.location.href = redirectUrl;
+      return response.blob().then(blob => ({ blob, redirectUrl }));
+    })
+    .then(({ blob, redirectUrl }) => {
+      // trigger download
+      const downloadLink = document.createElement('a');
+      const url = window.URL.createObjectURL(blob);
+      downloadLink.href = url;
+      downloadLink.download = 'shipments.xlsx';
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      downloadLink.remove();
+      window.URL.revokeObjectURL(url);
+    
+      // once that's kicked off, do your redirect
+      if (redirectUrl) window.location.href = redirectUrl;
+    })
+    .catch(error => console.error('Download or redirect failed', error));
+    
+  });
+
+</script> -->
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const form      = document.getElementById('main_form');
+    const updateBtn = document.getElementById('submit');
+    const exportBtn = document.getElementById('export-btn');
+    const endpoint  = "{{ url_for('main.createdShipments') }}";
+    let changedElements = {};
+    let lastAction = null;
+
+    // Track which button was clicked
+    updateBtn.addEventListener('click',  () => lastAction = 'update');
+    exportBtn.addEventListener('click',  () => lastAction = 'export');
+
+    // Called from your inputs, e.g.
+    window.trackChange = function(element, recordId) {
+      changedElements[element.name] = element.value;
+      changedElements[`ShipmentNumber_${recordId}`] = recordId;
+    };
+
+    form.addEventListener('submit', async (e) => {
+      // Always prevent the normal form post
+      e.preventDefault();
+
+      // If Export button was clicked
+      if (lastAction === 'export') {
+        const data = new FormData(form);
+        data.append('export', 'true');
+        try {
+          const res  = await fetch(endpoint, { method: 'POST', body: data });
+          if (!res.ok) throw new Error('Network error');
+          const blob = await res.blob();
+          const url  = URL.createObjectURL(blob);
+          const a    = document.createElement('a');
+          a.href     = url;
+          a.download = 'shipments.xlsx';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          URL.revokeObjectURL(url);
+        } catch (err) {
+          console.error('Export failed', err);
+          alert('Could not download file.');
+        }
+        return;
+      }
+
+      // Otherwise, Update button was clicked
+      if (lastAction === 'update') {
+        const data = new FormData();
+        for (const name in changedElements) {
+          const input = form.elements[name];
+          if (input && input.type === 'file') {
+            if (input.files.length > 0) {
+              data.append(name, input.files[0]);
+            }
+          } else {
+            data.append(name, changedElements[name]);
+          }
+        }
+        try {
+          const res     = await fetch(endpoint, { method: 'POST', body: data });
+          if (!res.ok) throw new Error('Network error');
+          const payload = await res.json();
+          if (payload.redirect) {
+            window.location.href = payload.redirect;
+          }
+        } catch (err) {
+          console.error('Update failed', err);
+          alert('Could not save changes.');
+        }
+      }
+    });
+  });
+</script>
+
+
+
+{% endblock %}
+
+{% block vertical_hover_script %}
+{% endblock %}

@@ -1,0 +1,10 @@
+__py*
+*.xlsx
+.vscode
+config.py
+email_test.py
+new changes_july-01-2025.txt
+static/uploads/*
+blueprints/static/uploads/
+Extras
+bilal dashboard

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="apple-touch-icon" sizes="76x76" href="/static/img/apple-icon.png">
+  <link rel="icon" type="image/png" href="/static/img/favicon.png">
+  <title>
+    RFT
+  </title>
+  <!-- Fonts and icons -->
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900|Roboto+Slab:400,700" />
+  <link href="/static/css/nucleo-icons.css" rel="stylesheet" />
+  <link href="/static/css/nucleo-svg.css" rel="stylesheet" />
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  <link id="pagestyle" href="/static/css/material-dashboard.css?v=3.1.0" rel="stylesheet" />
+</head>
+
+
+<style>
+  /* For WebKit browsers (Chrome, Safari, Edge) */
+  .scroll-container::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  .scroll-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+
+  .scroll-container::-webkit-scrollbar-thumb {
+    background-color: #c1c1c1;
+    border-radius: 5px;
+    border: 2px solid #f1f1f1;
+  }
+
+  .scroll-container::-webkit-scrollbar-thumb:hover {
+    background-color: #a8a8a8;
+  }
+
+  /* For Firefox */
+  .scroll-container {
+    scrollbar-width: thin;
+    scrollbar-color: #c1c1c1 #f1f1f1;
+  }
+
+  .fixed-height-card {
+    height: 350px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .scrollable-card-body {
+    flex: 1 1 auto;
+    overflow: auto !important;;
+  }
+
+  .bg-gradient-primary {
+    background-image: linear-gradient(195deg, #4054ec 0%, #D81B60 100%);
+  }
+  .dropdown-container {
+  display: none;
+  /* background-color: #262626; */
+  padding-left: 8px;
+  }
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  .dropdown-btn {
+  padding: 6px 8px 6px 16px;
+  text-decoration: none;
+  font-size: 20px;
+  color: #818181;
+  display: block;
+  border: none;
+  background: none;
+  width:100%;
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+  }
+  .hov:hover{
+    
+    display: flex;
+    width: 169px;
+    border: none;
+    border-radius: 5px;
+    background-image: linear-gradient(195deg, #4054ec 0%, #D81B60 100%);
+  }
+  .numbadge {
+  --bs-badge-padding-x: 0.5em;
+  --bs-badge-padding-y: 0.5em;
+  --bs-badge-font-size: 0.75em;
+  --bs-badge-font-weight: 700;
+  --bs-badge-color: #fff;
+  --bs-badge-border-radius: 10rem;
+  display: inline-block;
+  padding: var(--bs-badge-padding-y) var(--bs-badge-padding-x);
+  font-size: var(--bs-badge-font-size);
+  font-weight: var(--bs-badge-font-weight);
+  line-height: 1;
+  color: var(--bs-badge-color);
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: var(--bs-badge-border-radius);
+  }
+  /* Target the select2 container */
+.select2-container {
+    max-width: 607.321px !important;
+    min-width: 190px !important;
+    width: auto !important;
+}
+
+/* Ensure the dropdown itself also follows the same width */
+.select2-dropdown {
+    max-width: 607.321px !important;
+    min-width: 190px !important;
+    width: auto !important;
+}
+
+/* Style the inner text field where the selection appears */
+.select2-selection {
+    max-width: 607.321px !important;
+    min-width: 190px !important;
+    width: auto !important;
+}
+
+</style>
+
+
+
+<body class="g-sidenav-show" style="background-size: cover;  width: 100%;" background="./static/img/containers2.jpg">
+  {% include 'sidebar.html' %}  
+  <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg" style="display: flex; flex-direction: column; justify-content: space-between;">
+    <!-- Navbar -->
+    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur" data-scroll="true">
+      <div class="container-fluid py-1 px-3">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
+            <!-- <li class="breadcrumb-item text-sm"><a class="opacity-5 text-dark" href="javascript:;">Home</a></li> -->
+            <!-- <li class="breadcrumb-item text-sm text-dark active" aria-current="page">Update Users</li> -->
+          </ol>
+          
+        </nav>
+        <ul class="navbar-nav justify-content-end">
+          <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
+            <a href="javascript:;" class="nav-link text-body p-0" id="iconNavbarSidenav">
+              <div class="sidenav-toggler-inner">
+                <i class="sidenav-toggler-line"></i>
+                <i class="sidenav-toggler-line"></i>
+                <i class="sidenav-toggler-line"></i>
+              </div>
+            </a>
+          </li>
+          <li class="nav-item d-flex align-items-center">
+            <a href="#" class="nav-link text-body font-weight-bold px-0">
+              <i class="fa fa-user me-sm-1" style="font-size: 1.275rem;"></i>
+              <span class="d-sm-inline d-none" style="font-size: 1.275rem; color: white;">{{session['username']}}</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <!-- End Navbar -->
+    <div class="container-fluid py-4">
+      <div class="infographic-container">
+          <!-- <div class="infographic" style="padding-bottom: 100px;">
+              <div class="point">
+                  <div class="label">Secure Platform</div>
+                  <div class="icon">
+                      <img src="./static/img/secure-icon.png" alt="Secure Platform">
+                  </div>
+              </div>
+              <div class="point">
+                  <div class="label">Digital Storage</div>
+                  <div class="icon">
+                      <img src="./static/img/data-storage-icon.png" alt="Digital Storage">
+                  </div>
+              </div>
+              <div class="point">
+                  <div class="label">Scanning</div>
+                  <div class="icon">
+                      <img src="./static/img/scanning-icon.jpg" alt="Scanning">
+                  </div>
+              </div> -->
+          </div>
+      </div>
+      <div class="container" style="margin-left: 220px;">
+          <div class="logo" style="margin-top: 30px; padding-left: 60px;"></div>
+          <div class="text" style="padding-top: 30px; color: orange; font-family: sans-serif; font-weight: 700;">
+            <h1>Real time freight Tracking system</h1> </div>
+      </div>
+      <div class="container" style="margin-top: 60px; display: none;">
+          <div class="image"></div>
+          <div class="image"></div>
+          <div class="image"></div>
+          <div class="image"></div>
+          <div class="image"></div>
+      </div>
+      <!-- <div class="row">
+          <img src="/static/img/graphics.png" style="width: 50vw;">
+      </div> -->
+      <div class="row" style="margin-top: 70vh;">
+          <div class="col-12"></div>
+      </div>
+      <footer class="footer py-4">
+        <div class="container-fluid">
+          <div class="row align-items-center justify-content-lg-between">
+            <div class="col-lg-6 mb-lg-0 mb-4">
+              <div class="copyright text-center text-sm text-muted text-lg-start" style="width: 250px;background: white;opacity: 60%;">
+                © <script>
+                  document.write(new Date().getFullYear())
+                </script>, made by
+                      <a href="#" class="font-weight-bold" target="_blank">Bilal-Zafar</a>
+                      for MECL.
+                    </div>
+                  </div>
+                  <div class="col-lg-6">
+  </div>
+  </main>
+  <div class="fixed-plugin">
+    <div class="card shadow-lg">
+      <div class="card-header pb-0 pt-3">
+        <div class="float-start">
+          <h5 class="mt-3 mb-0"></h5>
+          <p></p>
+        </div>
+        <div class="float-end mt-4">
+          <button class="btn btn-link text-dark p-0 fixed-plugin-close-button">
+            <i class="material-icons">clear</i>
+          </button>
+        </div>
+        <!-- End Toggle Button -->
+      </div>
+    </div>
+  </div>
+  <!-- Core JS Files -->
+  <script src="/static/js/core/popper.min.js"></script>
+  <script src="/static/js/core/bootstrap.min.js"></script>
+  <script src="/static/js/plugins/perfect-scrollbar.min.js"></script>
+  <script src="/static/js/plugins/smooth-scrollbar.min.js"></script>
+  <script>
+    var win = navigator.platform.indexOf('Win') > -1;
+    if (win && document.querySelector('#sidenav-scrollbar')) {
+      var options = {
+        damping: '0.5'
+      }
+      Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+    }
+  </script>
+
+
+    <script>
+        function toggleDropdown() {
+            var dropdown = document.getElementById("reports-dropdown");
+            var icon = document.getElementById("reports-icon");
+            var isOpen = dropdown.style.display === "block";
+            dropdown.style.display = isOpen ? "none" : "block";
+            icon.className = isOpen ? "fas fa-caret-right" : "fas fa-caret-down";
+            localStorage.setItem('reportsDropdownState', !isOpen);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var dropdownState = localStorage.getItem('reportsDropdownState');
+            var dropdown = document.getElementById("reports-dropdown");
+            var icon = document.getElementById("reports-icon");
+            if (dropdownState === 'true') {
+                dropdown.style.display = "block";
+                icon.className = "fas fa-caret-down";
+            } else {
+                dropdown.style.display = "none";
+                icon.className = "fas fa-caret-right";
+            }
+        });
+    </script></body>
+
+</html>

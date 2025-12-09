@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block page_heading_1 %}Home{% endblock %}
+{% block page_heading_2 %}Settings{% endblock %} 
+{% block page_heading_3 %}Manage Dropdowns{% endblock %} 
+
+{% block heading_width %}width: 210px; {% endblock %}
+
+{% block content %}
+
+<form method="post">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>sr.</th>
+        <th>Name</th>
+        <th>Start Field</th>
+        <th>End Field</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for cfg in configs %}
+        <tr>
+          <td>{{ cfg.ID }}</td>
+          <td>
+            <input name="name_{{cfg.ID}}"
+                    value="{{ cfg.IntervalName }}"
+                    class="form-control form-control-sm"/>
+          </td>
+          <td>
+            <select name="start_{{cfg.ID}}" class="form-select-lg">
+              {% for f in date_fields %}
+                <option value="{{ f }}" {% if cfg.StartField==f %}selected{% endif %}>
+                  {{ f }}
+                </option>
+              {% endfor %}
+            </select>
+          </td>
+          <td>
+            <select name="end_{{cfg.ID}}" class="form-select-lg">
+              {% for f in date_fields %}
+                <option value="{{ f }}" {% if cfg.EndField==f %}selected{% endif %}>
+                  {{ f }}
+                </option>
+              {% endfor %}
+            </select>
+          </td>
+          <td>
+            <button type="submit" class="btn btn-sm btn-primary">Save</button>
+            <button 
+              type="submit" 
+              name="delete" 
+              value="{{cfg.ID}}" 
+              class="btn btn-sm btn-danger"
+              onclick="return confirm('Delete interval {{cfg.IntervalName}}?');"
+            >
+              Delete
+            </button>
+          </td>
+        </tr>
+      {% endfor %}
+      
+      {# 3 “New” row always visible #}
+      <tr class="table-success">
+        <td>New</td>
+        <td><input name="new_name" class="form-control-lg" placeholder="Heading Name"></td>
+        <td>
+          <select name="new_start" class="form-select-lg">
+            <option selected disabled></option>
+            {% for f in date_fields %}
+              <option value="{{ f }}">{{ f }}</option>
+            {% endfor %}
+          </select>
+        </td>
+        <td>
+          <select name="new_end" class="form-select-lg">
+            <option selected disabled></option>
+            {% for f in date_fields %}
+              <option value="{{ f }}">{{ f }}</option>
+            {% endfor %}
+          </select>
+        </td>
+        <td>
+          <button type="submit" name="add_new" value="1" class="btn btn-sm btn-success">
+            Add Interval
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</form> 
+  
+{% endblock %}
+
+
+{% block columns_toggle %}{% endblock %}
+{% block filters_toggle %}{% endblock %}
+{% block filters %}{% endblock %}
+
+{% block script_filters %}{% endblock %}
+
+{% block script_columns_toggle %}{% endblock %}
+{% block script_filters_toggle %}{% endblock %}

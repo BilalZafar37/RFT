@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+
+{% block page_heading_1 %}All Shipments{% endblock %} 
+{% block page_heading_2 %}Shipments List{% endblock %} 
+
+{% block page_heading_3 %}Shipments List{% endblock %} 
+
+{% block styles %}
+{% endblock %} 
+
+
+{% block button_submit %}
+{% endblock %} 
+
+{% block export_btn_class %} {#shipment list page spacific block#}
+{% endblock %}
+
+{% block export_btn %}
+
+{% endblock %}
+
+
+{% block content %}  
+
+{% if request.referrer and 'initial' in request.referrer %}
+  <h4 class="text-danger">Warning: This PO is used in the following shipments and/or containers</h4>
+{% elif request.referrer and 'createShipments' in request.referrer %}
+  <h4 class="text-danger">Warning: This PO_Line is used in the following shipments and/or containers</h4>
+{% else %}
+  <h4 class="text-danger">Warning: This record is used in the following shipments and/or containers</h4>
+{% endif %}
+
+<div class="mb-4">
+  <h5 class="text-primary">Related Shipments</h5>
+  <table class="table table-bordered table-striped">
+    <thead class="table-light">
+      <tr>
+        <th>Shipment #</th>
+        <th>BL Number</th>
+        <th>Created Date</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in shipments %}
+        <tr>
+          <td>{{ s.ShipmentNumber }}</td>
+          <td>{{ s.BLNumber or '-' }}</td>
+          <td>{{ s.CreatedDate.strftime('%d-%b-%Y') if s.CreatedDate else '-' }}</td>
+          <td>{{ s.status or '-' }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="mb-4">
+  <h5 class="text-primary">Related Containers</h5>
+  <table class="table table-bordered table-striped">
+    <thead class="table-light">
+      <tr>
+        <th>Container #</th>
+        <th>Type</th>
+        <th>Status</th>
+        <th>Remarks</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in containers %}
+        <tr>
+          <td>{{ c.ContainerNumber }}</td>
+          <td>{{ c.ContainerType or '-' }}</td>
+          <td>{{ c.status or '-' }}</td>
+          <td>{{ c.ContainerRemarks or '-' }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<form method="post">
+  <input type="hidden" name="po_id" value="{{ id }}">
+  <input type="hidden" name="confirm" value="yes">
+  <button type="submit" class="btn btn-danger">Yes, delete PO and all related data</button>
+  <a href="{{ request.referrer }}" class="btn btn-secondary">Cancel</a>
+</form>
+
+{% endblock %}
+
+
+
+{% block vertical_hover_script %}
+{% endblock %}

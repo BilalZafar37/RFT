@@ -1,0 +1,221 @@
+
+<aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3 bg-gradient-dark" id="sidenav-main">
+    <div class="sidenav-header">
+      <!-- <i class="fas fa-times p-3 cursor-pointer text-white opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i> -->
+      <!-- <a class="m-0" href="#"> -->
+        <img src="/static/img/RFT.gif" style="width: 250px; height:78px" alt="main_logo">
+        <!-- <span class="ms-1 font-weight-bold text-white">RFT</span> -->
+      <!-- </a> -->
+    </div>
+    <hr class="horizontal light mt-0 mb-2">
+    <div class="collapse navbar-collapse w-auto" id="sidenav-collapse-main">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link text-white {{ 'active' if request.endpoint in ['call_home'] else '' }}" href="{{ url_for('dashboard.dashboard') }}">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="material-icons opacity-10">dashboard</i>
+            </div>
+            <span class="nav-link-text ms-1">Dashboard</span>
+          </a>
+        </li>
+        {%if (not session['user_site_access']) or (session['role'] == 'admin') or (session['user_brand_access'])%}
+        <li class="nav-item">
+          <a class="nav-link text-white {{ 'active' if request.endpoint in ['call_home'] else '' }}" href="{{ url_for('main.freight_trackingView') }}">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="material-icons opacity-10">dashboard</i>
+            </div>
+            <span class="nav-link-text ms-1">General Import Details</span>
+          </a>
+        </li>
+        {% endif %}
+        <li class="nav-item">
+          <a class="nav-link text-white {{ 'active' if request.endpoint in ['call_home'] else '' }}" href="{{ url_for('main.initialPO_Updates') }}">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="material-icons opacity-10">dashboard</i>
+            </div>
+            <span class="nav-link-text ms-1">Initial PO Updates</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white {{ 'active' if request.endpoint in ['call_home'] else '' }}" href="{{ url_for('main.createShipments') }}">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="material-icons opacity-10">dashboard</i>
+            </div>
+            <span class="nav-link-text ms-1">Create New Shipment</span>
+          </a>
+        </li>
+        
+
+        <li class="nav-item dropbtn" aria-expanded="false" data-id="dropdown_shipments">
+          <a class="nav-link text-white {{ 'active' if request.endpoint in ['/net_value_summary'] else '' }}">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="material-icons opacity-10">analytics</i>
+            </div>
+            <span class="nav-link-text ms-1">All Shipments</span>
+            <i class="fas fa-caret-right ms-2"></i>
+          </a>
+        </li>
+        <div class="dropdown-container" style="display: none;">
+          <ul>
+            <li class="{{ 'hov-me' if '/net_value_summary/'  in request.path else 'hov' }}" style="position: relative; left: 25px;">
+              <a class="text-white text-center" href="{{ url_for('main.createdShipments') }}">Shipments List</a>
+            </li>
+            <li class="{{ 'hov-me' if '/net_value_summary/'  in request.path else 'hov' }}" style="position: relative; left: 25px;">
+              <a class="text-white text-center" href="{{ url_for('main.createdShipments') }}">Completed Shipments</a>
+            </li>
+          </ul>
+        </div>
+
+        <li class="nav-item dropbtn" aria-expanded="false" data-id="dropdown_finance">
+          <a class="nav-link text-white {{ 'active' if request.endpoint in ['/net_value_summary'] else '' }}">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="material-icons opacity-10">analytics</i>
+            </div>
+            <span class="nav-link-text ms-1">Finance</span>
+            <i class="fas fa-caret-right ms-2"></i>
+          </a>
+        </li>
+        <div class="dropdown-container" style="display: none;">
+          <ul>
+            <li class="{{ 'hov-me' if '/net_value_summary/'  in request.path else 'hov' }}" style="position: relative; left: 25px;">
+              <a class="text-white text-center" href="{{ url_for('main.coastAnalysis') }}">Cost Analysis</a>
+            </li>
+            <li class="{{ 'hov-me' if '/net_value_summary/'  in request.path else 'hov' }}" style="position: relative; left: 25px;">
+              <a class="text-white text-center" href="{{ url_for('main.expense_report') }}">Article cost Analysis</a>
+            </li>
+            <li class="{{ 'hov-me' if '/net_value_summary/'  in request.path else 'hov' }}" style="position: relative; left: 25px;">
+              <a class="text-white text-center" href="{{ url_for('main.po_report_page') }}">PO cost Analysis</a>
+            </li>
+          </ul>
+        </div>
+        
+        <li class="nav-item">
+          <a class="nav-link text-white {{ 'active' if request.endpoint in ['call_home'] else '' }}" href="{{ url_for('main.inTransitDetails') }}">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="material-icons opacity-10">dashboard</i>
+            </div>
+            <span class="nav-link-text ms-1">IN-Transit/Open PO</span>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link text-white {{ 'active' if request.endpoint in ['call_home'] else '' }}" href="{{ url_for('main.update_containers') }}">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="material-icons opacity-10">dashboard</i>
+            </div>
+            <span class="nav-link-text ms-1">Containers Update</span>
+          </a>
+        </li>
+
+        
+
+        <!-- <li class="nav-item">
+          <a class="nav-link text-white {{ 'active' if request.endpoint in ['call_home'] else '' }}" href="{{ url_for('main.test') }}">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="material-icons opacity-10">dashboard</i>
+            </div>
+            <span class="nav-link-text ms-1">Yard Storage</span>
+          </a>
+        </li> -->
+
+        <li class="nav-item">
+          <a class="nav-link text-white {{ 'active' if request.endpoint in ['categories'] else '' }}" href="{{ url_for('dropdowns.manage_categories') }}">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="material-icons opacity-10">upload_file</i>
+            </div>
+            <span class="nav-link-text ms-1">Manage Categories</span>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link text-white {{ 'active' if request.endpoint in ['categories'] else '' }}" href="{{ url_for('intervals.manage_intervals') }}">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="material-icons opacity-10">upload_file</i>
+            </div>
+            <span class="nav-link-text ms-1">Manage Lead-time chart</span>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link text-white {{ 'active' if request.endpoint in ['categories'] else '' }}" href="/admin/labels/FreightTrackingView">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="material-icons opacity-10">upload_file</i>
+            </div>
+            <span class="nav-link-text ms-1">Manage Field labels</span>
+          </a>
+        </li>
+
+        <li class="nav-item dropbtn" aria-expanded="false" data-id="dropdown_drpMng">
+          <a class="nav-link text-white {{ 'active' if request.endpoint in ['/net_value_summary'] else '' }}">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="material-icons opacity-10">analytics</i>
+            </div>
+            <span class="nav-link-text ms-1">Manage Dropdowns</span>
+            <i class="fas fa-caret-right ms-2"></i>
+          </a>
+        </li>
+        <div class="dropdown-container" style="display: none;">
+          <ul>
+            <li class="{{ 'hov-me' if '/net_value_summary/'  in request.path else 'hov' }}" style="position: relative; left: 25px;">
+              <a class="text-white text-center" href="/admin/dropdowns/statuses">Statuses</a>
+            </li>
+            <li class="{{ 'hov-me' if '/net_value_summary/'  in request.path else 'hov' }}" style="position: relative; left: 25px;">
+              <a class="text-white text-center" href="/admin/dropdowns/incoterms">Inco Terms</a>
+            </li>
+            <li class="{{ 'hov-me' if '/net_value_summary/' in request.path else 'hov' }}" style="position: relative; left: 25px;">
+              <a class="text-white text-center" href="/admin/dropdowns/modes">Modes of Transport</a>
+            </li>
+            <li class="{{ 'hov-me' if '/net_value_summary/' in request.path else 'hov' }}" style="position: relative; left: 25px;">
+              <a class="text-white text-center" href="/admin/dropdowns/agents">Custom Agents</a>
+            </li>
+            <li class="{{ 'hov-me' if '/net_value_summary/'  in request.path else 'hov' }}" style="position: relative; left: 25px;">
+              <a class="text-white text-center" href="/admin/dropdowns/origins">Origin Ports</a>
+            </li>
+            <li class="{{ 'hov-me' if '/net_value_summary/'  in request.path else 'hov' }}" style="position: relative; left: 25px;">
+              <a class="text-white text-center" href="/admin/dropdowns/destinations">Destination Ports</a>
+            </li>
+            <li class="{{ 'hov-me' if '/net_value_summary/' in request.path else 'hov' }}" style="position: relative; left: 25px;">
+              <a class="text-white text-center" href="/admin/dropdowns/lines">Shipping Lines</a>
+            </li>
+          </ul>
+        </div>
+
+        <li class="nav-item">
+          <a class="nav-link text-white {{ 'active' if request.endpoint in ['upload_sheet'] else '' }}" href="{{ url_for('main.upload_file') }}">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="material-icons opacity-10">upload_file</i>
+            </div>
+            <span class="nav-link-text ms-1">Upload Files</span>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link text-white {{ 'active' if request.endpoint in ['upload_sheet'] else '' }}" href="{{ url_for('main.settings') }}">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="material-icons opacity-10">upload_file</i>
+            </div>
+            <span class="nav-link-text ms-1">Settings</span>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link text-white {{ 'active' if request.endpoint in ['upload_sheet'] else '' }}" href="{{ url_for('auth.login') }}">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="material-icons opacity-10">upload_file</i>
+            </div>
+            <span class="nav-link-text ms-1">Sign-in</span>
+          </a>
+        </li>
+
+      </ul>
+    </div>
+    <div class="sidenav-footer position-absolute w-100 bottom-0">
+      <div class="mx-3">
+        <a class="btn btn-outline-primary mt-4 w-100" href="#" type="button">Documentation</a>
+      </div>
+    </div>
+</aside>
+
+
+
+

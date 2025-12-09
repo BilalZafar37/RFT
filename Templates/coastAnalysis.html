@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% block page_heading_1  %}Finance{% endblock %}
+{% block page_heading_2  %}Reports{% endblock %}
+{% block page_heading_3  %}Cost Analysis Report{% endblock %}
+{% block heading_width %}width: 210px; {% endblock %}
+
+{% block styles %}
+/* the dropdown list items */
+    .select2-container--default 
+      .select2-results__option {
+      color: black !important;
+    }
+    .select2-container--default .select2-selection--multiple , .select2-selection__choice {
+      background-color: rgb(23, 23, 23) !important;
+    }
+
+    .select2-container {
+      max-width: 607.321px !important;
+      min-width: 190px !important;
+      width: auto !important;
+    }
+
+    /* Ensure the dropdown itself also follows the same width */
+    .select2-dropdown {
+        max-width: 607.321px !important;
+        min-width: 190px !important;
+        width: auto !important;
+    }
+
+    /* Style the inner text field where the selection appears */
+    .select2-selection {
+        max-width: 607.321px !important;
+        min-width: 190px !important;
+        width: auto !important;
+    }
+{% endblock %} 
+
+{% block export_btn_class %} {#shipment list page spacific block#}
+{% endblock %}
+
+{% block export_btn %}
+<div class="dropdown" style="margin-left:auto; margin-right:10px;">
+  <form id="export1" name="export1" action="{{ url_for('main.coastAnalysis') }}" method="post">
+    <select id="export_brands" name="export_brands" multiple>
+      {% for brand in session["user_brand_access"] %}
+      <option value="{{brand}}">{{brand}}</option>
+      {% endfor %}
+    </select>
+    <button class="btn btn-secondary" type="submit" name="export">
+      Export to excel
+      <i class="fa fa-file-export"></i>
+    </button>
+  </form>
+</div>
+{% endblock %}
+
+{% block content %}
+  <table id="myTable" class="table mb-0 table-responsive table-hover">
+    <thead>
+      <tr>
+        <th>Sr.</th>
+        {% for col in columns %}
+          <th data-col="{{ col.name }}" class="text-center">
+            {{ col.label }}
+            <i class="fas fa-caret-up sort-arrow-OR" onclick="sortTableWithToggle(this, {{loop.index}})"></i>
+          </th>
+        {% endfor %}
+        
+      </tr>
+    </thead>
+    <tbody>
+      {% set total = rows|length %}
+      {% for row in rows %}
+        <tr>
+          <td class="text-center">{{ total - loop.index0 }}.</td>
+          {% for col in columns %}
+            <td class="col-{{col.name}} text-center {% if col.label == 'PO Numbers' %}po-cell{% endif %}" {% if col.label == 'PO Numbers' %} onclick="expandCell(this)" {% endif %}>
+              {% if col.label not in ['Shipment #','B/L','PO Numbers','Brand','Loading Port','Release Port','Total Qty Shipped', 'Total Value Shipped', 'Num. Containers', 'Cost Per.Container'] %}
+                {{ "{:,.0f}".format(row[col.name] | default(0)) }} <svg xmlns="http://www.w3.org/2000/svg" id="Layer_1" data-name="Layer 1" viewBox="0 0 1124.14 1256.39" width="auto" height="10" style="height: 20px;" class="icon" fill="#8A20FF"><path d="M699.62 1113.02c-20.06 44.48-33.32 92.75-38.4 143.37l424.51-90.24c20.06-44.47 33.31-92.75 38.4-143.37l-424.51 90.24ZM1085.73 895.8c20.06-44.47 33.32-92.75 38.4-143.37l-330.68 70.33v-135.2l292.27-62.11c20.06-44.47 33.32-92.75 38.4-143.37l-330.68 70.27V66.13c-50.67 28.45-95.67 66.32-132.25 110.99v403.35l-132.25 28.11V0c-50.67 28.44-95.67 66.32-132.25 110.99v525.69l-295.91 62.88c-20.06 44.47-33.33 92.75-38.42 143.37l334.33-71.05v170.26l-358.3 76.14c-20.06 44.47-33.32 92.75-38.4 143.37l375.04-79.7c30.53-6.35 56.77-24.4 73.83-49.24l68.78-101.97v-.02c7.14-10.55 11.3-23.27 11.3-36.97V743.77l132.25-28.11v270.4l424.53-90.28Z" class="cls-1"></path></svg>
+              {% elif col.label == 'Total Value Shipped' %}
+                {{ "{:,.0f}".format(row[col.name] | default(0)) }} USD
+              {% elif col.label == 'Shipment #' %}
+                <div style="display: flex; align-items: center; gap: 5px;">
+                  <a class="shipment-clickable" href="{{ url_for('main.updateShipments', shipment_id=row['shipment_id']) }}">{{ row[col.name] }}</a>
+                  <i class="fas fa-copy copy-btn" title="Copy" style="cursor:pointer;" onclick="navigator.clipboard.writeText('{{ row[col.name] }}')"></i>
+                </div>
+              {% elif col.label == 'B/L' %}
+                <div style="display: flex; align-items: center; gap: 5px;">
+                  <a class="shipment-clickable" href="{{ url_for('main.updateShipments', shipment_id=row['shipment_id']) }}">{{ row[col.name] }}</a>
+                  <i class="fas fa-copy copy-btn" title="Copy" style="cursor:pointer;" onclick="navigator.clipboard.writeText('{{ row[col.name] }}')"></i>
+                </div>
+              {% elif col.label == 'Cost Per.Container' %}
+                {% if row['container_count'] and row['total_expense'] %}
+                  {{ "{:,.0f}".format(row['total_expense'] / row['container_count']) }} SAR
+                {% else %}
+                  0 SAR
+                {% endif %}
+              {% else %}
+                {{ row[col.name] }}
+              {% endif %}
+            </td>
+          {% endfor %}
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}
+
+{% block script_extra %}
+  <script>
+    function expandCell(cell) {
+      cell.classList.toggle("expanded");
+    }
+  </script>
+
+  <script>
+    function sortTableWithToggle(element, columnIndex) {
+      const table = document.querySelector("#myTable");
+      const rows = Array.from(table.getElementsByTagName("tbody")[0].getElementsByTagName("tr"));
+
+      // Determine the sort order based on the current arrow class
+      const isDescending = element.classList.contains("fa-caret-down");
+      const newOrder = isDescending ? "asc" : "desc";
+
+      // Toggle the arrow class for the clicked column only
+      const allArrows = document.querySelectorAll(".sort-arrow-SA, .sort-arrow-OR");
+      allArrows.forEach(arrow => {
+        if (arrow !== element) {
+          arrow.classList.remove("fa-caret-up", "fa-caret-down");
+          arrow.classList.add("fa-caret-down"); // Reset other arrows to down
+        }
+      });
+
+      element.classList.toggle("fa-caret-down", !isDescending);
+      element.classList.toggle("fa-caret-up", isDescending);
+
+      // Sort only visible rows
+      const visibleRows = rows.filter(row => row.style.display !== "none");
+
+      visibleRows.sort((a, b) => {
+        const cellA = a.cells[columnIndex]?.innerText.trim() || "";
+        const cellB = b.cells[columnIndex]?.innerText.trim() || "";
+      
+        // Always treat empty as smallest
+        if (!cellA && !cellB) return 0;
+        // Appear on top when sorting ascending
+        // Appear at bottom when sorting descending
+        if (!cellA) return newOrder === "asc" ? -1 : 1;
+        if (!cellB) return newOrder === "asc" ? 1 : -1;
+      
+        // Detect number
+        const numA = parseFloat(cellA.replace(/,/g, ''));
+        const numB = parseFloat(cellB.replace(/,/g, ''));
+        const isNumeric = !isNaN(numA) && !isNaN(numB);
+      
+        // Detect date (support formats like 10-Jul-2025)
+        const parseDate = str => {
+          const parts = str.split("-");
+          if (parts.length === 3 && parts[1].length === 3) {
+            return new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
+          }
+          return new Date(str); // fallback
+        };
+        const dateA = parseDate(cellA);
+        const dateB = parseDate(cellB);
+        const isDate = !isNaN(dateA.getTime()) && !isNaN(dateB.getTime());
+      
+        let comparison = 0;
+        const cleanText = str => str
+          .replace(/\s+/g, ' ')         // replace multiple spaces/newlines with single space
+          .replace(/[\u200B\u00A0]/g, '') // remove invisible characters
+          .trim()
+          .toLowerCase()
+          .normalize('NFKD');            // normalize accents etc.
+        
+        if (isNumeric) {
+          comparison = numA - numB;
+        } else if (isDate) {
+          comparison = dateA - dateB;
+        } else {
+          const aText = cleanText(cellA);
+          const bText = cleanText(cellB);
+          comparison = aText.localeCompare(bText);
+        }
+      
+        return newOrder === "desc" ? -comparison : comparison;
+      });
+      
+      // Reattach sorted rows
+      visibleRows.forEach(row => table.getElementsByTagName("tbody")[0].appendChild(row));
+    }
+  </script>
+{% endblock %}

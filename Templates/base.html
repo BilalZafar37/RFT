@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="apple-touch-icon" sizes="76x76" href="/static/img/apple-icon.png">
+  <link rel="icon" type="image/png" href="/static/img/favicon.png">
+  <title>
+    RFT System (DEVELOPMENT)
+  </title>
+  <!-- experiment integration -->
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+  crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- END experiment integration -->
+
+  <!-- Fonts and icons -->
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900|Roboto+Slab:400,700" />
+  <link href="/static/css/nucleo-icons.css" rel="stylesheet" />
+  <link href="/static/css/nucleo-svg.css" rel="stylesheet" />
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  <link id="pagestyle" href="/static/css/material-dashboard.css?v=3.1.0" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+  <!-- filepond  -->
+  <link href="https://unpkg.com/filepond/dist/filepond.min.css" rel="stylesheet" />
+  <script src="https://unpkg.com/filepond/dist/filepond.min.js"></script>
+  
+</head>
+
+<style>
+  .layout {
+  display: flex;
+  align-items: flex-start; /* keep both at top */
+  height: 100vh;           /* optional, full-height layout */
+  overflow: hidden;        /* if you want scroll inside page-content only */
+  }
+
+  /* style the sidebar host itself */
+  my-sidebar {
+    flex: 0 0 250px;         /* fixed 250px wide */
+    height: 100%;            /* match container height if you like */
+    box-shadow: 2px 0 6px rgba(0,0,0,0.1);
+    background: #fff;
+    overflow-y: auto;        /* scroll if sidebar content is tall */
+  }
+
+
+  /* the main area takes the rest of the space */
+  .page-content {
+    flex: 1 1 auto;
+    padding: 1rem;
+    overflow-y: auto;        /* scroll inside main */
+  }
+
+
+  /* you can adjust the color to match your theme */
+  .dark-version .hover-column {
+    background-color: #3e5781 !important;
+  }
+
+  .dark-version .table-hover tbody tr:hover td{
+    background-color: #3e5781 !important;
+  }
+
+
+  .dark-version .table>:not(caption)>*>* {
+    border-color: hsla(0,0%,100%,.04)!important;
+    color: #ffffff!important;
+    background-color: #2c3d59 ;
+  }
+
+  .dark-version label  {
+      color: hsla(0, 100%, 100%, 0.8)!important
+  }
+
+  .dark-version input, select, textarea{
+      color: white !important;
+      background-color: #486085;
+      border: 1px solid white;
+  } 
+  .dark-version #filters {
+    border: none !important;
+  }
+
+  /* LIGHT MODE overrides */
+  .light-version .table > :not(caption) > * > * {
+    border-color: #ddd !important;
+    color: #000 !important;
+    <!-- background-color: #fff !important; -->
+  }
+
+  .light-version label {
+    color: #000 !important;
+  }
+
+  .light-version input,
+  .light-version select,
+  .light-version textarea {
+    color: #000 !important;
+    background-color: #f5f5f5 !important;
+    border: 1px solid #ccc !important;
+  }
+
+  /* your hover‐column & hover‐row tweaks */
+  .light-version .hover-column,
+  .light-version .table-hover tbody tr:hover td {
+    background-color: #f0f0f0 !important;
+  }
+
+  /* tables text */
+  .light-version table, 
+  .light-version table th,
+  .light-version table td {
+    color: #000 ;
+  }
+
+  /* card header & its h6 */
+  <!-- .light-version .card-header {
+    
+  } -->
+  .light-version .card-header h6 {
+    background-image: linear-gradient(195deg, #4054ec 0%, #D81B60 100%) ;
+  }
+
+  /* filters panel */
+  .light-version #filters {
+    background-color: #f5f5f5 !important;
+    border: 1px solid #ddd !important;
+  }
+
+  {% block styles %}
+  {% endblock %} 
+  
+  /* Use this class on your shipment number element, e.g. <span class="shipment-clickable">#12345</span> */
+  
+   .shipment-clickable {
+     display: inline-block;
+     color: #007bff;          /* base link-blue color */
+     text-decoration: none;
+     position: relative;
+     transition: color 0.2s ease, transform 0.2s ease;
+     cursor: pointer;
+     width: fit-content;
+   }
+  
+   .shipment-clickable::after {
+     content: '';
+     position: absolute;
+     left: 0;
+     bottom: -2px;
+     width: 100%;
+     height: 2px;
+     background: #007bff;
+     transform: scaleX(0);
+     transform-origin: left center;
+     transition: transform 0.2s ease;
+   }
+  
+   .shipment-clickable:hover {
+     color: #0056b3;          /* darker blue on hover */
+     transform: translateY(-2px);
+   }
+  
+   .shipment-clickable:hover::after {
+     transform: scaleX(1);
+   }
+  
+   .shipment-clickable:active {
+     color: #003f7f;
+     transform: translateY(0);
+   }
+  /*  */
+    input[type="file"] {
+      position: relative;
+    }
+  
+    input[type="file"]::file-selector-button {
+      width: 136px;
+      color: transparent;
+    }
+  
+    /* Faked label styles and icon */
+    input[type="file"]::before {
+      position: absolute;
+      pointer-events: none;
+      top: 10px;
+      left: 16px;
+      height: 20px;
+      width: 20px;
+      content: "";
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230964B0'%3E%3Cpath d='M18 15v3H6v-3H4v3c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-3h-2zM7 9l1.41 1.41L11 7.83V16h2V7.83l2.59 2.58L17 9l-5-5-5 5z'/%3E%3C/svg%3E");
+  
+    }
+  
+    input[type="file"]::after {
+      position: absolute;
+      pointer-events: none;
+      top: 11px;
+      left: 40px;
+      color: #0964b0;
+      content: "Upload File";
+    }
+  
+    /* ------- From Step 1 ------- */
+  
+    /* file upload button */
+    input[type="file"]::file-selector-button {
+      border-radius: 4px;
+      padding: 0 16px;
+      height: 40px;
+      cursor: pointer;
+      background-color: white;
+      border: 1px solid rgba(0, 0, 0, 0.16);
+      box-shadow: 0px 1px 0px rgba(0, 0, 0, 0.05);
+      margin-right: 16px;
+      transition: background-color 200ms;
+    }
+  
+    /* file upload button hover state */
+    input[type="file"]::file-selector-button:hover {
+      background-color: #f3f4f6;
+    }
+  
+    /* file upload button active state */
+    input[type="file"]::file-selector-button:active {
+      background-color: #e5e7eb;
+    }
+              /* end of file upload button styling */
+    /* ------------------------ */
+  
+
+  .filter-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding-left: 19px;
+  }
+
+  .filter-container select,
+  .filter-container input {
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+  .bg-gradient-primary {
+    background-image: linear-gradient(195deg, #4054ec 0%, #D81B60 100%);
+  }
+  .dropdown-container {
+    display: block;
+    padding-left: 8px;
+  }
+  ::-webkit-scrollbar {
+    display: none;
+  } 
+  .dropdown-btn {
+    padding: 6px 8px 6px 16px;
+    text-decoration: none;
+    font-size: 20px;
+    color: #818181;
+    display: block;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    outline: none;
+  }
+  .hov:hover {
+    display: flex;
+    width: 169px;
+    border: none;
+    border-radius: 5px;
+    background-image: linear-gradient(195deg, #4054ec 0%, #D81B60 100%);
+  }
+  .numbadge {
+    --bs-badge-padding-x: 0.5em;
+    --bs-badge-padding-y: 0.5em;
+    --bs-badge-font-size: 0.75em;
+    --bs-badge-font-weight: 700;
+    --bs-badge-color: #fff;
+    --bs-badge-border-radius: 10rem;
+    display: inline-block;
+    padding: var(--bs-badge-padding-y) var(--bs-badge-padding-x);
+    font-size: var(--bs-badge-font-size);
+    font-weight: var(--bs-badge-font-weight);
+    line-height: 1;
+    color: var(--bs-badge-color);
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: var(--bs-badge-border-radius);
+  }
+  .border2 {
+    border: 2px solid #000 !important;
+  }
+  .input-custom {
+    background-color: #f8f9fa;
+    border: none;
+    border-bottom: 2px solid #ced4da;
+    padding: 10px;
+    border-radius: 0;
+    outline: none;
+  }
+
+  .input-custom:focus {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #4054ec;
+    box-shadow: none;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  label {
+    font-weight: bold;
+  }
+
+  .btn-primary {
+    background-color: #4054ec;
+    border-color: #4054ec;
+  }
+
+  .btn-primary:hover {
+    background-color: #3547d3;
+    border-color: #3547d3;
+  }
+  .instructions {
+      /* font-size: 5px; */
+      color: #51d94f; /* Bootstrap danger color */
+      background-color: #fbfe12; /* Bootstrap danger background */
+      border: 1px solid #ebccd1; /* Bootstrap danger border */
+      padding: 5px;
+      border-radius: 4px;
+      margin-bottom: 15px;
+      font-weight: 500;
+  }
+  /* regular highlight (steady) for bulk container update one class (#fff3cd)*/
+  .highlight-col {
+    background-color: lightskyblue !important;
+  }
+  /* freeze the first column */
+  .sticky-left-1 {
+    position: sticky;
+    left: 0;
+    background: #fff !important;
+    z-index: 2;           /* keep it on top of other cells */
+  }
+
+  /* freeze the second column */
+  .sticky-left-2 {
+    position: sticky;
+    left: 60px;          /* adjust to the exact width of col 1 */
+    background: #fff !important;
+    z-index: 1;
+  }
+  /* freeze the second column */
+  .sticky-left-3 {
+    position: sticky;
+    left: 140px;          /* adjust to the exact width of col 1 */
+    background: #fff !important;
+    z-index: 1;
+  }
+  .sticky-left-4 {
+    position: sticky;
+    left: 310px;          /* adjust to the exact width of col 1 */
+    background: #fff !important;
+    z-index: 1;
+  }
+
+  .scroll-wrapper {
+    max-height: 70vh;         /* or any height you want */
+    overflow-x: auto;
+    overflow-y: auto;
+    position: relative;
+    background: white;
+  }
+  
+  /* Optional: make the horizontal scrollbar always visible */
+  .scroll-wrapper::-webkit-scrollbar {
+    display: block;
+    height: 12px;
+  }
+  
+  .scroll-wrapper::-webkit-scrollbar-thumb {
+    background: #888;
+  }
+
+  .fixed-x-scroll {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 16px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    background: #f2f2f2;
+    z-index: 999;
+  }
+  
+  .scroll-wrapper {
+    overflow: auto;
+    max-height: calc(100vh - 50px); /* leave room for fixed scroll bar */
+  }
+  .po-cell {
+        max-width: calc(8ch + 4px); /* Adjust for padding/margins or slight variations */
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        cursor: pointer;
+        display: inline-block; /* Ensures consistent behavior for text-overflow */
+  }
+
+  .po-cell.expanded {
+      max-width: none; /* Show full content when expanded */
+      white-space: normal; /* Allow multi-line text if needed */
+  }
+</style>
+
+<body id="app-body" class="g-sidenav-show layout 
+          {% if current_user.theme=='dark' %}
+            dark-version bg-gray-900
+          {% else %}
+            light-version
+          {% endif %} "
+  >
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+  
+
+  <script>
+    $(document).ready(function(){
+        $("#brandFilter, #origin_country, #destination_country, #article_selection, #shipping_line, #export_brands").select2({
+            allow_clear:true,
+        });
+    });
+    // multiple: false,
+  </script>
+
+  
+  <!-- 1) Define a template holding your sidebar HTML -->
+  <template id="sidebar-template">
+    <!-- load your CSS as part of the template -->
+    <link rel="stylesheet" href="/static/css/index.css">
+    <link 
+      rel="stylesheet" 
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"
+    >
+    {% include 'sidebar2.html' %}
+  </template>
+  
+  <!-- 2) Use only the custom element in your body -->
+  <my-sidebar class="{% if current_user.theme=='dark' %}dark-version{% endif %}" style="max-width: max-content;"></my-sidebar>
+  
+  <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg page-content">
+    <!-- Navbar -->
+    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur" data-scroll="true">
+      <div class="container-fluid py-1 px-3">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
+            <li class="breadcrumb-item text-sm"><a class="opacity-5 text-dark" href="javascript:;">Home</a></li>
+            <li class="breadcrumb-item text-sm text-dark active" aria-current="page">{% block page_heading_1 %}{% endblock %}</li>
+          </ol>
+          <h6 class="font-weight-bolder mb-0">{% block page_heading_2 %}{% endblock %}</h6>
+        </nav>
+        <ul class="navbar-nav justify-content-end">
+          <!-- <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
+            <a href="javascript:;" class="nav-link text-body p-0" id="iconNavbarSidenav">
+              <div class="sidenav-toggler-inner">
+              </div>
+            </a>
+          </li> -->
+          <li class="nav-item d-flex align-items-center">
+            <div class="form-check form-switch align-items-center mb-3">
+              <i class="fa {{ 'fa-moon' if current_user.theme=='dark' else 'fa-moon-o' }}  me-sm-1" style="font-size: 1.275rem;"></i>
+              <input class="form-check-input" type="checkbox" id="theme-toggler" checked="">
+              <!-- <label class="form-check-label mb-0 ms-3" for="rememberMe">{{ 'Switch to light mode' if current_user.theme=='dark' else 'Switch to dark mode' }}</label> -->
+            </div>
+          </li>
+          <li class="nav-item d-flex align-items-center">
+            <a href="#" class="nav-link text-body font-weight-bold px-0">
+              <i class="fa fa-user me-sm-1" style="font-size: 1.275rem;"></i>
+              <span class="d-sm-inline d-none" style="font-size: 1.275rem;">{{session['username']}}</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <!-- End Navbar -->
+    <div class="container-fluid py-4">
+      <div class="row">
+        <div class="col-12">
+          <div class="card my-4">
+            <div class="card-header p-0 mt-n4 mx-3 {{'sticky-top' if request.endpoint != 'main.updateShipments'}}" style="top: 18px;">
+              <div  class="bg-gray-900 shadow-info border-radius-lg pt-4 pb-3" style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;">
+
+                <h6 class="text-white text-capitalize ps-3" 
+                  style="{% block heading_width %}width: 210px; {% endblock %}cursor: pointer; border-top-right-radius: 5px; border-bottom-right-radius: 5px; ">{% block page_heading_3 %}{% endblock %}
+                </h6>
+                {% block export_btn %}
+                {% endblock %}
+                {% block columns_toggle %}
+                 <!-- FOR Columns DROPDOWN -->  {#shipment list page spacific block#}
+                <div class="dropdown" style="{% block export_btn_class %} margin-left:auto;{% endblock %} margin-right:10px;">
+                  <button class="btn btn-secondary dropdown-toggle" type="button"
+                          data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-columns-gap"></i>
+                  </button>
+                  <ul class="dropdown-menu dropdown-menu-end">
+                    {% for col in columns %}
+                      <li>
+                        <label class="dropdown-item">
+                          <input type="checkbox"
+                                 class="col-toggle"
+                                 data-col="{{ col.name }}"
+                                 {% if col.visible_by_default is not defined or col.visible_by_default %}checked{% endif %}>
+                          {{ col.label }}
+                        </label>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                </div>
+                {% endblock %}
+
+                {% block filters_toggle %}
+                <!-- FOR FILTERS DROPDOWN -->
+                <div class="dropdown" style="margin-left:5px;">
+                  <button class="btn btn-secondary dropdown-toggle" type="button"
+                          data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-funnel-fill"></i>
+                  </button>
+                  <ul class="dropdown-menu dropdown-menu-end">
+                    {% for col in columns if col.filter_type != 'none' %}
+                      <li>
+                        <!-- <div class="filter-item" data-col="{{ col.name }}"> -->
+                        <label>
+                          <input type="checkbox"
+                                  class="filter-toggle"
+                                  data-col="{{ col.name }}"
+                                  checked>
+                          {{ col.label }} Filter
+                        </label>
+                        <!-- </div> -->
+                      </li>
+                    {% endfor %}
+                  </ul>
+                </div>                
+                {% endblock %}
+
+              </div>
+            </div>
+            <div id="messages" class="card-body px-0 pb-2">
+              {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                  {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show text-white" role="alert" style="color: white;">
+                      {{ message }}
+                      <button type="button" class="btn-close opacity-10 py-3 text-lg" style="color: white;" data-bs-dismiss="alert" aria-label="Close">X</button>
+                    </div>
+                  {% endfor %}
+                {% endif %}
+              {% endwith %}
+              
+              {% block filters %}
+              <!-- ACTUAL FILTERSS -->
+              <div id="filters" class="bg-gray-900 shadow-info filter-container m-3 rounded-3" style="z-index: 1;background-color: #f5f5f5; 
+                padding: 10px;
+                margin: 5px;
+                /* margin-bottom: 10px; */
+                ">
+                  {% for col in columns %}
+                  <div class="filter-control" data-col="{{ col.name }}">
+                    <label for="filter-{{ col.name }}">{{ col.label }}</label>
+                
+                    {% if col.filter_type == 'select' %}
+                      <select id="filter-{{ col.name }}"
+                              data-col="{{ col.name }}">
+                        <option value="">All</option>
+                        {% for opt in col.options %}
+                          <option value="{{ opt }}">{{ opt }}</option>
+                        {% endfor %}
+                      </select>
+                
+                    {% elif col.filter_type == 'range' %}
+                      <input type="number"
+                             id="filter-{{ col.name }}_min"
+                             data-col="{{ col.name }}_min"
+                             placeholder="Min"/>
+                      <input type="number"
+                             id="filter-{{ col.name }}_max"
+                             data-col="{{ col.name }}_max"
+                             placeholder="Max"/>
+                
+                    {% elif col.filter_type == 'date' %}
+                      <input type="date"
+                             id="filter-{{ col.name }}"
+                             data-col="{{ col.name }}"/>
+                
+                    {% else %}
+                      <input type="text"
+                             id="filter-{{ col.name }}"
+                             data-col="{{ col.name }}"
+                             placeholder="Search…"/>
+                    {% endif %}
+                  </div>
+                  {% endfor %}  
+                  {% block button_submit %}
+                  {% endblock %}                                      
+              </div>
+              {% endblock %}
+
+              {% block bulkupdate %}
+              {% endblock %}
+
+              <div id="show_submited_data" class="shadow-success border-radius-lg mb-3 ms-3">
+                <div class=" py-2 backgroundColor text-dark ">
+                  <div class="p-0 table-responsive">
+                  {% block content %}  
+                    <table id="myTable" class="table align-items-center mb-0 table-responsive ">
+                      <thead>
+                        <tr>
+                          {% for col in columns %}
+                            <th data-col="{{ col.name }}">{{ col.label }}</th>
+                          {% endfor %}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for row in rows %}
+                          <tr>
+                            {% for col in columns %}
+                              <td class="col-{{col.name}}">{{ row|attr(col.name) }}</td>
+                            {% endfor %}
+                          </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  {% endblock %}     
+                  </div>         
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% include 'footer_credits.html' %}
+    </div>
+  </main>
+  
+
+  <!-- Core JS Files -->
+  <!-- <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script> -->
+   
+
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+  <script src="/static/js/core/popper.min.js"></script>
+  <script src="/static/js/core/bootstrap.min.js"></script>
+  <script src="/static/js/plugins/perfect-scrollbar.min.js"></script>
+  <script src="/static/js/plugins/smooth-scrollbar.min.js"></script>
+  <script src="/static/js/generalScripts.js"></script>
+
+
+  {% block script_filters %}
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const table        = document.getElementById('myTable');
+    const filtersDiv   = document.getElementById('filters');
+    const filterCtrls  = filtersDiv.querySelectorAll('[data-col]');
+
+    // map column key → its index
+    const headerCells = table.tHead.rows[0].cells;
+    const colIndex = {};
+    Array.from(headerCells).forEach((th, i) => {
+      if (th.dataset.col) colIndex[th.dataset.col] = i;
+    });
+
+    let timeout;
+    filtersDiv.addEventListener('input', () => {
+      clearTimeout(timeout);
+      timeout = setTimeout(runFilters, 200);
+    });
+    filtersDiv.addEventListener('change', runFilters);
+
+    function runFilters() {
+      // build an object of filter criteria
+      const criteria = {};
+      filterCtrls.forEach(ctrl => {
+        const key = ctrl.dataset.col;
+        const val = ctrl.value;
+        if (!val) return;
+
+        if (key.endsWith('_min') || key.endsWith('_max')) {
+          const base = key.replace(/_(min|max)$/, '');
+          criteria[base] = criteria[base] || {};
+          criteria[base][ key.endsWith('_min') ? 'min' : 'max' ] = parseFloat(val);
+        }
+        else {
+          criteria[key] = val;
+        }
+      });
+
+      // run each row through the filters
+      Array.from(table.tBodies[0].rows).forEach(row => {
+        let show = true;
+
+        for (let [col, crit] of Object.entries(criteria)) {
+          const idx  = colIndex[col];
+          const cell = row.cells[idx];
+          if (!cell) continue;
+
+          // 1) if there's an <input>, <select> or <textarea>, read its .value()
+          let cellValue = '';
+          const ctl = cell.querySelector('input, select, textarea');
+          if (ctl) {
+            cellValue = ctl.value.trim();
+          } else {
+            cellValue = cell.textContent.trim();
+          }
+
+          // 2) apply the right kind of test
+          if (typeof crit === 'object') {
+            // numeric range
+            const num = parseFloat(cellValue) || 0;
+            if ((crit.min != null && num < crit.min) ||
+                (crit.max != null && num > crit.max)) {
+              show = false;
+            }
+          }
+          else if (/^\d{4}-\d{2}-\d{2}$/.test(crit)) {
+            // exact date match (ISO yyyy-MM-dd)
+            if (cellValue !== crit) show = false;
+          }
+          else {
+            // substring match (case-insensitive)
+            if (!cellValue.toLowerCase().includes(crit.toLowerCase())) {
+              show = false;
+            }
+          }
+
+          if (!show) break;
+        }
+
+        row.style.display = show ? '' : 'none';
+      });
+    }
+  });
+  </script>
+  {% endblock %}
+
+  {% block script_columns_toggle %}
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1) Column toggles
+      document.querySelectorAll('.col-toggle').forEach(cb => {
+        const col = cb.dataset.col;
+        // restore from localStorage if you like, otherwise default 'checked'
+        const stored = localStorage.getItem(`colvis:${col}`);
+        if (stored !== null) cb.checked = stored === '1';
+    
+        function apply() {
+          document.querySelectorAll(`.col-${col}`).forEach(el => {
+            el.style.display = cb.checked ? '' : 'none';
+          });
+          // also hide/show the <th>
+          document.querySelectorAll(`th[data-col="${col}"]`).forEach(th => {
+            th.style.display = cb.checked ? '' : 'none';
+          });
+          localStorage.setItem(`colvis:${col}`, cb.checked ? '1' : '0');
+        }
+    
+        cb.addEventListener('change', apply);
+        apply();
+      });
+    
+      // // 2) Filter toggles
+      // document.querySelectorAll('.filter-toggle').forEach(cb => {
+      //   const col = cb.dataset.col;
+      //   // restore state if desired
+      //   const stored = localStorage.getItem(`filtvis:${col}`);
+      //   if (stored !== null) cb.checked = stored === '1';
+    
+      //   function apply() {
+      //     const ctrl = document.querySelector(`[data-col="${col}"]`);
+      //     if (ctrl) ctrl.closest('div').style.display = cb.checked ? '' : 'none';
+      //     localStorage.setItem(`filtvis:${col}`, cb.checked ? '1' : '0');
+      //   }
+    
+      //   cb.addEventListener('change', apply);
+      //   apply();
+      // });
+    });
+  </script>
+  {% endblock %}
+
+  {% block script_filters_toggle %}
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // cache the filters container
+      const filtersDiv = document.getElementById('filters');
+
+      // find all the checkboxes in the dropdown
+      document.querySelectorAll('.filter-toggle').forEach(cb => {
+        const col = cb.dataset.col;
+
+        // restore saved visibility, if any
+        const stored = localStorage.getItem(`filtvis:${col}`);
+        if (stored !== null) cb.checked = stored === '1';
+
+        // the matching filter-control div
+        const control = filtersDiv.querySelector(`.filter-control[data-col="${col}"]`);
+
+        function apply() {
+          if (control) {
+            control.style.display = cb.checked ? '' : 'none';
+          }
+          localStorage.setItem(`filtvis:${col}`, cb.checked ? '1' : '0');
+        }
+
+        cb.addEventListener('change', apply);
+        apply();
+      });
+    });
+  </script>
+  {% endblock %}
+
+  {% block vertical_hover_script %}
+  <script>
+    const table = document.getElementById('myTable');
+    table.querySelectorAll('tbody td').forEach(td => {
+      td.addEventListener('mouseenter', () => {
+        const idx = Array.from(td.parentElement.children).indexOf(td) + 1;
+        table.querySelectorAll('tr').forEach(tr => {
+          const cell = tr.querySelector('th:nth-child(' + idx + '), td:nth-child(' + idx + ')');
+          if (cell) cell.classList.add('hover-column');
+        });
+      });
+      td.addEventListener('mouseleave', () => {
+        const idx = Array.from(td.parentElement.children).indexOf(td) + 1;
+        table.querySelectorAll('tr').forEach(tr => {
+          const cell = tr.querySelector('th:nth-child(' + idx + '), td:nth-child(' + idx + ')');
+          if (cell) cell.classList.remove('hover-column');
+        });
+      });
+    });
+  </script>
+  {% endblock %}
+
+  <!-- script to make shadow dom and add side bar and some style sheet and js for side bars -->
+  <script>
+    const tmpl = document.getElementById('sidebar-template');
+    
+    class MySidebar extends HTMLElement {
+      constructor() {
+        super();
+        const shadow = this.attachShadow({ mode: 'open' });
+    
+        // inject CSS, stamp template…
+        //const link = document.createElement('link');
+        //link.rel = 'stylesheet';
+        //link.href = '/static/css/index.css';
+        //shadow.appendChild(link);
+        
+        // 2) inject Bootstrap into the shadow as well
+        //const bs = document.createElement('link');
+        //bs.rel       = 'stylesheet';
+        //bs.href      = 'https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css';
+        //bs.integrity = 'sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC';
+        //bs.crossOrigin = 'anonymous';
+        //shadow.appendChild(bs);
+    
+        // 2) stamp in the template
+        shadow.appendChild(tmpl.content.cloneNode(true));
+
+        // grab the parts we need
+        // grab your button and sidebar host
+        this.toggleBtn  = shadow.getElementById('toggle-btn');
+        this.sidebarEl = shadow.querySelector('.sidebar');
+        
+      }
+    
+      connectedCallback() {
+        // main toggle
+        this.toggleBtn.addEventListener('click', () => this.toggleSidebar());
+
+    
+        // submenu toggles
+        this.shadowRoot.querySelectorAll('.dropdown-btn')
+          .forEach(btn =>
+            btn.addEventListener('click', () => this.toggleSubMenu(btn))
+          );
+      }
+    
+      toggleSidebar() {
+        this.sidebarEl.classList.toggle('close');
+        this.toggleBtn.classList.toggle('rotate');
+        this.closeAllSubMenus();
+      }
+    
+      toggleSubMenu(button) {
+        //console.log("true")
+        const submenu = button.nextElementSibling;
+        if (!submenu.classList.contains('show')) {
+          this.closeAllSubMenus();
+        }
+        submenu.classList.toggle('show');
+        button.classList.toggle('rotate');
+    
+        if (this.classList.contains('close')) {
+          this.toggleSidebar();  // reopen if it was closed
+        }
+      }
+    
+      closeAllSubMenus() {
+        this.shadowRoot.querySelectorAll('.submenu.show').forEach(ul => {
+          ul.classList.remove('show');
+          ul.previousElementSibling.classList.remove('rotate');
+        });
+      }
+    }
+    
+    customElements.define('my-sidebar', MySidebar);
+    
+  </script>
+  
+  <!-- DARK /LIGHT switch -->
+  <script>
+    (function(){
+      const btn   = document.getElementById('theme-toggler');
+      const body  = document.getElementById('app-body');
+      const sidebar = document.querySelector('my-sidebar');
+      const filterContainer = document.getElementById('filters');
+    
+      btn.addEventListener('click', () => {
+        // decide the new theme
+        const isDark = body.classList.toggle('dark-version');
+        // remove/add the other mode
+        body.classList.toggle('light-version', !isDark);
+        // also toggle bg-gray-900 on body
+        body.classList.toggle('bg-gray-900', isDark);
+        // toggle dark-version on the sidebar host
+        sidebar.classList.toggle('dark-version', isDark);
+
+        filterContainer.classList.toggle('bg-gray-900', isDark);
+    
+        // update button text
+        btn.textContent = isDark
+          ? 'Switch to light mode'
+          : 'Switch to dark mode';
+    
+        // persist on server
+        fetch('{{ url_for("main.set_theme") }}', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({theme: isDark?'dark':'light'})
+        });
+      });
+    })();
+  </script>
+
+  <!-- Date restrict t 2 years current and next -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const today = new Date();
+      const y     = today.getFullYear();
+      const min   = `${y}-01-01`;
+      const max   = `${y + 1}-12-31`;
+
+      document.querySelectorAll('input[type="date"]').forEach(inp => {
+        // only set min/max if the field is blank
+        if (!inp.value) {
+          inp.min = min;
+          inp.max = max;
+        }
+      });
+    });
+  </script>
+
+
+  {% block script_extra %}
+  {% endblock %}
+</body>
+</html>
